@@ -1,0 +1,86 @@
+name: Build
+
+# Every push: test sysq, sysact and HeadroomKit, and build the app. A push to main also publishes
+# it as a GitHub release, which is what the app's Update and install.sh download.
+#
+# Nothing depends on this workflow: if GitHub Actions is unavailable (or a commit has no release),
+# the app's updater and install.sh download the source and build it on the Mac instead.
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  # The logic that runs anywhere, on Linux (cheap and quick).
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+          cache-dependency-path: |
+            sysq/go.sum
+            sysact/go.sum
+      - name: sysq
+        working-directory: sysq
+        run: |
+          go vet ./...
+          go test ./...
+      - name: sysact
+        working-directory: sysact
+        run: |
+          go vet ./...
+          go test ./...
+      - uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.1"
+      - name: HeadroomKit
+        run: swift test --package-path headroom/HeadroomKit
+
+  build:
+    runs-on: macos-15
+    env:
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+          cache-dependency-path: |
+            sysq/go.sum
+            sysact/go.sum
+      - run: swift --version && go version
+      # On macOS this includes the seatbelt write-, network- and read-denial tests.
+      - name: Test sysq
+        working-directory: sysq
+        run: go test ./...
+      - name: Test sysact
+        working-directory: sysact
+        run: go test ./...
+      - name: Test HeadroomKit
+        run: swift test --package-path headroom/HeadroomKit
+      - name: Build the app
+        run: |
+          echo "VERSION=0.1.${{ github.run_number }}" >> "$GITHUB_ENV"
+          VERSION="0.1.${{ github.run_number }}" BRANCH="${{ github.ref_name }}" headroom/scripts/build-app.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Headroom
+          path: headroom/build/Headroom.zip
+      - name: Release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # A re-run keeps its run number, so the release may already be there: replace its zip.
+        run: |
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            gh release upload "v$VERSION" headroom/build/Headroom.zip --clobber
+          else
+            gh release create "v$VERSION" headroom/build/Headroom.zip --target "$GITHUB_SHA" \
+              --title "Headroom $VERSION" --notes "$(git log -1 --format=%B)"
+          fi

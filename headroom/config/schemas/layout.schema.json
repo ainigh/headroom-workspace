@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Headroom layout.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "key_groups": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "enum": [
+            "pinned",
+            "auto"
+          ]
+        },
+        "pinned": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "string"
+          }
+        },
+        "auto_hold_minutes": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "group_order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hidden_groups": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "panel": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "always_on_top": {
+          "type": "boolean"
+        },
+        "remember_position": {
+          "type": "boolean"
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
+    "menu_bar_readout": {
+      "type": "string",
+      "pattern": "^(none|worst|[a-z][a-z0-9_]*\\.headline)$"
+    }
+  }
+}

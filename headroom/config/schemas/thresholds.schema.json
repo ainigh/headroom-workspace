@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Headroom thresholds.yaml",
+  "type": "object",
+  "required": [
+    "version"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    }
+  },
+  "additionalProperties": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "amber",
+      "red"
+    ],
+    "properties": {
+      "metric": {
+        "type": "string"
+      },
+      "amber": {
+        "oneOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "string",
+            "pattern": "^[0-9.]+\\s*([KMGT]i?B|B)?(/s)?$"
+          }
+        ]
+      },
+      "red": {
+        "oneOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "string",
+            "pattern": "^[0-9.]+\\s*([KMGT]i?B|B)?(/s)?$"
+          }
+        ]
+      },
+      "direction": {
+        "enum": [
+          "up",
+          "down"
+        ]
+      }
+    }
+  }
+}

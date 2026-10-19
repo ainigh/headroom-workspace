@@ -1,4 +1,5 @@
 version: 1
+order: [view, optimize, deep_dive, repair]
 modes:
   view:
     label: View
@@ -8,21 +9,27 @@ modes:
     label: Optimize
     question: What can I reclaim or speed up right now, and what has the most impact?
     rank_by: reclaimable
+    tint: reclaimable
     groups:
       memory:   { recipes: [mem.inactive_holders], actions: [app.quit, mem.purge] }
-      storage:  { recipes: [disk.caches, disk.recent_big, disk.duplicates], actions: [fs.trash] }
-      local_ai: { recipes: [ai.idle_models, ai.stale_model_files], actions: [ai.ollama_unload] }
+      cpu:      { recipes: [proc.hogs], actions: [app.quit, app.force_quit] }
+      storage:  { recipes: [disk.caches, disk.recent_big, disk.duplicates], actions: [fs.trash, cache.clear] }
+      local_ai: { recipes: [ai.idle_models, ai.stale_model_files], actions: [ai.ollama_unload, ai.ollama_stop] }
   deep_dive:
     label: Deep Dive
     question: Explain what is driving the current usage and whether it is normal.
     history_range: 24h
+    consumers: 25
     groups:
       network: { recipes: [net.by_process, net.destinations] }
       cpu:     { recipes: [cpu.cores, proc.hogs] }
+      memory:  { recipes: [mem.detail, mem.inactive_holders] }
+      storage: { recipes: [disk.by_type, disk.recent_big] }
   repair:
     label: Repair
     question: Does anything look broken, stuck, or unhealthy, and how do I fix it?
+    tint: warnings
     groups:
-      storage: { recipes: [disk.health], actions: [disk.verify, spotlight.rebuild] }
+      storage: { recipes: [disk.health, backup.status], actions: [disk.verify, spotlight.rebuild, tm.start_backup] }
       memory:  { recipes: [mem.health] }
-      backup:  { recipes: [backup.status] }
+      cpu:     { recipes: [proc.zombies_orphans, logs.errors], actions: [app.force_quit] }

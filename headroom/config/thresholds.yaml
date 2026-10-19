@@ -1,5 +1,6 @@
 version: 1
-# amber/red boundaries; direction says whether higher is worse
+# amber/red boundaries per group, passed to its attention recipe; direction
+# says whether higher is worse (up) or lower is worse (down).
 memory:   { metric: pressure_pct, amber: 60,     red: 85,      direction: up }
 cpu:      { metric: load_pct,     amber: 70,     red: 90,      direction: up }
 gpu:      { metric: utilization,  amber: 80,     red: 95,      direction: up }

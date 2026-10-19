@@ -1,4 +1,5 @@
 version: 1
+# Refresh rates by state; Headroom writes these through to sysqd's schedules.
 rates:
   view_open:   { headline: 2s, detail: 5s, consumers: 5s }
   idle:        { headline: 30s, detail: 60s, consumers: 60s }

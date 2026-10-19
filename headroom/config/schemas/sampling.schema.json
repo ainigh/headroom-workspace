@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Headroom sampling.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "rates"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "rates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "view_open",
+        "idle"
+      ],
+      "properties": {
+        "view_open": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "headline": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            },
+            "detail": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            },
+            "consumers": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            }
+          }
+        },
+        "idle": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "headline": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            },
+            "detail": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            },
+            "consumers": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            }
+          }
+        },
+        "on_battery": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "headline": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            },
+            "detail": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            },
+            "consumers": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            }
+          }
+        }
+      }
+    },
+    "hidden_groups": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "headline": {
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+        },
+        "detail": {
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+        },
+        "consumers": {
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+        }
+      }
+    }
+  }
+}

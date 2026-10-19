@@ -1,0 +1,6 @@
+version: 1
+# Assistant turn log (everything except full messages). Summaries are kept
+# until you delete them (headroom-spec §8.10).
+assistant_log_days: 180
+# Graph ranges offered; longer ranges read sysq's downsampled tiers.
+graph_ranges: [5m, 1h, 24h, 7d]

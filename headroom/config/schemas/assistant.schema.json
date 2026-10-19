@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Headroom assistant.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "backend": {
+      "enum": [
+        "ollama"
+      ]
+    },
+    "ollama_url": {
+      "type": "string",
+      "pattern": "^http://(127\\.0\\.0\\.1|localhost)(:[0-9]+)?/?$"
+    },
+    "model": {
+      "type": "string"
+    },
+    "tools": {
+      "enum": [
+        "auto",
+        "on",
+        "off"
+      ]
+    },
+    "privacy_level": {
+      "enum": [
+        "aggregates",
+        "consumers",
+        "files"
+      ]
+    },
+    "summary_window": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 50
+    },
+    "action_requests": {
+      "type": "boolean"
+    },
+    "confirm_delay_seconds": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 30
+    },
+    "fuel_budget": {
+      "type": "integer",
+      "minimum": 10,
+      "maximum": 100000
+    },
+    "max_tool_calls": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "max_turn_seconds": {
+      "type": "number",
+      "minimum": 10,
+      "maximum": 1800
+    },
+    "narrative_range": {
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+    },
+    "system_prompt": {
+      "type": "string"
+    },
+    "request_template": {
+      "type": "string"
+    },
+    "unload_after_minutes": {
+      "type": "number",
+      "minimum": 0
+    }
+  }
+}
