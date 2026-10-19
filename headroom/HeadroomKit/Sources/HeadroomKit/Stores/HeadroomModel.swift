@@ -211,6 +211,22 @@ public final class HeadroomModel {
         setLayout { $0.orderText(ids) }
     }
 
+    /// Sets one top-level key in a config file (keeps comments), validated.
+    public func setTopLevel(_ file: String, key: String, value: String) -> ConfigProblem? {
+        let text = configStore.loader.text(of: file)
+        return configStore.save(file, text: LayoutEditor(text: text).replacing(key, indent: "", with: value))
+    }
+
+    /// Sets `parent.key` (block style) in a config file, validated.
+    public func setNested(_ file: String, parent: String, key: String, value: String) -> ConfigProblem? {
+        let text = configStore.loader.text(of: file)
+        return configStore.save(file, text: LayoutEditor(text: text).replacing(key, indent: "  ", with: value, under: parent))
+    }
+
+    public func setAlwaysOnTop(_ on: Bool) -> ConfigProblem? {
+        setLayout { $0.flagText("always_on_top", on, under: "panel") }
+    }
+
     func setLayout(_ edit: (LayoutEditor) -> String?) -> ConfigProblem? {
         let text = configStore.loader.text(of: "layout")
         guard let next = edit(LayoutEditor(text: text)) else { return nil }
@@ -254,4 +270,16 @@ public struct LayoutEditor: Sendable {
     }
 
     public func orderText(_ ids: [String]) -> String? { replacing("group_order", indent: "", with: list(ids)) }
+
+    /// Sets a boolean wherever the key is written (block or flow style),
+    /// else adds it under `parent`.
+    public func flagText(_ key: String, _ on: Bool, under parent: String) -> String? {
+        let pattern = "(\\b\(key):\\s*)(true|false)"
+        if let r = text.range(of: pattern, options: .regularExpression) {
+            let old = String(text[r])
+            let new = old.replacingOccurrences(of: "(true|false)$", with: on ? "true" : "false", options: .regularExpression)
+            return text.replacingCharacters(in: r, with: new)
+        }
+        return replacing(key, indent: "  ", with: on ? "true" : "false", under: parent)
+    }
 }

@@ -125,6 +125,9 @@ final class ViewModelTests: XCTestCase {
         XCTAssertEqual(e.pinnedText(["cpu", "memory", "network", "gpu", "extra"]),
                        "version: 1\nkey_groups:\n  mode: pinned          # pinned | auto\n  pinned: [cpu, memory, network, gpu]\n  auto_hold_minutes: 5\ngroup_order: [memory, cpu]\n")
         XCTAssertEqual(e.orderText(["cpu", "memory"])?.contains("group_order: [cpu, memory]\n"), true)
+        let flow = LayoutEditor(text: "version: 1\npanel: { always_on_top: false, remember_position: true }\n")
+        XCTAssertEqual(flow.flagText("always_on_top", true, under: "panel"), "version: 1\npanel: { always_on_top: true, remember_position: true }\n")
+        XCTAssertEqual(LayoutEditor(text: "version: 1\n").flagText("always_on_top", true, under: "panel"), "version: 1\n\npanel:\n  always_on_top: true")
     }
 
     func testCLIText() {

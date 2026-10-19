@@ -1,6 +1,9 @@
 import Foundation
 import Observation
 import Yams
+#if canImport(CoreServices)
+import CoreServices
+#endif
 
 /// A problem with one config file, shown as a non-blocking banner.
 public struct ConfigProblem: Sendable, Hashable, Identifiable {
@@ -253,6 +256,9 @@ public final class ConfigStore {
 
     @ObservationIgnored private var mtimes: [String: Date] = [:]
     @ObservationIgnored private var timer: Timer?
+    #if canImport(CoreServices)
+    @ObservationIgnored private var watcher: DirectoryWatcher?
+    #endif
 
     public init(loader: ConfigLoader) {
         self.loader = loader
@@ -281,15 +287,29 @@ public final class ConfigStore {
         return out
     }
 
-    /// Polls file modification times (cheap) and reloads on change.
+    /// Reloads when a file changes: FSEvents on the config folder on macOS
+    /// (implementation.md §2), a cheap mtime poll elsewhere. Either way the
+    /// reload only happens when an mtime actually changed.
     public func startWatching(every interval: TimeInterval = 2) {
-        timer?.invalidate()
+        stopWatching()
+        #if canImport(CoreServices)
+        watcher = DirectoryWatcher(paths: [loader.userDir.path]) { [weak self] in
+            Task { @MainActor in self?.checkForChanges() }
+        }
+        if watcher != nil { return }
+        #endif
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.checkForChanges() }
         }
     }
 
-    public func stopWatching() { timer?.invalidate(); timer = nil }
+    public func stopWatching() {
+        timer?.invalidate()
+        timer = nil
+        #if canImport(CoreServices)
+        watcher = nil
+        #endif
+    }
 
     public func checkForChanges() {
         if currentMtimes() != mtimes { reload() }
@@ -303,3 +323,35 @@ public final class ConfigStore {
         return p
     }
 }
+
+#if canImport(CoreServices)
+/// An FSEvents stream over a directory tree, delivering on the main queue.
+final class DirectoryWatcher {
+    private var stream: FSEventStreamRef?
+    private let callback: () -> Void
+
+    init?(paths: [String], latency: Double = 0.3, callback: @escaping () -> Void) {
+        self.callback = callback
+        var ctx = FSEventStreamContext(version: 0, info: nil, retain: nil, release: nil, copyDescription: nil)
+        ctx.info = Unmanaged.passUnretained(self).toOpaque()
+        let cb: FSEventStreamCallback = { _, info, _, _, _, _ in
+            guard let info else { return }
+            Unmanaged<DirectoryWatcher>.fromOpaque(info).takeUnretainedValue().callback()
+        }
+        let flags = FSEventStreamCreateFlags(kFSEventStreamCreateFlagFileEvents | kFSEventStreamCreateFlagNoDefer)
+        guard let s = FSEventStreamCreate(kCFAllocatorDefault, cb, &ctx, paths as CFArray,
+                                          FSEventStreamEventId(kFSEventStreamEventIdSinceNow), latency, flags) else { return nil }
+        stream = s
+        FSEventStreamSetDispatchQueue(s, DispatchQueue.main)
+        FSEventStreamStart(s)
+    }
+
+    deinit {
+        if let s = stream {
+            FSEventStreamStop(s)
+            FSEventStreamInvalidate(s)
+            FSEventStreamRelease(s)
+        }
+    }
+}
+#endif

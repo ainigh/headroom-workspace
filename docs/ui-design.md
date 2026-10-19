@@ -25,6 +25,7 @@ References `headroom-spec.md` for behavior. This document proposes the look, lay
 
 - Icon plus an optional readout chosen in settings (e.g. memory available, or the worst group's headline). Readout text turns amber/red with status.
 - Left click: toggle the small view. Right click: menu with mode switch, Open Large View, Graphs, Storage Explorer, Ask AI, Pause sampling, Settings, Quit.
+- As built (implementation.md §2 fixes `MenuBarExtra`, which can't tell left from right clicks): one menu whose first item toggles the small view, followed by the items above; ⌥⌘H toggles the small view from anywhere.
 
 ## 4. Small view (floating panel)
 
