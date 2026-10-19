@@ -212,7 +212,7 @@ type Typed struct {
 func bound(v any) Value {
 	switch x := v.(type) {
 	case Typed:
-		return Value{x.V, x.T}
+		return Value(x)
 	case nil:
 		return Value{nil, table.Str}
 	case int64:

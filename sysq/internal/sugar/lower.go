@@ -790,7 +790,7 @@ func (l *lowerer) joinStage(how string, args, end int) (string, error) {
 
 func (l *lowerer) groupStage(k int, sig []int, end int) (string, error) {
 	keysA, keysB := -1, -1
-	aggA, aggB := -1, -1
+	var aggA, aggB int
 	i := 0
 	if i < len(sig) && l.is(sig[i], "by") {
 		i++
