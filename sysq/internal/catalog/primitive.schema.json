@@ -43,7 +43,7 @@
       "type": "array",
       "items": { "$ref": "#/definitions/col" }
     },
-    "sandbox": { "enum": ["read-only-default", "read-only-network", "read-only-sudo"] },
+    "sandbox": { "enum": ["read-only-default", "read-only-network", "read-only-loopback", "read-only-sudo"] },
     "sandbox_exec": { "type": "array", "items": { "type": "string", "pattern": "^/" } },
     "cache_ttl": { "type": "string", "pattern": "^[0-9]+(ms|s|m|h)$" },
     "requires_sudo": {
@@ -112,7 +112,8 @@
         "required": { "type": "boolean" },
         "doc": { "type": "string" },
         "allow_dash": { "type": "boolean" },
-        "render": { "enum": ["seconds", "minutes", "log", "bytes", "kilobytes", "find_k"] },
+        "render": { "enum": ["seconds", "minutes", "log", "find_mtime", "bytes", "kilobytes", "find_k"] },
+        "within": { "type": "array", "items": { "type": "string", "pattern": "^(~|/)" } },
         "must_exist": { "type": "boolean" },
         "dialect": { "enum": ["nspredicate", "mdquery"] },
         "fields": { "type": "object", "additionalProperties": { "type": "string" } }

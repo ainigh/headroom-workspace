@@ -1,0 +1,14 @@
+name: net.firewall
+doc: Application firewall state and stealth mode.
+cost: cheap
+sensitivity: public
+commands:
+  - { id: state, argv: ["/usr/libexec/ApplicationFirewall/socketfilterfw", "--getglobalstate"] }
+  - { id: stealth, argv: ["/usr/libexec/ApplicationFirewall/socketfilterfw", "--getstealthmode"], optional: true }
+parser: firewall
+timeout: 5s
+cache_ttl: 5m
+schema:
+  - { name: enabled, type: bool }
+  - { name: state,   type: int, doc: "0 off, 1 on, 2 block all incoming" }
+  - { name: stealth, type: bool }

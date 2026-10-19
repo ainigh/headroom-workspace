@@ -1,0 +1,12 @@
+name: users.list
+doc: Local user accounts with uid; system accounts (leading underscore or uid below 500) are flagged.
+cost: cheap
+sensitivity: personal
+argv: ["/usr/bin/dscl", ".", "list", "/Users", "UniqueID"]
+parser: dscl_users
+timeout: 5s
+cache_ttl: 10m
+schema:
+  - { name: name,   type: str }
+  - { name: uid,    type: uid }
+  - { name: system, type: bool }

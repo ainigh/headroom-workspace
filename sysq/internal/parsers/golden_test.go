@@ -23,6 +23,12 @@ func TestGoldenTables(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// Network primitives are off by policy; enable them for fixture parsing.
+	for _, p := range e.Catalog.All() {
+		if p.Network {
+			e.Policy.NetworkPrimitives = append(e.Policy.NetworkPrimitives, p.Name)
+		}
+	}
 	golden := filepath.Join(testenv.Root(), "tests", "golden")
 	for _, p := range e.Catalog.All() {
 		if p.Builtin != "" {

@@ -1,0 +1,12 @@
+name: sys.updates
+doc: Software update install history (history only; checking for updates needs the network and is not offered).
+cost: moderate
+sensitivity: public
+argv: ["/usr/sbin/softwareupdate", "--history"]
+parser: su_history
+timeout: 20s
+cache_ttl: 1h
+schema:
+  - { name: name,      type: str }
+  - { name: version,   type: str }
+  - { name: installed, type: ts }

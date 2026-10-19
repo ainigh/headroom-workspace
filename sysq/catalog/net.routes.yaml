@@ -1,0 +1,14 @@
+name: net.routes
+doc: IPv4 routing table.
+cost: cheap
+sensitivity: personal
+argv: ["/usr/sbin/netstat", "-rn", "-f", "inet"]
+parser: netstat_routes
+timeout: 5s
+cache_ttl: 30s
+schema:
+  - { name: destination, type: str }
+  - { name: gateway,     type: str }
+  - { name: flags,       type: str }
+  - { name: interface,   type: str }
+  - { name: expire,      type: str }

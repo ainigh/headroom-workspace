@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>kMDItemContentType</key>
+	<string>com.apple.disk-image-udif</string>
+	<key>kMDItemDateAdded</key>
+	<date>2026-10-19T05:41:09Z</date>
+	<key>kMDItemDisplayName</key>
+	<string>Xcode_26.dmg</string>
+	<key>kMDItemFSSize</key>
+	<integer>3500000000</integer>
+	<key>kMDItemWhereFroms</key>
+	<array>
+		<string>https://download.developer.apple.com/Developer_Tools/Xcode_26/Xcode_26.dmg</string>
+		<string>https://developer.apple.com/</string>
+	</array>
+	<key>kMDItemLastUsedDate</key>
+	<date>2026-10-19T05:50:12Z</date>
+</dict>
+</plist>

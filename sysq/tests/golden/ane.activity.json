@@ -1,0 +1,47 @@
+{
+  "schema": [
+    {
+      "name": "ane_mw",
+      "type": "float",
+      "unit": "mW"
+    },
+    {
+      "name": "gpu_mw",
+      "type": "float",
+      "unit": "mW"
+    },
+    {
+      "name": "cpu_mw",
+      "type": "float",
+      "unit": "mW"
+    },
+    {
+      "name": "combined_mw",
+      "type": "float",
+      "unit": "mW"
+    },
+    {
+      "name": "ane_active",
+      "type": "bool"
+    }
+  ],
+  "rows": [
+    [
+      845,
+      6120,
+      4213,
+      11178,
+      true
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "ane.activity"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

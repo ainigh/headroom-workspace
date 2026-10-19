@@ -1,0 +1,71 @@
+{
+  "schema": [
+    {
+      "name": "path",
+      "type": "path"
+    },
+    {
+      "name": "name",
+      "type": "str"
+    },
+    {
+      "name": "size",
+      "type": "bytes"
+    },
+    {
+      "name": "modified",
+      "type": "ts"
+    },
+    {
+      "name": "owner",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      "/Users/me/.ollama/models/blobs/sha256-e796792eba26c4d3b04b0ac5adb01a453dd9ec2dfd83b6c59cbf6fe5f30b0f68",
+      "sha256-e796792eba26c4d3b04b0ac5adb01a453dd9ec2dfd83b6c59cbf6fe5f30b0f68",
+      19999999488,
+      "2026-10-12T14:55:00-07:00",
+      "me"
+    ],
+    [
+      "/Users/me/.ollama/models/blobs/sha256-3a43f93b78ec50f7c4e4dc8bd1cb3fff5a900e7d574c51a6f7495e48486e0dac",
+      "sha256-3a43f93b78ec50f7c4e4dc8bd1cb3fff5a900e7d574c51a6f7495e48486e0dac",
+      16000000000,
+      "2026-09-30T09:10:00-07:00",
+      "me"
+    ],
+    [
+      "/Users/me/Downloads/Xcode_26.dmg",
+      "Xcode_26.dmg",
+      3500000000,
+      "2026-10-18T22:41:00-07:00",
+      "me"
+    ],
+    [
+      "/Users/me/Library/Developer/CoreSimulator/Volumes/iOS_23A343/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/dyld/dyld_sim_shared_cache_arm64e",
+      "dyld_sim_shared_cache_arm64e",
+      2200000000,
+      "2026-08-21T19:03:00-07:00",
+      "me"
+    ],
+    [
+      "/Users/me/Movies/Family Trip 2024.mov",
+      "Family Trip 2024.mov",
+      1200000000,
+      "2025-03-03T00:00:00-08:00",
+      "me"
+    ]
+  ],
+  "meta": {
+    "rows": 5,
+    "truncated": false,
+    "source": [
+      "fs.large"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

@@ -1,0 +1,25 @@
+name: fs.recent
+doc: Files modified within a recent window under a root (optionally above a size), newest first.
+params:
+  path:     { type: path, default: "~", must_exist: true }
+  since:    { type: duration, default: 1d, min: 1, max: 31536000, render: find_mtime }
+  min_size: { type: bytes, min: 1024, render: find_k }
+  limit:    { type: int, default: 50, min: 1, max: 500 }
+cost: expensive
+sensitivity: personal
+argv: ["/usr/bin/find", "{path}", "-xdev", "-type", "f", "-mtime", "{since}", ["-size", "{min_size}"], "-ls"]
+allow_exit: [1]
+parser: find_ls_recent
+timeout: 20s
+partial_ok: true
+cache_ttl: 5m
+pushdown:
+  filter: { bounds: [{ column: size, ops: [">", ">="], param: min_size }] }
+  limit: limit
+fixture_params: { path: "~/Downloads", since: 7d }
+schema:
+  - { name: path,     type: path }
+  - { name: name,     type: str }
+  - { name: size,     type: bytes }
+  - { name: modified, type: ts }
+  - { name: owner,    type: str }

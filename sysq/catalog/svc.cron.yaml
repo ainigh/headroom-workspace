@@ -1,0 +1,13 @@
+name: svc.cron
+doc: This user's crontab entries.
+cost: cheap
+sensitivity: personal
+argv: ["/usr/bin/crontab", "-l"]
+allow_exit: [1]
+parser: crontab
+timeout: 3s
+cache_ttl: 1m
+redact: true
+schema:
+  - { name: schedule, type: str }
+  - { name: command,  type: str }

@@ -146,3 +146,32 @@ func FuzzValidateBuild(f *testing.F) {
 		}
 	})
 }
+
+func TestWithinRoots(t *testing.T) {
+	home := t.TempDir()
+	home, _ = filepath.EvalSymlinks(home)
+	if err := os.MkdirAll(filepath.Join(home, "Library", "Logs"), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(home, "Documents"), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	pol := RootPolicy{Home: home, Allowed: []string{"~"}}
+	specs := map[string]Spec{"path": {Type: TPath, Within: []string{"~/Library/Logs", "/private/var/log"}}}
+	for _, bad := range []string{"~/Library/Logs/../../Documents/x", "~/Documents/x", "~/Library/LogsX/y"} {
+		if _, err := Validate(specs, map[string]any{"path": bad}, pol); !errors.Is(err, ErrInvalid) {
+			t.Errorf("%s accepted: %v", bad, err)
+		}
+	}
+	v, err := Validate(specs, map[string]any{"path": "~/Library/Logs/app.log"}, pol)
+	if err != nil || v["path"].Text != filepath.Join(home, "Library/Logs/app.log") {
+		t.Fatalf("%v %+v", err, v)
+	}
+}
+
+func TestFindMtimeRender(t *testing.T) {
+	v, err := Validate(map[string]Spec{"since": {Type: TDuration, Render: "find_mtime"}}, map[string]any{"since": "2h"}, nil)
+	if err != nil || v["since"].Text != "-7200s" {
+		t.Fatalf("%v %+v", err, v)
+	}
+}

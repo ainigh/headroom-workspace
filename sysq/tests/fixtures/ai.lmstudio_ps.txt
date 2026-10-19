@@ -1,0 +1,1 @@
+[{"identifier":"qwen2.5-7b-instruct","modelKey":"qwen2.5-7b-instruct","path":"lmstudio-community/Qwen2.5-7B-Instruct-GGUF/Qwen2.5-7B-Instruct-Q4_K_M.gguf","sizeBytes":4683073536,"type":"llm"}]

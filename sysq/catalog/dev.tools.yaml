@@ -1,0 +1,20 @@
+name: dev.tools
+doc: Versions of installed developer toolchains (git, go, node, python3, rustc, swift, docker); missing tools are left out.
+cost: moderate
+sensitivity: public
+commands:
+  - { id: git, argv: ["{binary}", "--version"], binary_paths: ["/opt/homebrew/bin/git", "/usr/local/bin/git", "/Library/Developer/CommandLineTools/usr/bin/git", "/Applications/Xcode.app/Contents/Developer/usr/bin/git"], optional: true }
+  - { id: go, argv: ["{binary}", "version"], binary_paths: ["/opt/homebrew/bin/go", "/usr/local/go/bin/go", "/usr/local/bin/go"], optional: true }
+  - { id: node, argv: ["{binary}", "--version"], binary_paths: ["/opt/homebrew/bin/node", "/usr/local/bin/node"], optional: true }
+  - { id: python3, argv: ["{binary}", "--version"], binary_paths: ["/opt/homebrew/bin/python3", "/usr/local/bin/python3", "/Library/Developer/CommandLineTools/usr/bin/python3"], optional: true }
+  - { id: rustc, argv: ["{binary}", "--version"], binary_paths: ["/opt/homebrew/bin/rustc", "/usr/local/bin/rustc"], optional: true }
+  - { id: swift, argv: ["{binary}", "--version"], binary_paths: ["/Library/Developer/CommandLineTools/usr/bin/swift", "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift"], optional: true }
+  - { id: docker, argv: ["{binary}", "--version"], binary_paths: ["/usr/local/bin/docker", "/opt/homebrew/bin/docker", "/Applications/Docker.app/Contents/Resources/bin/docker"], optional: true }
+parser: tool_versions
+timeout: 10s
+cache_ttl: 1h
+sandbox_exec: ["/Library/Developer/CommandLineTools/", "/Applications/Xcode.app/Contents/Developer/"]
+schema:
+  - { name: tool,    type: str }
+  - { name: version, type: str }
+  - { name: raw,     type: str }

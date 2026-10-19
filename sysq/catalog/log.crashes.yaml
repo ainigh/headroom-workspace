@@ -1,0 +1,18 @@
+name: log.crashes
+doc: Crash, hang and diagnostic reports written recently, with the process name and time from each report's file name.
+params:
+  dir:   { type: path, default: "~/Library/Logs/DiagnosticReports", within: ["~/Library/Logs", "/Library/Logs"] }
+  since: { type: duration, default: 7d, min: 60, max: 31536000, render: find_mtime }
+cost: moderate
+sensitivity: personal
+argv: ["/usr/bin/find", "{dir}", "-type", "f", "-mtime", "{since}", "-ls"]
+allow_exit: [1]
+parser: crash_reports
+timeout: 10s
+cache_ttl: 1m
+schema:
+  - { name: process, type: str }
+  - { name: ts,      type: ts }
+  - { name: kind,    type: str, doc: "file extension: ips, crash, hang, spin, diag" }
+  - { name: size,    type: bytes }
+  - { name: path,    type: path }

@@ -1,0 +1,58 @@
+{
+  "schema": [
+    {
+      "name": "process",
+      "type": "str"
+    },
+    {
+      "name": "ts",
+      "type": "ts"
+    },
+    {
+      "name": "kind",
+      "type": "str",
+      "doc": "file extension: ips, crash, hang, spin, diag"
+    },
+    {
+      "name": "size",
+      "type": "bytes"
+    },
+    {
+      "name": "path",
+      "type": "path"
+    }
+  ],
+  "rows": [
+    [
+      "Google Chrome Helper (Renderer)",
+      "2026-10-18T22:15:01-07:00",
+      "ips",
+      44876,
+      "/Users/me/Library/Logs/DiagnosticReports/Google Chrome Helper (Renderer)-2026-10-18-221501.ips"
+    ],
+    [
+      "photoanalysisd",
+      "2026-10-17T09:02:11-07:00",
+      "ips",
+      11234,
+      "/Users/me/Library/Logs/DiagnosticReports/photoanalysisd-2026-10-17-090211.ips"
+    ],
+    [
+      "Xcode",
+      "2026-10-15T13:44:02-07:00",
+      "hang",
+      60321,
+      "/Users/me/Library/Logs/DiagnosticReports/Xcode_2026-10-15-134402_MacBook-Pro.hang"
+    ]
+  ],
+  "meta": {
+    "rows": 3,
+    "truncated": false,
+    "source": [
+      "log.crashes"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

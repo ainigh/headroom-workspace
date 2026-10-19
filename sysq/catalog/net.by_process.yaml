@@ -1,0 +1,14 @@
+name: net.by_process
+doc: Bytes in and out per process from one nettop sample (cumulative while each process has had sockets; sample twice for rates). nettop needs network statistics access that the seatbelt may restrict.
+cost: moderate
+sensitivity: personal
+argv: ["/usr/bin/nettop", "-P", "-L", "1", "-J", "bytes_in,bytes_out", "-x"]
+parser: nettop_csv
+timeout: 8s
+cache_ttl: 2s
+schema:
+  - { name: command,   type: str }
+  - { name: pid,       type: pid }
+  - { name: bytes_in,  type: bytes }
+  - { name: bytes_out, type: bytes }
+  - { name: bytes,     type: bytes }

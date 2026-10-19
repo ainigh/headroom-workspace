@@ -8,3 +8,4 @@
  3320 /System/Library/PrivateFrameworks/PhotoAnalysis.framework/Versions/A/Support/photoanalysisd
  4011 /usr/bin/curl
  4100 /Applications/Headroom.app/Contents/MacOS/Headroom
+ 4380 <defunct>

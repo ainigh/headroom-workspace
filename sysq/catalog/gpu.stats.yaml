@@ -1,0 +1,16 @@
+name: gpu.stats
+doc: GPU utilization (device, renderer, tiler) and GPU memory in use, from IOAccelerator performance statistics.
+cost: cheap
+sensitivity: public
+argv: ["/usr/sbin/ioreg", "-r", "-d", "1", "-c", "IOAccelerator"]
+parser: ioreg_gpu
+timeout: 5s
+cache_ttl: 2s
+schema:
+  - { name: model,       type: str }
+  - { name: cores,       type: int }
+  - { name: utilization, type: float, unit: "%" }
+  - { name: renderer,    type: float, unit: "%" }
+  - { name: tiler,       type: float, unit: "%" }
+  - { name: in_use_mem,  type: bytes }
+  - { name: alloc_mem,   type: bytes }

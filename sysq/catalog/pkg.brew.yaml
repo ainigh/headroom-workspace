@@ -1,0 +1,16 @@
+name: pkg.brew
+doc: Installed Homebrew formulae and casks read from the Cellar and Caskroom (brew itself is never run).
+cost: cheap
+sensitivity: public
+commands:
+  - { id: cellar, argv: ["/usr/bin/find", "/opt/homebrew/Cellar", "/usr/local/Cellar", "-mindepth", "2", "-maxdepth", "2", "-type", "d"], allow_exit: [1] }
+  - { id: caskroom, argv: ["/usr/bin/find", "/opt/homebrew/Caskroom", "/usr/local/Caskroom", "-mindepth", "2", "-maxdepth", "2", "-type", "d"], allow_exit: [1], optional: true }
+parser: brew_dirs
+timeout: 10s
+cache_ttl: 10m
+schema:
+  - { name: name,     type: str }
+  - { name: kind,     type: enum, values: [formula, cask] }
+  - { name: version,  type: str }
+  - { name: versions, type: int, doc: "versions of this package kept on disk" }
+  - { name: path,     type: path }

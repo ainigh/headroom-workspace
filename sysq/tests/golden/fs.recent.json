@@ -1,0 +1,57 @@
+{
+  "schema": [
+    {
+      "name": "path",
+      "type": "path"
+    },
+    {
+      "name": "name",
+      "type": "str"
+    },
+    {
+      "name": "size",
+      "type": "bytes"
+    },
+    {
+      "name": "modified",
+      "type": "ts"
+    },
+    {
+      "name": "owner",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      "/Users/me/Downloads/invoice-2026-10.pdf",
+      "invoice-2026-10.pdf",
+      301234,
+      "2026-10-19T08:59:00-07:00",
+      "me"
+    ],
+    [
+      "/Users/me/Downloads/Xcode_26.dmg",
+      "Xcode_26.dmg",
+      3500000000,
+      "2026-10-18T22:41:00-07:00",
+      "me"
+    ],
+    [
+      "/Users/me/Downloads/node-v24.9.0.pkg",
+      "node-v24.9.0.pkg",
+      16777216,
+      "2026-10-15T21:07:00-07:00",
+      "me"
+    ]
+  ],
+  "meta": {
+    "rows": 3,
+    "truncated": false,
+    "source": [
+      "fs.recent"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

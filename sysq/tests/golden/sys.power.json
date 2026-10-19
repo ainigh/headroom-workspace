@@ -1,0 +1,55 @@
+{
+  "schema": [
+    {
+      "name": "source",
+      "type": "enum",
+      "values": [
+        "ac",
+        "battery",
+        "ups"
+      ]
+    },
+    {
+      "name": "has_battery",
+      "type": "bool"
+    },
+    {
+      "name": "percent",
+      "type": "int",
+      "unit": "%"
+    },
+    {
+      "name": "state",
+      "type": "str",
+      "doc": "charging, discharging, charged, AC attached, finishing charge"
+    },
+    {
+      "name": "remaining",
+      "type": "duration"
+    },
+    {
+      "name": "low_power_mode",
+      "type": "bool"
+    }
+  ],
+  "rows": [
+    [
+      "ac",
+      true,
+      87,
+      "charging",
+      2520,
+      false
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "sys.power"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

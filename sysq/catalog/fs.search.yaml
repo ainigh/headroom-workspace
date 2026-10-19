@@ -1,0 +1,19 @@
+name: fs.search
+doc: Spotlight search within a scope. The query comes from a filter on name, kind or size (pushed into mdfind); a search with no filter is refused.
+params:
+  scope: { type: path, default: "~", must_exist: true }
+  where: { type: predicate, dialect: mdquery, fields: { name: kMDItemFSName, kind: kMDItemKind, size: kMDItemFSSize }, doc: "set by | filter name contains ..." }
+cost: moderate
+sensitivity: personal
+argv: ["/usr/bin/mdfind", "-onlyin", "{scope}", "{where}"]
+parser: path_lines
+timeout: 10s
+partial_ok: true
+cache_ttl: 1m
+pushdown:
+  filter: { predicate: where }
+fixture_params: { scope: "~" }
+schema:
+  - { name: path,   type: path }
+  - { name: name,   type: str }
+  - { name: parent, type: path }

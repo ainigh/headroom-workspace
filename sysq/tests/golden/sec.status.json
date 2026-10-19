@@ -1,0 +1,48 @@
+{
+  "schema": [
+    {
+      "name": "sip",
+      "type": "bool"
+    },
+    {
+      "name": "filevault",
+      "type": "bool"
+    },
+    {
+      "name": "gatekeeper",
+      "type": "bool"
+    },
+    {
+      "name": "sip_raw",
+      "type": "str"
+    },
+    {
+      "name": "filevault_raw",
+      "type": "str"
+    },
+    {
+      "name": "gatekeeper_raw",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      true,
+      true,
+      true,
+      "System Integrity Protection status: enabled.",
+      "FileVault is On.",
+      "assessments enabled"
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "sec.status"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

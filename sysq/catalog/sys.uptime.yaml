@@ -1,0 +1,11 @@
+name: sys.uptime
+doc: Boot time and uptime.
+cost: cheap
+sensitivity: public
+argv: ["/usr/sbin/sysctl", "-n", "kern.boottime"]
+parser: sys_uptime
+timeout: 3s
+cache_ttl: 1m
+schema:
+  - { name: booted, type: ts }
+  - { name: uptime, type: duration }

@@ -1,0 +1,43 @@
+{
+  "schema": [
+    {
+      "name": "path",
+      "type": "path"
+    },
+    {
+      "name": "name",
+      "type": "str"
+    },
+    {
+      "name": "parent",
+      "type": "path"
+    }
+  ],
+  "rows": [
+    [
+      "/Users/me/Documents/Invoices/invoice-2026-09.pdf",
+      "invoice-2026-09.pdf",
+      "/Users/me/Documents/Invoices"
+    ],
+    [
+      "/Users/me/Documents/Invoices/invoice-2026-10.pdf",
+      "invoice-2026-10.pdf",
+      "/Users/me/Documents/Invoices"
+    ],
+    [
+      "/Users/me/Downloads/invoice-2026-10.pdf",
+      "invoice-2026-10.pdf",
+      "/Users/me/Downloads"
+    ]
+  ],
+  "meta": {
+    "rows": 3,
+    "truncated": false,
+    "source": [
+      "fs.search"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

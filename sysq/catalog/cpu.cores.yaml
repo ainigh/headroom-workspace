@@ -1,0 +1,20 @@
+name: cpu.cores
+doc: CPU clusters (performance vs efficiency) with core counts and cache; load_pct is whole-CPU usage from top (per-cluster load needs powermetrics, which needs sudo).
+cost: moderate
+sensitivity: public
+commands:
+  - id: sysctl
+    argv: ["/usr/sbin/sysctl", "hw.nperflevels", "hw.perflevel0.name", "hw.perflevel0.logicalcpu", "hw.perflevel0.l2cachesize", "hw.perflevel1.name", "hw.perflevel1.logicalcpu", "hw.perflevel1.l2cachesize"]
+    allow_exit: [1]
+  - { id: top, argv: ["/usr/bin/top", "-l", "2", "-n", "0", "-s", "1"] }
+parser: cpu_cores
+timeout: 6s
+cache_ttl: 2s
+schema:
+  - { name: cluster,  type: str }
+  - { name: kind,     type: enum, values: [P, E] }
+  - { name: cores,    type: int }
+  - { name: l2_cache, type: bytes }
+  - { name: load_pct, type: float, unit: "%" }
+  - { name: user_pct, type: float, unit: "%" }
+  - { name: sys_pct,  type: float, unit: "%" }

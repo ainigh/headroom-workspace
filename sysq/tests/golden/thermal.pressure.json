@@ -1,0 +1,41 @@
+{
+  "schema": [
+    {
+      "name": "level",
+      "type": "int",
+      "doc": "0 nominal, 1 fair (Moderate), 2 serious (Heavy), 3 critical (Trapping/Sleeping) — same scale as sys.thermal"
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "values": [
+        "nominal",
+        "fair",
+        "serious",
+        "critical"
+      ]
+    },
+    {
+      "name": "pressure",
+      "type": "str",
+      "doc": "powermetrics' own word"
+    }
+  ],
+  "rows": [
+    [
+      0,
+      "nominal",
+      "Nominal"
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "thermal.pressure"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

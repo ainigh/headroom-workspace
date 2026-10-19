@@ -22,3 +22,45 @@ fixtures:
   sys.thermal: synthetic
   net.connections: synthetic
   proc.info: synthetic
+  sys.uptime: synthetic
+  sys.power: synthetic
+  fs.large: synthetic
+  fs.recent: synthetic
+  fs.stat: synthetic
+  fs.hash: synthetic
+  fs.search: synthetic
+  fs.meta: synthetic
+  fs.find_dirs: synthetic
+  tm.status: synthetic
+  svc.cron: synthetic
+  net.wifi: synthetic
+  net.dns: synthetic
+  net.routes: synthetic
+  net.firewall: synthetic
+  sec.status: synthetic
+  apps.installed: synthetic
+  pkg.brew: synthetic
+  pkg.npm_global: synthetic
+  dev.tools: synthetic
+  git.status: synthetic
+  git.log: synthetic
+  git.branches: synthetic
+  log.crashes: synthetic
+  log.file: synthetic
+  sys.updates: synthetic
+  prefs.read: synthetic
+  users.list: synthetic
+  gpu.stats: synthetic
+  ane.activity: synthetic
+  thermal.pressure: synthetic
+  cpu.cores: synthetic
+  thermal.state: synthetic
+  battery.state: synthetic
+  net.netstat: synthetic
+  net.by_process: synthetic
+  proc.energy: synthetic
+  ai.model_files: synthetic
+  ai.ollama_ps: synthetic
+  ai.lmstudio_ps: synthetic
+  disk.purgeable: synthetic
+  disk.io: synthetic

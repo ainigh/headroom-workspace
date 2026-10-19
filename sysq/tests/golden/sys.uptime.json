@@ -1,0 +1,28 @@
+{
+  "schema": [
+    {
+      "name": "booted",
+      "type": "ts"
+    },
+    {
+      "name": "uptime",
+      "type": "duration"
+    }
+  ],
+  "rows": [
+    [
+      "2026-10-05T08:01:12-07:00",
+      1219550
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "sys.uptime"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

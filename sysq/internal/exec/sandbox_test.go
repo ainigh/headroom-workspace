@@ -38,11 +38,15 @@ func TestProfilesDenyWritesAndNetwork(t *testing.T) {
 		if !strings.Contains(text, "(deny default)") {
 			t.Errorf("%s: missing (deny default)", name)
 		}
-		if name != "read-only-network" && !strings.Contains(text, "(deny network*)") {
+		netProfile := name == "read-only-network" || name == "read-only-loopback"
+		if !netProfile && !strings.Contains(text, "(deny network*)") {
 			t.Errorf("%s: network not denied", name)
 		}
-		if name == "read-only-network" && !strings.Contains(text, "(deny network-bind network-inbound)") {
+		if netProfile && !strings.Contains(text, "(deny network-bind network-inbound)") {
 			t.Errorf("%s: inbound not denied", name)
+		}
+		if name == "read-only-loopback" && (strings.Contains(text, "(allow network-outbound)") || !strings.Contains(text, `(allow network-outbound (remote ip "localhost:*"))`)) {
+			t.Errorf("%s: outbound not limited to loopback", name)
 		}
 		if !strings.Contains(text, "(deny user-preference-write)") {
 			t.Errorf("%s: preference writes not denied", name)

@@ -1,0 +1,8 @@
+Machine model: Mac16,7
+OS version: 25A362
+
+*** Sampled system activity (Mon Oct 19 10:47:02 2026 -0700) (1001.90ms elapsed) ***
+
+**** Thermal pressure ****
+
+Current pressure level: Nominal

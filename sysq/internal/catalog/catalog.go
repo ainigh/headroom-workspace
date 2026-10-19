@@ -365,11 +365,11 @@ func (p *Primitive) check() error {
 	if p.Sandbox == "" {
 		p.Sandbox = "read-only-default"
 	}
-	if p.Network && p.Sandbox != "read-only-network" {
-		return fmt.Errorf("network primitives must use the read-only-network profile")
+	if p.Network && p.Sandbox != "read-only-network" && p.Sandbox != "read-only-loopback" {
+		return fmt.Errorf("network primitives must use the read-only-network or read-only-loopback profile")
 	}
-	if !p.Network && p.Sandbox == "read-only-network" {
-		return fmt.Errorf("read-only-network profile requires network: true")
+	if !p.Network && (p.Sandbox == "read-only-network" || p.Sandbox == "read-only-loopback") {
+		return fmt.Errorf("%s profile requires network: true", p.Sandbox)
 	}
 	if p.RequiresSudo != nil && p.Sandbox != "read-only-sudo" {
 		return fmt.Errorf("sudo primitives must use the read-only-sudo profile")
@@ -447,8 +447,21 @@ func (p *Primitive) check() error {
 				}
 			}
 		}
-		if err := deniedFlags(first.Text, c.Argv); err != nil {
+		if filepath.Base(first.Text) == "sudo" {
+			if err := checkSudo(p, c); err != nil {
+				return fmt.Errorf("command %s: %w", c.ID, err)
+			}
+		} else if err := deniedFlags(first.Text, c.Argv); err != nil {
 			return fmt.Errorf("command %s: %w", c.ID, err)
+		}
+		// {binary}: the verb rules of every candidate binary apply too.
+		for _, b := range c.BinaryPaths {
+			if base := filepath.Base(b); base == "sh" || base == "bash" || base == "zsh" || base == "env" || base == "osascript" || base == "xargs" || base == "sudo" {
+				return fmt.Errorf("command %s: %s is not allowed as a primitive binary", c.ID, base)
+			}
+			if err := deniedFlags(b, c.Argv); err != nil {
+				return fmt.Errorf("command %s: %w", c.ID, err)
+			}
 		}
 	}
 	for _, col := range p.Schema {
@@ -462,6 +475,30 @@ func (p *Primitive) check() error {
 		}
 	}
 	return nil
+}
+
+// checkSudo allows /usr/bin/sudo only as `sudo -n <binary> <args...>`
+// exactly matching the primitive's requires_sudo rule, with no placeholders
+// (the sudoers rule names that exact binary and flags).
+func checkSudo(p *Primitive, c Command) error {
+	if p.RequiresSudo == nil {
+		return fmt.Errorf("sudo is only allowed for primitives with requires_sudo")
+	}
+	if c.Argv[0].Text != "/usr/bin/sudo" {
+		return fmt.Errorf("sudo must be /usr/bin/sudo")
+	}
+	want := append([]string{"-n", p.RequiresSudo.Binary}, p.RequiresSudo.Args...)
+	got := c.Argv[1:]
+	if len(got) != len(want) {
+		return fmt.Errorf("sudo argv must be exactly: sudo %s", strings.Join(want, " "))
+	}
+	for i, el := range got {
+		if el.Group != nil || el.Text != want[i] || len(argv.Names(el.Text)) > 0 {
+			return fmt.Errorf("sudo argv must be exactly: sudo %s", strings.Join(want, " "))
+		}
+	}
+	inner := append(Template{{Text: p.RequiresSudo.Binary}}, got[2:]...)
+	return deniedFlags(p.RequiresSudo.Binary, inner)
 }
 
 // deniedFlags refuses mutating or phoning-home verbs (design §6.1).

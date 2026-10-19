@@ -1,0 +1,16 @@
+name: net.wifi
+doc: Wi-Fi network name (when macOS reports it), address, router and hardware address.
+cost: cheap
+sensitivity: personal
+commands:
+  - { id: network, argv: ["/usr/sbin/networksetup", "-getairportnetwork", "en0"], allow_exit: [1] }
+  - { id: info, argv: ["/usr/sbin/networksetup", "-getinfo", "Wi-Fi"], optional: true }
+parser: net_wifi
+timeout: 5s
+cache_ttl: 30s
+schema:
+  - { name: ssid,      type: str }
+  - { name: connected, type: bool }
+  - { name: ip,        type: str }
+  - { name: router,    type: str }
+  - { name: mac,       type: str }

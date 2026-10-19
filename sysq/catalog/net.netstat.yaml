@@ -1,0 +1,18 @@
+name: net.netstat
+doc: Cumulative packets and bytes per network interface since boot (netstat -ib); sample twice for throughput.
+cost: cheap
+sensitivity: public
+argv: ["/usr/sbin/netstat", "-ib"]
+parser: netstat_ib
+timeout: 5s
+cache_ttl: 1s
+schema:
+  - { name: name,      type: str }
+  - { name: up,        type: bool }
+  - { name: mtu,       type: int }
+  - { name: ipkts,     type: int }
+  - { name: ibytes,    type: bytes }
+  - { name: ierrs,     type: int }
+  - { name: opkts,     type: int }
+  - { name: obytes,    type: bytes }
+  - { name: oerrs,     type: int }

@@ -1,0 +1,14 @@
+name: fs.hash
+doc: SHA-256 of one file (reads the whole file).
+params:
+  path: { type: path, required: true, must_exist: true }
+cost: expensive
+sensitivity: personal
+argv: ["/usr/bin/shasum", "-a", "256", "{path}"]
+parser: shasum
+timeout: 30s
+cache_ttl: 10m
+fixture_params: { path: "~/Downloads/Xcode_26.dmg" }
+schema:
+  - { name: path,   type: path }
+  - { name: sha256, type: str }

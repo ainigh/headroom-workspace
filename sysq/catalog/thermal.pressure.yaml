@@ -1,0 +1,15 @@
+name: thermal.pressure
+doc: Thermal pressure level from powermetrics (Nominal, Moderate, Heavy, Trapping, Sleeping). Needs a NOPASSWD sudoers rule for exactly this powermetrics command.
+cost: moderate
+sensitivity: public
+requires_sudo: { binary: /usr/bin/powermetrics, args: ["--samplers", "thermal", "-n", "1", "-i", "1000"] }
+argv: ["/usr/bin/sudo", "-n", "/usr/bin/powermetrics", "--samplers", "thermal", "-n", "1", "-i", "1000"]
+sandbox: read-only-sudo
+sandbox_exec: ["/usr/bin/powermetrics"]
+parser: powermetrics_thermal
+timeout: 6s
+cache_ttl: 5s
+schema:
+  - { name: level,    type: int, doc: "0 nominal, 1 fair (Moderate), 2 serious (Heavy), 3 critical (Trapping/Sleeping) — same scale as sys.thermal" }
+  - { name: state,    type: enum, values: [nominal, fair, serious, critical] }
+  - { name: pressure, type: str, doc: "powermetrics' own word" }

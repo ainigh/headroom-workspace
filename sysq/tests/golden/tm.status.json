@@ -1,0 +1,44 @@
+{
+  "schema": [
+    {
+      "name": "running",
+      "type": "bool"
+    },
+    {
+      "name": "phase",
+      "type": "str"
+    },
+    {
+      "name": "percent",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "last_backup",
+      "type": "ts"
+    },
+    {
+      "name": "hours_since_last_backup",
+      "type": "float"
+    }
+  ],
+  "rows": [
+    [
+      false,
+      "",
+      null,
+      "2026-10-18T22:15:01-07:00",
+      12.5
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "tm.status"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

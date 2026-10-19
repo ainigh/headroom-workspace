@@ -1,0 +1,52 @@
+{
+  "schema": [
+    {
+      "name": "disk",
+      "type": "str"
+    },
+    {
+      "name": "kb_per_transfer",
+      "type": "float"
+    },
+    {
+      "name": "tps",
+      "type": "float"
+    },
+    {
+      "name": "mb_per_s",
+      "type": "float",
+      "unit": "MB/s"
+    },
+    {
+      "name": "bytes_per_s",
+      "type": "bytes",
+      "unit": "/s"
+    }
+  ],
+  "rows": [
+    [
+      "disk0",
+      18.2,
+      45,
+      0.8,
+      838860
+    ],
+    [
+      "disk5",
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "meta": {
+    "rows": 2,
+    "truncated": false,
+    "source": [
+      "disk.io"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

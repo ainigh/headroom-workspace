@@ -95,7 +95,6 @@ func (lib *Library) Schema(fixtures *engine.Engine, name string) ([]map[string]a
 // ---- proposals --------------------------------------------------------------------
 
 var (
-	identRe  = regexp.MustCompile(`^[a-z][a-z0-9_]*$`)
 	tagRe    = regexp.MustCompile(`^[a-z0-9_-]{1,32}$`)
 	reserved = map[string]bool{"cost": true, "sensitivity": true}
 )

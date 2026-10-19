@@ -1,0 +1,18 @@
+name: sec.status
+doc: System Integrity Protection, FileVault and Gatekeeper status.
+cost: cheap
+sensitivity: public
+commands:
+  - { id: csrutil, argv: ["/usr/bin/csrutil", "status"], optional: true }
+  - { id: fdesetup, argv: ["/usr/bin/fdesetup", "status"], optional: true }
+  - { id: spctl, argv: ["/usr/sbin/spctl", "--status"], optional: true, allow_exit: [1] }
+parser: sec_status
+timeout: 5s
+cache_ttl: 10m
+schema:
+  - { name: sip,            type: bool }
+  - { name: filevault,      type: bool }
+  - { name: gatekeeper,     type: bool }
+  - { name: sip_raw,        type: str }
+  - { name: filevault_raw,  type: str }
+  - { name: gatekeeper_raw, type: str }

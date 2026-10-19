@@ -33,7 +33,7 @@ func parsePsList(in Input) ([]Row, error) {
 	var rows []Row
 	for _, l := range lines(in.Out("ps")) {
 		f := strings.Fields(l)
-		if len(f) < 12 {
+		if len(f) < 13 {
 			continue
 		}
 		pid, ok := atoi(f[0])
@@ -41,21 +41,21 @@ func parsePsList(in Input) ([]Row, error) {
 			continue
 		}
 		ppid, _ := atoi(f[1])
-		cpu, _ := atof(f[3])
-		memPct, _ := atof(f[4])
-		rss, _ := atoi(f[5])
+		cpu, _ := atof(f[4])
+		memPct, _ := atof(f[5])
+		rss, _ := atoi(f[6])
 		var started any
-		if t, err := time.ParseInLocation("Mon Jan 2 15:04:05 2006", strings.Join(f[6:11], " "), loc(in)); err == nil {
+		if t, err := time.ParseInLocation("Mon Jan 2 15:04:05 2006", strings.Join(f[7:12], " "), loc(in)); err == nil {
 			started = t
 		}
-		cmd := strings.Join(f[11:], " ")
+		cmd := strings.Join(f[12:], " ")
 		path := exe[pid]
 		name := basename(path)
 		if name == "" {
 			name = basename(strings.Fields(cmd)[0])
 		}
 		rows = append(rows, Row{
-			"pid": pid, "ppid": ppid, "user": f[2], "cpu": cpu, "mem_pct": memPct,
+			"pid": pid, "ppid": ppid, "user": f[2], "state": f[3], "cpu": cpu, "mem_pct": memPct,
 			"rss": rss * 1024, "started": started, "name": name, "exe": path, "command": cmd,
 		})
 	}

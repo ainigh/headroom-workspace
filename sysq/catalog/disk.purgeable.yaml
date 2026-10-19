@@ -1,0 +1,17 @@
+name: disk.purgeable
+doc: Boot volume container size and free space, purgeable space when macOS reports it (empty otherwise), and the count of local Time Machine snapshots.
+cost: cheap
+sensitivity: public
+commands:
+  - { id: info, argv: ["/usr/sbin/diskutil", "info", "-plist", "/"] }
+  - { id: snapshots, argv: ["/usr/bin/tmutil", "listlocalsnapshots", "/"], optional: true }
+parser: disk_purgeable
+timeout: 8s
+cache_ttl: 1m
+schema:
+  - { name: volume,          type: str }
+  - { name: container_size,  type: bytes }
+  - { name: container_free,  type: bytes }
+  - { name: volume_free,     type: bytes }
+  - { name: purgeable,       type: bytes }
+  - { name: local_snapshots, type: int }

@@ -1,0 +1,71 @@
+{
+  "schema": [
+    {
+      "name": "command",
+      "type": "str"
+    },
+    {
+      "name": "pid",
+      "type": "pid"
+    },
+    {
+      "name": "bytes_in",
+      "type": "bytes"
+    },
+    {
+      "name": "bytes_out",
+      "type": "bytes"
+    },
+    {
+      "name": "bytes",
+      "type": "bytes"
+    }
+  ],
+  "rows": [
+    [
+      "Google Chrome H",
+      2244,
+      734567890,
+      45678901,
+      780246791
+    ],
+    [
+      "ollama",
+      1502,
+      12345678,
+      9876543,
+      22222221
+    ],
+    [
+      "Headroom",
+      4100,
+      2345678,
+      1234567,
+      3580245
+    ],
+    [
+      "mDNSResponder",
+      412,
+      1834567,
+      987654,
+      2822221
+    ],
+    [
+      "launchd",
+      1,
+      0,
+      0,
+      0
+    ]
+  ],
+  "meta": {
+    "rows": 5,
+    "truncated": false,
+    "source": [
+      "net.by_process"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

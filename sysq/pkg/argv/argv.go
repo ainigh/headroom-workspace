@@ -43,6 +43,9 @@ type Spec struct {
 	Render string `yaml:"render,omitempty" json:"render,omitempty"`
 	// MustExist requires a path to exist (paths only).
 	MustExist bool `yaml:"must_exist,omitempty" json:"must_exist,omitempty"`
+	// Within further restricts a path to these roots (checked after the path
+	// policy has cleaned it and resolved symlinks).
+	Within []string `yaml:"within,omitempty" json:"within,omitempty"`
 	// Predicate parameters: the dialect a predicate is rendered into and the
 	// mapping from sysq column names to dialect field names.
 	Dialect string            `yaml:"dialect,omitempty" json:"dialect,omitempty"`
@@ -233,6 +236,23 @@ func validateOne(name string, s Spec, v any, pol PathPolicy) (Value, error) {
 		if err != nil {
 			return Value{}, invalid(name, "%v", err)
 		}
+		if len(s.Within) > 0 {
+			home := ""
+			if hp, ok := pol.(interface{ HomeDir() string }); ok {
+				home = hp.HomeDir()
+			}
+			ok := false
+			for _, root := range s.Within {
+				r := filepath.Clean(ExpandHome(root, home))
+				if within(clean, r) || within(clean, resolve(r)) {
+					ok = true
+					break
+				}
+			}
+			if !ok {
+				return Value{}, invalid(name, "%s is not under %s", str, strings.Join(s.Within, ", "))
+			}
+		}
 		if s.MustExist {
 			if _, err := os.Lstat(clean); err != nil {
 				return Value{}, invalid(name, "does not exist")
@@ -379,6 +399,9 @@ func renderDuration(sec float64, how string) string {
 	switch how {
 	case "minutes":
 		return strconv.FormatInt(int64(math.Ceil(sec/60)), 10)
+	case "find_mtime":
+		// find -mtime -7200s: modified less than this long ago
+		return "-" + strconv.FormatInt(int64(math.Max(1, math.Ceil(sec))), 10) + "s"
 	case "log":
 		if sec >= 3600 && math.Mod(sec, 3600) == 0 {
 			return fmt.Sprintf("%dh", int64(sec/3600))
@@ -521,6 +544,9 @@ type RootPolicy struct {
 	Allowed  []string
 	Excluded []string
 }
+
+// HomeDir returns the home directory used for ~ expansion.
+func (r RootPolicy) HomeDir() string { return r.Home }
 
 // CheckPath implements PathPolicy.
 func (r RootPolicy) CheckPath(p string) (string, error) {

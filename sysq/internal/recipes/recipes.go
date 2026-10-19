@@ -226,9 +226,7 @@ func (f *file) parse() error {
 // header captures what recipe(...) and param(...) declare during a load-time
 // execution of the module.
 type header struct {
-	kw     map[string]starlark.Value
-	params []Param
-	order  []string
+	kw map[string]starlark.Value
 }
 
 type paramDecl struct {
@@ -309,9 +307,6 @@ func paramBuiltin(thread *starlark.Thread, fn *starlark.Builtin, args starlark.T
 		default:
 			return nil, fmt.Errorf("param: unknown option %s", k)
 		}
-	}
-	if spec.Default == nil && !spec.Required && spec.Type != argv.TStr && spec.Type != argv.TPath {
-		// Optional typed params default to unset (None in run()).
 	}
 	return &paramDecl{spec: spec}, nil
 }

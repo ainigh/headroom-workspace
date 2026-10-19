@@ -1,0 +1,20 @@
+name: git.log
+doc: Recent commits of one git repository.
+params:
+  path: { type: path, required: true, must_exist: true }
+  n:    { type: int, default: 10, min: 1, max: 200 }
+cost: cheap
+sensitivity: personal
+argv: ["{binary}", "--no-optional-locks", "-C", "{path}", "log", "-n", "{n}", "--format=%H%x09%an%x09%aI%x09%s"]
+binary_paths: ["/opt/homebrew/bin/git", "/usr/local/bin/git", "/Library/Developer/CommandLineTools/usr/bin/git", "/Applications/Xcode.app/Contents/Developer/usr/bin/git"]
+parser: git_log
+timeout: 10s
+cache_ttl: 30s
+sandbox_exec: ["/Library/Developer/CommandLineTools/", "/Applications/Xcode.app/Contents/Developer/"]
+pushdown: { limit: n }
+fixture_params: { path: "~/Developer/headroom" }
+schema:
+  - { name: commit,  type: str }
+  - { name: author,  type: str }
+  - { name: date,    type: ts }
+  - { name: subject, type: str }

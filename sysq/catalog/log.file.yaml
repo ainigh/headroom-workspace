@@ -1,0 +1,16 @@
+name: log.file
+doc: The last lines of a log file under ~/Library/Logs, /Library/Logs or /private/var/log (secrets redacted).
+params:
+  path: { type: path, required: true, must_exist: true, within: ["~/Library/Logs", "/Library/Logs", "/private/var/log"] }
+  n:    { type: int, default: 100, min: 1, max: 2000 }
+cost: cheap
+sensitivity: personal
+argv: ["/usr/bin/tail", "-n", "{n}", "{path}"]
+parser: text_lines
+timeout: 5s
+redact: true
+cache_ttl: 5s
+fixture_params: { path: "~/Library/Logs/Headroom/update.log", n: 100 }
+schema:
+  - { name: line, type: int }
+  - { name: text, type: str }

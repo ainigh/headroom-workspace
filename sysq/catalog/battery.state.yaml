@@ -1,0 +1,23 @@
+name: battery.state
+doc: Battery charge, power source, health (max vs design capacity), cycle count, temperature and charge/discharge watts.
+cost: cheap
+sensitivity: public
+commands:
+  - { id: batt, argv: ["/usr/bin/pmset", "-g", "batt"] }
+  - { id: ioreg, argv: ["/usr/sbin/ioreg", "-r", "-c", "AppleSmartBattery"], optional: true }
+parser: battery_state
+timeout: 5s
+cache_ttl: 10s
+schema:
+  - { name: has_battery,   type: bool }
+  - { name: percent,       type: int, unit: "%" }
+  - { name: state,         type: str }
+  - { name: plugged,       type: bool }
+  - { name: charging,      type: bool }
+  - { name: remaining,     type: duration }
+  - { name: cycle_count,   type: int }
+  - { name: health_pct,    type: float, unit: "%" }
+  - { name: temperature_c, type: float, unit: "°C" }
+  - { name: voltage_v,     type: float, unit: V }
+  - { name: amps,          type: float, unit: A }
+  - { name: watts,         type: float, unit: W, doc: "positive charging, negative discharging" }
