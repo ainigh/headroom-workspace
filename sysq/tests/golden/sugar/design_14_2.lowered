@@ -1,0 +1,29 @@
+# bindings
+hogs = proc.top(by="cpu", n=20).filter(expr("cpu > 30"))
+total_home = disk.usage("~", depth=1).group(expr(""), expr("sum(size) as bytes"))
+# scalars and tables mix freely
+threshold = 50
+big = hogs.filter(expr("cpu > threshold", threshold=threshold))
+# control flow
+if count(big) > 0:
+  emit(big)
+elif count(hogs) > 0:
+  emit("Moderate load only" , hogs.limit(5))
+else:
+  emit("Idle")
+# bounded iteration (row bound, fuel bound)
+for p in big.limit(5):
+  files = proc.info(p.pid).open_files.filter(expr("kind == \"REG\" and path startswith \"~\""))
+  emit({ "pid": p.pid, "command": p.command, "home_files": files.limit(10) })
+# pure functions (no recursion)
+def listening_by(cmd):
+  return net.listeners.join(proc.list, on="pid").filter(expr("command contains cmd", cmd=cmd))
+emit(listening_by("node"))
+# snapshots and time
+before = snapshot("launchd_morning")
+drift = svc.launchd.diff(before, on="label")
+if count(drift) > 0:
+  emit(drift)
+# watch produces a table with a `t` column; window ops work on it
+mem = watch(sys.memory, every=Duration("2s"), for_=Duration("30s"))
+emit(mem.select(expr("t, pressure, free")).window(expr("avg(free) over (order by t rows 5)")))

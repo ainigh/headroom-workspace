@@ -87,9 +87,7 @@ func Eval(n Node, env *Env) (Value, error) {
 		}
 		return Value{nil, table.Str}, nil
 	case Ident:
-		if v, ok := env.Bindings[x.Name]; ok {
-			return bound(v), nil
-		}
+		// A column of the input wins over a script variable of the same name.
 		if env.Table != nil {
 			if i := env.Table.ColIndex(x.Name); i >= 0 {
 				var v any
@@ -98,6 +96,11 @@ func Eval(n Node, env *Env) (Value, error) {
 				}
 				return Value{v, env.Table.Schema[i].Type}, nil
 			}
+		}
+		if v, ok := env.Bindings[x.Name]; ok {
+			return bound(v), nil
+		}
+		if env.Table != nil {
 			return Value{}, fmt.Errorf("unknown column %q (columns: %s)", x.Name, colNames(env.Table))
 		}
 		return Value{}, fmt.Errorf("unknown name %q", x.Name)

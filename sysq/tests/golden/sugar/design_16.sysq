@@ -1,0 +1,15 @@
+let cpu  = proc.top(by: "cpu", n: 10)
+let mem  = proc.top(by: "mem", n: 10)
+let io   = disk.volumes | filter used_pct > 85
+let swap = sys.memory | select swap_used, pressure
+let hot  = sys.thermal
+
+let culprits = cpu | union mem | distinct pid
+             | join (net.connections | group by pid { count() as conns }) on pid left
+
+emit { culprits: culprits | sort by cpu desc | limit 8,
+       memory: swap, thermal: hot, full_volumes: io }
+
+if any(cpu, cpu > 80) and hot.level >= 2 {
+  emit "Likely thermal throttling from a CPU hog"
+}

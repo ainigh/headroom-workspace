@@ -86,12 +86,12 @@ func InferType(n Node, schema []table.Col, bindings map[string]any) table.Col {
 		}
 		return table.Col{Type: table.Str}
 	case Ident:
-		if v, ok := bindings[x.Name]; ok {
-			return table.Col{Type: bound(v).T}
-		}
 		if c, ok := find(x.Name); ok {
 			c.Name = ""
 			return c
+		}
+		if v, ok := bindings[x.Name]; ok {
+			return table.Col{Type: bound(v).T}
 		}
 	case Unary:
 		if x.Op == "not" {
@@ -320,12 +320,14 @@ func nsPredicate(n Node, fields map[string]string, bindings map[string]any) (str
 		if !ok {
 			return "", fmt.Errorf("left side must be a column")
 		}
-		if _, isVar := bindings[id.Name]; isVar {
-			return "", fmt.Errorf("left side is a variable")
-		}
 		field, ok := fields[id.Name]
 		if !ok {
 			return "", fmt.Errorf("column %s cannot be pushed", id.Name)
+		}
+		if yid, isIdent := x.Y.(Ident); isIdent {
+			if _, isCol := fields[yid.Name]; isCol {
+				return "", fmt.Errorf("right side is a column")
+			}
 		}
 		v, ok := constValue(x.Y, bindings)
 		if !ok {

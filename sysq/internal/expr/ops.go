@@ -47,13 +47,11 @@ func Select(t *table.Table, items []Item, base *Env) (*table.Table, error) {
 			name = DefaultName(it.X)
 		}
 		if id, ok := it.X.(Ident); ok {
-			if _, isVar := base.Bindings[id.Name]; !isVar {
-				if i := t.ColIndex(id.Name); i >= 0 {
-					c := t.Schema[i]
-					c.Name = name
-					cols = append(cols, out{col: c, src: i})
-					continue
-				}
+			if i := t.ColIndex(id.Name); i >= 0 {
+				c := t.Schema[i]
+				c.Name = name
+				cols = append(cols, out{col: c, src: i})
+				continue
 			}
 		}
 		c := InferType(it.X, t.Schema, base.Bindings)

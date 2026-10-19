@@ -1,0 +1,10 @@
+cpu = proc.top(by="cpu", n=10)
+mem = proc.top(by="mem", n=10)
+io = disk.volumes.filter(expr("used_pct > 85"))
+swap = sys.memory.select(expr("swap_used, pressure"))
+hot = sys.thermal
+culprits = cpu.union(mem).distinct("pid").join((net.connections.group(expr("pid"), expr("count() as conns"))), on="pid", how="left")
+emit({ "culprits": culprits.sort(expr("cpu desc", cpu=cpu)).limit(8),
+       "memory": swap, "thermal": hot, "full_volumes": io })
+if any(cpu, expr("cpu > 80", cpu=cpu)) and scalar(hot.level) >= 2:
+  emit("Likely thermal throttling from a CPU hog")
