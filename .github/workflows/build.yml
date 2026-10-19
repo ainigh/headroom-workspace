@@ -41,6 +41,8 @@ jobs:
           swift-version: "6.1"
       - name: HeadroomKit
         run: swift test --package-path headroom/HeadroomKit
+      - name: ConfirmationToken can't be constructed outside ConfirmationFlow
+        run: headroom/scripts/check-confirmation-token.sh
 
   build:
     runs-on: macos-15

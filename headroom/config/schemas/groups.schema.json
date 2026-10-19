@@ -209,6 +209,16 @@
           }
         }
       }
+    },
+    "overview": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+      "description": "Recipe for the large view's health sentence."
+    },
+    "item_profile": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+      "description": "Recipe the Actions panel and the assistant's item scope use: called with kind and id."
     }
   }
 }

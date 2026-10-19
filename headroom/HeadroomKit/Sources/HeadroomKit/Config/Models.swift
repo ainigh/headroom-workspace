@@ -50,6 +50,8 @@ public struct GroupConfig: Codable, Hashable, Sendable, Identifiable {
 
 public struct GroupsFile: Codable, Sendable {
     public var version: Int
+    public var overview: String?
+    public var item_profile: String?
     public var groups: [GroupConfig]
 }
 
@@ -164,6 +166,7 @@ public struct AssistantFile: Codable, Sendable {
     public var system_prompt: String?
     public var request_template: String?
     public var unload_after_minutes: Double?
+    public var preflight_recipe: String?
 
     public var privacy: String { privacy_level ?? "consumers" }
     /// sysq's sensitivity ceiling for the assistant (sysq-design §28). Never "secret".
@@ -225,6 +228,7 @@ public struct AppConfig: Sendable {
     public var systemPrompt: String
     public var requestTemplate: String
     public var textToolsPrompt: String
+    public var notices: Notices
 
     public func group(_ id: String) -> GroupConfig? { groups.groups.first { $0.id == id } }
 
@@ -249,4 +253,24 @@ public struct AppConfig: Sendable {
 public func seconds(_ s: String?, default d: Double) -> Double {
     guard let s, let v = Units.parse(s) else { return d }
     return v
+}
+
+/// prompts/notices.md: the short messages Headroom adds to a conversation,
+/// one "## name" section each.
+public struct Notices: Sendable {
+    public var values: [String: String]
+
+    public init(_ text: String) {
+        var out: [String: String] = [:]
+        var key: String?
+        var buf: [String] = []
+        func flush() { if let k = key { out[k] = buf.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines) }; buf = [] }
+        for line in text.components(separatedBy: "\n") {
+            if line.hasPrefix("## ") { flush(); key = String(line.dropFirst(3)).trimmingCharacters(in: .whitespaces) } else if key != nil { buf.append(line) }
+        }
+        flush()
+        values = out
+    }
+
+    public subscript(_ k: String) -> String { values[k] ?? "" }
 }

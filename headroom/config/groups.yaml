@@ -7,6 +7,10 @@ version: 1
 #   consumers: who is using it (value = the column the bar shows; name = label column)
 #   sparkline: history series for the small chart
 #   attention: recipe that turns thresholds.yaml into a status color
+# Large view header sentence, and the recipe that profiles one item
+# (process, app, path, model) for the Actions panel and the assistant.
+overview: health.overview
+item_profile: item.profile
 groups:
   - id: memory
     name: Memory

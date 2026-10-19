@@ -80,6 +80,11 @@
     "unload_after_minutes": {
       "type": "number",
       "minimum": 0
+    },
+    "preflight_recipe": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+      "description": "Recipe run with memory=<model size> before a model loads (warns when tight)."
     }
   }
 }

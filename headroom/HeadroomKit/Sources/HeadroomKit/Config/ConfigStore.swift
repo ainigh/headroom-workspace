@@ -49,6 +49,8 @@ public struct ConfigLoader: Sendable {
         let a = c?.assistant
         out.append(userDir.appendingPathComponent(a?.system_prompt ?? "prompts/system.md"))
         out.append(userDir.appendingPathComponent(a?.request_template ?? "prompts/request.md.tmpl"))
+        out.append(userDir.appendingPathComponent("prompts/text-tools.md"))
+        out.append(userDir.appendingPathComponent("prompts/notices.md"))
         return out
     }
 
@@ -171,7 +173,8 @@ public struct ConfigLoader: Sendable {
             retention: (values["retention"] as? RetentionFile) ?? RetentionFile(version: 1),
             systemPrompt: text(assistant.system_prompt, "prompts/system.md"),
             requestTemplate: text(assistant.request_template, "prompts/request.md.tmpl"),
-            textToolsPrompt: text("prompts/text-tools.md", "prompts/text-tools.md")
+            textToolsPrompt: text("prompts/text-tools.md", "prompts/text-tools.md"),
+            notices: Notices(text("prompts/notices.md", "prompts/notices.md"))
         )
         problems += crossCheck(cfg)
         return (cfg, problems)
@@ -245,6 +248,8 @@ public final class ConfigStore {
     public private(set) var problems: [ConfigProblem]
     public private(set) var generation = 0
     public let loader: ConfigLoader
+    /// Called after every reload with the new value.
+    @ObservationIgnored public var onChange: ((AppConfig) -> Void)?
 
     @ObservationIgnored private var mtimes: [String: Date] = [:]
     @ObservationIgnored private var timer: Timer?
@@ -265,6 +270,7 @@ public final class ConfigStore {
         problems = p
         generation += 1
         mtimes = currentMtimes()
+        onChange?(c)
     }
 
     private func currentMtimes() -> [String: Date] {

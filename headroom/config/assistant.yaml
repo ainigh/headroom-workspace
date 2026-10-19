@@ -15,3 +15,4 @@ narrative_range: 2h
 system_prompt: prompts/system.md
 request_template: prompts/request.md.tmpl
 unload_after_minutes: 10
+preflight_recipe: headroom.check   # run with memory=<model size> before loading a model

@@ -30,7 +30,9 @@ func TestHeadroomGroupBindings(t *testing.T) {
 		t.Skip("no headroom/config next to sysq")
 	}
 	var groups struct {
-		Groups []struct {
+		Overview    string `yaml:"overview"`
+		ItemProfile string `yaml:"item_profile"`
+		Groups      []struct {
 			ID        string  `yaml:"id"`
 			Headline  binding `yaml:"headline"`
 			Detail    binding `yaml:"detail"`
@@ -69,6 +71,23 @@ func TestHeadroomGroupBindings(t *testing.T) {
 			run(t, binding{Recipe: g.Attention}, "status")
 		})
 	}
+	t.Run("overview", func(t *testing.T) { run(t, binding{Recipe: groups.Overview}, "") })
+	t.Run("item_profile", func(t *testing.T) {
+		run(t, binding{Recipe: groups.ItemProfile, Params: map[string]any{"kind": "process", "id": "1"}}, "")
+	})
+	adata, err := os.ReadFile(filepath.Join(cfg, "assistant.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var asst struct {
+		Preflight string `yaml:"preflight_recipe"`
+	}
+	if err := yaml.Unmarshal(adata, &asst); err != nil {
+		t.Fatal(err)
+	}
+	t.Run("preflight", func(t *testing.T) {
+		run(t, binding{Recipe: asst.Preflight, Params: map[string]any{"memory": float64(5e9)}}, "fits")
+	})
 	mdata, err := os.ReadFile(filepath.Join(cfg, "modes.yaml"))
 	if err != nil {
 		t.Fatal(err)
