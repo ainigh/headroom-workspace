@@ -221,28 +221,34 @@ func (s *Store) AddEvent(ctx context.Context, e Event) error {
 // data past each tier's retention. rawKeep may extend raw retention.
 func (s *Store) Downsample(ctx context.Context, rawKeep time.Duration) error {
 	now := s.now()
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	roll := func(from, to int, bucket time.Duration, olderThan time.Time) error {
-		b := bucket.Milliseconds()
-		_, err := s.db.ExecContext(ctx, `
-INSERT OR REPLACE INTO points (recipe,label,col,key,tier,ts,value,n)
-SELECT recipe,label,col,key,?, (ts / ?) * ?, SUM(value*n)/SUM(n), SUM(n)
-FROM points WHERE tier = ? AND ts < ?
-GROUP BY recipe,label,col,key,(ts / ?)`, to, b, b, from, olderThan.UnixMilli(), b)
-		return err
-	}
-	// Complete buckets only: everything before the current bucket.
-	if err := roll(TierRaw, Tier1m, time.Minute, now.Truncate(time.Minute)); err != nil {
-		return err
-	}
-	if err := roll(Tier1m, Tier10m, 10*time.Minute, now.Truncate(10*time.Minute)); err != nil {
-		return err
-	}
 	keep := DefaultRetention
 	raw := keep[TierRaw]
 	if rawKeep > raw {
 		raw = rawKeep
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	// A bucket is recomputed only while every finer point it covers is
+	// still stored: from the first whole bucket after the finer tier's
+	// retention cutoff up to (not including) the current bucket. A bucket
+	// the cutoff falls inside was already rolled up complete on an earlier
+	// pass and keeps that value.
+	roll := func(from, to int, bucket, fromKeep time.Duration) error {
+		b := bucket.Milliseconds()
+		newerThan := now.Add(-fromKeep).Truncate(bucket).Add(bucket)
+		olderThan := now.Truncate(bucket)
+		_, err := s.db.ExecContext(ctx, `
+INSERT OR REPLACE INTO points (recipe,label,col,key,tier,ts,value,n)
+SELECT recipe,label,col,key,?, (ts / ?) * ?, SUM(value*n)/SUM(n), SUM(n)
+FROM points WHERE tier = ? AND ts >= ? AND ts < ?
+GROUP BY recipe,label,col,key,(ts / ?)`, to, b, b, from, newerThan.UnixMilli(), olderThan.UnixMilli(), b)
+		return err
+	}
+	if err := roll(TierRaw, Tier1m, time.Minute, raw); err != nil {
+		return err
+	}
+	if err := roll(Tier1m, Tier10m, 10*time.Minute, keep[Tier1m]); err != nil {
+		return err
 	}
 	for tier, d := range map[int]time.Duration{TierRaw: raw, Tier1m: keep[Tier1m], Tier10m: keep[Tier10m]} {
 		if _, err := s.db.ExecContext(ctx, `DELETE FROM points WHERE tier = ? AND ts < ?`, tier, now.Add(-d).UnixMilli()); err != nil {
