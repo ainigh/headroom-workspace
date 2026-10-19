@@ -106,8 +106,8 @@ func Parse(data []byte) (*Config, error) {
 		if s.retention, err = parseDur(s.Retention, 0); err != nil {
 			return nil, fmt.Errorf("%s: retention: %w", s.Name, err)
 		}
-		if s.every < time.Second {
-			return nil, fmt.Errorf("%s: every must be at least 1s", s.Name)
+		if s.every < time.Second || s.idle < time.Second {
+			return nil, fmt.Errorf("%s: every and idle_every must be at least 1s", s.Name)
 		}
 	}
 	return &c, nil
