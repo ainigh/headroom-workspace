@@ -550,7 +550,7 @@ func HumanBytes(n int64) string {
 	}
 	units := []string{"B", "KB", "MB", "GB", "TB", "PB"}
 	i := 0
-	for f >= 1000 && i < len(units)-1 {
+	for f >= 999.5 && i < len(units)-1 {
 		f /= 1000
 		i++
 	}
@@ -558,7 +558,9 @@ func HumanBytes(n int64) string {
 	switch {
 	case i == 0:
 		s = fmt.Sprintf("%d B", int64(f))
-	case f >= 100:
+	case f >= 99.95:
+		// "%.0f" rounds up at .5, so 99.95 would print "100.0" below; and
+		// values that round to 1000 moved to the next unit above.
 		s = fmt.Sprintf("%.0f %s", f, units[i])
 	default:
 		s = fmt.Sprintf("%.1f %s", f, units[i])
