@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 // Command is what a plan resolves to.
@@ -149,9 +150,14 @@ func (OS) Run(ctx context.Context, c Command) (Result, error) {
 	return res, nil
 }
 
+// truncate keeps at most n bytes, never splitting a UTF-8 sequence (the
+// output travels as JSON).
 func truncate(s string, n int) string {
 	if len(s) <= n {
 		return s
+	}
+	for n > 0 && !utf8.RuneStart(s[n]) {
+		n--
 	}
 	return s[:n] + "…"
 }
