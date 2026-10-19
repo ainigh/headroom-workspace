@@ -76,3 +76,9 @@ One line per choice the docs left open. Format: `YYYY-MM-DD — area — decisio
 2026-10-19 — ci — GitHub Actions runners currently don't start for this repo (jobs end in seconds with no logs), so the app target can't be compiled by CI; install.sh and the in-app updater build from source on the Mac when no release matches, exactly as super-mac-tts-stt-service does.
 2026-10-19 — headroom/ui — Every SwiftUI view struct is marked `@MainActor`: before the Xcode 16 SDK only `body` is main-actor, so helper methods touching HeadroomKit's main-actor stores would not compile on Xcode 15; the hot key is ⌃⌥H because ⌥⌘H is macOS's "Hide Others".
 2026-10-19 — sysact/tests — Tests build their fake $HOME with internal/testhome (next to the package), not t.TempDir(): on macOS the temp dir is under /private/var, which the shipped rules protect as a tree, so every fake-home path was refused.
+2026-10-19 — sysq/table — HumanBytes rounds before picking the unit: 999,950 B shows as "1.0 MB", never "1000.0 KB" or "100.0 KB".
+2026-10-19 — sysq/audit — `Read` walks local calendar days (files are named by local date); truncating to UTC days skipped today's file in the Americas until the afternoon.
+2026-10-19 — sysq/history — Downsample recomputes a bucket only while every finer point it covers is still inside the finer tier's retention; a bucket the cutoff falls inside keeps the value it got when complete.
+2026-10-19 — sysq/httpapi — Polling a pairing id expires stale (10 min) requests like listing and requesting do; a stale id reads as not found.
+2026-10-19 — sysq/sampler — `idle_every` has the same 1 s floor as `every` (the schema already forbids negative durations).
+2026-10-19 — sysact/run — Captured output is truncated on a UTF-8 boundary so the JSON result is always valid.
