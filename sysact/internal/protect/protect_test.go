@@ -4,11 +4,12 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/ainigh/headroom-workspace/sysact/internal/testhome"
 )
 
 func TestShippedRules(t *testing.T) {
-	home := t.TempDir()
-	home, _ = filepath.EvalSymlinks(home)
+	home := testhome.New(t)
 	os.MkdirAll(filepath.Join(home, "Downloads"), 0o755)
 	os.Symlink("/usr/lib", filepath.Join(home, "Downloads", "sys"))
 	r, err := Load("", home)

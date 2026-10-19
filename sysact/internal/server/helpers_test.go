@@ -12,6 +12,8 @@ import (
 	"github.com/ainigh/headroom-workspace/sysact/internal/actions"
 	"github.com/ainigh/headroom-workspace/sysact/internal/protect"
 	"github.com/ainigh/headroom-workspace/sysact/internal/run"
+
+	"github.com/ainigh/headroom-workspace/sysact/internal/testhome"
 )
 
 type fakeRunner struct{ n *int }
@@ -25,8 +27,7 @@ var testHome string
 
 func testServer(t *testing.T, dry bool) (*Server, *int) {
 	t.Helper()
-	home := t.TempDir()
-	home, _ = filepath.EvalSymlinks(home)
+	home := testhome.New(t)
 	testHome = home
 	for _, d := range []string{"Library/Caches/com.example.app", "Downloads", ".ssh", "Library/Keychains", "Documents"} {
 		if err := os.MkdirAll(filepath.Join(home, d), 0o755); err != nil {
