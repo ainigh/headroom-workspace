@@ -1,0 +1,29 @@
+# sysqd sampling schedules. Headroom writes its sampling.yaml through to this
+# file; edit either one. Rates: every = a view is open; idle_every = no view;
+# battery_every = no view and on battery.
+version: 1
+schedules:
+  - { recipe: mem.headline,     every: 5s,  idle_every: 30s, battery_every: 60s }
+  - { recipe: cpu.headline,     every: 5s,  idle_every: 30s, battery_every: 60s }
+  - { recipe: gpu.headline,     every: 5s,  idle_every: 60s, battery_every: 120s }
+  - { recipe: disk.headline,    every: 60s, idle_every: 300s }
+  - { recipe: net.headline,     every: 5s,  idle_every: 60s, battery_every: 120s }
+  - { recipe: battery.headline, every: 60s, idle_every: 300s }
+  - { recipe: thermal.headline, every: 15s, idle_every: 60s }
+  - { recipe: ai.headline,      every: 15s, idle_every: 120s }
+  - { name: proc.top.cpu, recipe: proc.top, params: { by: cpu, n: 15 }, every: 10s, idle_every: 60s, battery_every: 300s, keep_table: true, columns: [cpu, mem], key: pid }
+  - { name: proc.top.mem, recipe: proc.top, params: { by: mem, n: 15 }, every: 10s, idle_every: 60s, battery_every: 300s, keep_table: true, columns: [cpu, mem], key: pid }
+narrative:
+  - { recipe: mem.headline, column: pressure_pct, label: memory pressure, unit: "%", high: 60 }
+  - { recipe: mem.headline, column: swap_used, label: swap in use, unit: bytes, trend: true }
+  - { recipe: cpu.headline, column: load_pct, label: CPU load, unit: "%", high: 70 }
+  - { recipe: gpu.headline, column: utilization, label: GPU utilization, unit: "%", high: 80 }
+  - { recipe: disk.headline, column: free, label: disk free, unit: bytes, low: 50000000000, trend: true }
+  - { recipe: net.headline, column: throughput, label: network throughput, unit: bytes/s, high: 50000000 }
+  - { recipe: thermal.headline, column: level, label: thermal level, high: 1 }
+  - { recipe: ai.headline, column: memory_held, label: local model memory, unit: bytes, trend: true }
+events:
+  - { name: mem.headline, column: pressure, kind: pressure, message: "memory pressure {from} → {to}", severity: medium }
+  - { name: thermal.headline, column: state, kind: thermal, message: "thermal state {from} → {to}", severity: medium }
+  - { name: battery.headline, column: source, kind: power, message: "power source {from} → {to}" }
+  - { name: ai.headline, column: models_loaded, kind: model, message: "local models loaded {from} → {to}" }

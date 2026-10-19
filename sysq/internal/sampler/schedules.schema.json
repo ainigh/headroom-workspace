@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "sysqd schedules.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "schedules"],
+  "properties": {
+    "version": { "const": 1 },
+    "schedules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["recipe"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[a-z][a-z0-9_.]*$" },
+          "recipe": { "type": "string", "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$" },
+          "params": { "type": "object" },
+          "every": { "$ref": "#/definitions/dur" },
+          "idle_every": { "$ref": "#/definitions/dur" },
+          "battery_every": { "$ref": "#/definitions/dur" },
+          "keep_table": { "type": "boolean" },
+          "columns": { "type": "array", "items": { "type": "string" } },
+          "key": { "type": "string" },
+          "retention": { "$ref": "#/definitions/dur" },
+          "disabled": { "type": "boolean" }
+        }
+      }
+    },
+    "narrative": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["recipe", "column", "label"],
+        "properties": {
+          "recipe": { "type": "string" }, "column": { "type": "string" }, "label": { "type": "string" },
+          "unit": { "enum": ["", "%", "bytes", "bytes/s"] },
+          "high": { "type": "number" }, "low": { "type": "number" }, "trend": { "type": "boolean" }
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "column", "kind", "message"],
+        "properties": {
+          "name": { "type": "string" }, "column": { "type": "string" }, "kind": { "type": "string", "pattern": "^[a-z_]+$" },
+          "message": { "type": "string" }, "severity": { "enum": ["info", "low", "medium", "high", "critical"] }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "dur": { "type": "string", "pattern": "^([0-9]+(ms|s|m|h))+$" }
+  }
+}

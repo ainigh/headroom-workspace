@@ -64,10 +64,16 @@ func addExtraCommands(root *cobra.Command) {
 	}
 }
 
+// setupHooks extend an opened environment (history store, ...).
+var setupHooks []func(*setup.Env)
+
 func openEnv() (*setup.Env, error) {
 	env, err := setup.Open(setup.Options{Dir: flagDir, Fixtures: flagFixtures})
 	if err != nil {
 		return nil, err
+	}
+	for _, h := range setupHooks {
+		h(env)
 	}
 	if env.PolicyError != nil {
 		fmt.Fprintln(os.Stderr, "sysq: policy.yaml ignored:", env.PolicyError)

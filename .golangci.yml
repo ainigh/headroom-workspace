@@ -15,6 +15,10 @@ linters:
         - (net.Conn).Close
         - (net.Listener).Close
         - (*database/sql.Rows).Close
+        - (*database/sql.Stmt).Close
+        - (*database/sql.Tx).Rollback
+        - (*database/sql.DB).Close
+        - (*github.com/ainigh/headroom-workspace/sysq/internal/history.Store).Close
   exclusions:
     rules:
       - path: _test\.go

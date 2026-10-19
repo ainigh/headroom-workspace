@@ -1,0 +1,10 @@
+name: history.narrative
+doc: A few plain sentences about recent history ("memory pressure above 60% for 20 min; disk free fell 12 GB") for model context.
+params:
+  range: { type: duration, default: 2h, max: 604800 }
+cost: cheap
+sensitivity: personal
+builtin: history_narrative
+schema:
+  - { name: sentence, type: str }
+  - { name: topic,    type: str }

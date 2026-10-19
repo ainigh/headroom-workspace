@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "sysqd clients.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "api": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "port": { "type": "integer", "minimum": 1024, "maximum": 65535 },
+        "exposed": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "clients": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "token_sha256", "privacy"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$" },
+          "name": { "type": "string" },
+          "token_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "privacy": { "enum": ["aggregates", "consumers", "files"] },
+          "allow_scripts": { "type": "boolean" },
+          "allow_propose": { "type": "boolean" },
+          "origins": { "type": "array", "items": { "type": "string" } },
+          "exposed": { "type": "array", "items": { "type": "string" } },
+          "created": {},
+          "last_seen": {},
+          "host": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

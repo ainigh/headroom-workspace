@@ -17,6 +17,7 @@ import (
 	"github.com/ainigh/headroom-workspace/sysq/internal/exec"
 	"github.com/ainigh/headroom-workspace/sysq/internal/policy"
 	"github.com/ainigh/headroom-workspace/sysq/internal/recipes"
+	"github.com/ainigh/headroom-workspace/sysq/internal/script"
 	"github.com/ainigh/headroom-workspace/sysq/pkg/audit"
 )
 
@@ -41,11 +42,13 @@ type Env struct {
 	// FixtureEngine serves the shipped fixtures; used to derive recipe output
 	// schemas by dry run without executing anything live.
 	FixtureEngine *engine.Engine
+	// History serves history() when a store is available.
+	History script.HistoryFunc
 }
 
 // RecipeEnv returns what running recipes needs.
 func (e *Env) RecipeEnv() recipes.Env {
-	return recipes.Env{Engine: e.Engine, SnapshotDir: filepath.Join(e.Dir, "snapshots")}
+	return recipes.Env{Engine: e.Engine, SnapshotDir: filepath.Join(e.Dir, "snapshots"), History: e.History}
 }
 
 // UserRecipeDir is where promoted and proposed recipes live.
