@@ -3,6 +3,7 @@ import SwiftUI
 
 /// The floating panel (ui-design §4): key groups 2×2, alert strip, grouped
 /// top consumers.
+@MainActor
 struct SmallPanelView: View {
     let model: HeadroomModel
     let ui: UIState
@@ -85,6 +86,7 @@ struct SmallPanelView: View {
 }
 
 /// Always-on-top toggle, saved to layout.yaml.
+@MainActor
 struct PinButton: View {
     let model: HeadroomModel
     let windows: WindowManager
@@ -99,6 +101,7 @@ struct PinButton: View {
 }
 
 /// The large view (ui-design §5) and the drill-in (§6) in one window.
+@MainActor
 struct LargeView: View {
     let model: HeadroomModel
     let ui: UIState
@@ -224,6 +227,7 @@ struct LargeView: View {
 }
 
 /// One group in full (ui-design §6).
+@MainActor
 struct DrillInView: View {
     let model: HeadroomModel
     let ui: UIState
@@ -307,6 +311,7 @@ struct DrillInView: View {
 }
 
 /// Every column of a one-row detail table, as label/value lines.
+@MainActor
 struct MetricsList: View {
     var table: SysqTable
     var body: some View {

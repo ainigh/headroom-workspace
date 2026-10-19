@@ -7,11 +7,17 @@ import UserNotifications
 
 /// macOS notifications for HeadroomKit's NotificationStore.
 final class SystemNotifier: Notifier, @unchecked Sendable {
+    /// UNUserNotificationCenter throws an Objective-C exception (a crash)
+    /// in a process without a bundle identifier, e.g. a `swift run` build.
+    private let available = Bundle.main.bundleIdentifier != nil
+
     init() {
+        guard available else { return }
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
     }
 
     func post(id: String, title: String, body: String) {
+        guard available else { return }
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
@@ -49,8 +55,8 @@ final class PowerMonitor {
     }
 }
 
-/// ⌥⌘H toggles the small view from anywhere (Carbon hot key: no
-/// accessibility permission needed).
+/// ⌃⌥H toggles the small view from anywhere (Carbon hot key: no
+/// accessibility permission needed; ⌥⌘H would take "Hide Others").
 final class HotKey {
     private var ref: EventHotKeyRef?
     private var handler: EventHandlerRef?
@@ -64,7 +70,7 @@ final class HotKey {
             return noErr
         }, 1, &spec, nil, &handler)
         let id = EventHotKeyID(signature: OSType(0x4844_524D), id: 1) // "HDRM"
-        RegisterEventHotKey(UInt32(kVK_ANSI_H), UInt32(cmdKey | optionKey), id, GetApplicationEventTarget(), 0, &ref)
+        RegisterEventHotKey(UInt32(kVK_ANSI_H), UInt32(controlKey | optionKey), id, GetApplicationEventTarget(), 0, &ref)
     }
 
     deinit {
@@ -86,6 +92,7 @@ enum LaunchAtLogin {
     }
 }
 
+@MainActor
 enum Finder {
     static func reveal(_ path: String) {
         let p = (path as NSString).expandingTildeInPath

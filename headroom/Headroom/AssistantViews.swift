@@ -2,6 +2,7 @@ import HeadroomKit
 import SwiftUI
 
 /// The assistant panel (ui-design §9).
+@MainActor
 struct AssistantView: View {
     let model: HeadroomModel
     let ui: UIState
@@ -32,7 +33,7 @@ struct AssistantView: View {
                     .buttonStyle(.borderless).help("New conversation").disabled(a.running)
             }
             .padding(10)
-            ProgressView(value: a.fuel).progressViewStyle(.linear).tint(a.fuel > 0.8 ? .orange : .accentColor)
+            ProgressView(value: a.fuel).progressViewStyle(.linear).tint(a.fuel > 0.8 ? Color.orange : Color.accentColor)
                 .frame(height: 2).opacity(a.fuel > 0 ? 1 : 0)
                 .help("Query budget used")
             Divider()
@@ -84,6 +85,7 @@ struct AssistantView: View {
     }
 }
 
+@MainActor
 struct TurnView: View {
     let model: HeadroomModel
     let turn: AssistantTurn
@@ -139,6 +141,7 @@ struct TurnView: View {
 }
 
 /// MESSAGE with recipe and action names as clickable chips.
+@MainActor
 struct MessageText: View {
     let model: HeadroomModel
     let text: String
@@ -181,6 +184,7 @@ struct MessageText: View {
     }
 }
 
+@MainActor
 struct ActionRequestCard: View {
     let model: HeadroomModel
     let turn: AssistantTurn
@@ -216,6 +220,7 @@ struct ActionRequestCard: View {
 }
 
 /// Summary History (headroom-spec §8.10): browse, search, filter, delete.
+@MainActor
 struct SummaryHistoryView: View {
     let model: HeadroomModel
     @State private var search = ""

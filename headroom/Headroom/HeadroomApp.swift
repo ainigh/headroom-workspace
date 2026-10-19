@@ -20,6 +20,7 @@ struct HeadroomApp: App {
 }
 
 /// Icon plus the optional readout (layout.yaml menu_bar_readout).
+@MainActor
 struct MenuBarLabel: View {
     @ObservedObject var app: AppDelegate
 
@@ -43,13 +44,14 @@ struct MenuBarLabel: View {
     }
 }
 
+@MainActor
 struct MenuContent: View {
     @ObservedObject var app: AppDelegate
 
     var body: some View {
         if let model = app.model {
             Button(app.windows?.panelVisible == true ? "Hide Headroom" : "Show Headroom") { app.windows?.togglePanel() }
-                .keyboardShortcut("h", modifiers: [.command, .option])
+                .keyboardShortcut("h", modifiers: [.control, .option])
             Divider()
             Picker("Mode", selection: Binding(get: { model.mode }, set: { model.setMode($0) })) {
                 ForEach(model.panel().modes) { m in Text(m.label).tag(m.id) }
