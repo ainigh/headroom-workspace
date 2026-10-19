@@ -61,10 +61,15 @@ func (l *Log) Write(r Record) error {
 	return err
 }
 
-// Read returns records newer than since, oldest first.
+// Read returns records newer than since, oldest first. Files are named by
+// the local calendar date, so the walk is over calendar days in since's
+// location (Truncate would cut at UTC midnight and skip today's file in
+// the Americas until the afternoon).
 func (l *Log) Read(since time.Time) ([]Record, error) {
 	var out []Record
-	for d := since.Truncate(24 * time.Hour); !d.After(time.Now()); d = d.Add(24 * time.Hour) {
+	y, m, d0 := since.Date()
+	last := time.Now().In(since.Location())
+	for d := time.Date(y, m, d0, 0, 0, 0, 0, since.Location()); !d.After(last); d = d.AddDate(0, 0, 1) {
 		data, err := os.ReadFile(filepath.Join(l.Dir, d.Format("2006-01-02")+".jsonl"))
 		if err != nil {
 			continue
