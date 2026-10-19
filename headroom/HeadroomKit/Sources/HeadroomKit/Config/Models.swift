@@ -141,6 +141,9 @@ public struct SamplingFile: Codable, Sendable {
     public var version: Int
     public var rates: RateSet
     public var hidden_groups: Rates?
+    /// Passed through to sysqd's schedules.yaml as written.
+    public var narrative: [JSONValue]?
+    public var events: [JSONValue]?
 }
 
 public struct AssistantFile: Codable, Sendable {

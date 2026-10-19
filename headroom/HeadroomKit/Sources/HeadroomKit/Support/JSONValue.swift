@@ -109,3 +109,19 @@ extension JSONValue: ExpressibleByStringLiteral, ExpressibleByIntegerLiteral, Ex
     public init(booleanLiteral value: Bool) { self = .bool(value) }
     public init(nilLiteral: ()) { self = .null }
 }
+
+extension JSONValue: ExpressibleByDictionaryLiteral, ExpressibleByArrayLiteral {
+    public init(dictionaryLiteral elements: (String, JSONValue)...) {
+        self = .object(Dictionary(elements, uniquingKeysWith: { _, b in b }))
+    }
+    public init(arrayLiteral elements: JSONValue...) { self = .array(elements) }
+}
+
+extension JSONValue {
+    /// Compact JSON text (sorted keys), for prompts, logs and CLI lines.
+    public var json: String {
+        let e = JSONEncoder()
+        e.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return (try? e.encode(self)).map { String(decoding: $0, as: UTF8.self) } ?? description
+    }
+}

@@ -92,6 +92,85 @@
           "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
         }
       }
+    },
+    "narrative": {
+      "type": "array",
+      "description": "Passed through to sysqd's schedules.yaml: series the resource narrative describes.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "recipe",
+          "column",
+          "label"
+        ],
+        "properties": {
+          "recipe": {
+            "type": "string"
+          },
+          "column": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "unit": {
+            "enum": [
+              "",
+              "%",
+              "bytes",
+              "bytes/s"
+            ]
+          },
+          "high": {
+            "type": "number"
+          },
+          "low": {
+            "type": "number"
+          },
+          "trend": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "description": "Passed through to sysqd's schedules.yaml: value changes recorded as events (graph markers).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "column",
+          "kind",
+          "message"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "column": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "pattern": "^[a-z_]+$"
+          },
+          "message": {
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "info",
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          }
+        }
+      }
     }
   }
 }

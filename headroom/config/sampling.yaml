@@ -5,3 +5,22 @@ rates:
   idle:        { headline: 30s, detail: 60s, consumers: 60s }
   on_battery:  { headline: 15s, detail: 60s, consumers: 120s }
 hidden_groups: { headline: 300s }
+# Written through to sysqd's schedules.yaml with the rates above: one schedule
+# per group headline and consumer list (consumers keep whole tables so
+# "what spiked at 3:14?" can be answered).
+# The resource narrative the assistant reads (history.narrative):
+narrative:
+  - { recipe: mem.headline, column: pressure_pct, label: memory pressure, unit: "%", high: 60 }
+  - { recipe: mem.headline, column: swap_used, label: swap in use, unit: bytes, trend: true }
+  - { recipe: cpu.headline, column: load_pct, label: CPU load, unit: "%", high: 70 }
+  - { recipe: gpu.headline, column: utilization, label: GPU utilization, unit: "%", high: 80 }
+  - { recipe: disk.headline, column: free, label: disk free, unit: bytes, low: 50000000000, trend: true }
+  - { recipe: net.headline, column: throughput, label: network throughput, unit: bytes/s, high: 50000000 }
+  - { recipe: thermal.headline, column: level, label: thermal level, high: 1 }
+  - { recipe: ai.headline, column: memory_held, label: local model memory, unit: bytes, trend: true }
+# Value changes recorded as events (markers on the graphs):
+events:
+  - { name: mem.headline, column: pressure, kind: pressure, message: "memory pressure {from} → {to}", severity: medium }
+  - { name: thermal.headline, column: state, kind: thermal, message: "thermal state {from} → {to}", severity: medium }
+  - { name: battery.headline, column: source, kind: power, message: "power source {from} → {to}" }
+  - { name: ai.headline, column: models_loaded, kind: model, message: "local models loaded {from} → {to}" }
