@@ -1,6 +1,8 @@
 # Kickoff prompt for Claude Code
 
-Open the workspace (`cd headroom-workspace && claude`) and paste this as the first message:
+Do not modify
+
+paste this as the first message:
 
 ---
 
