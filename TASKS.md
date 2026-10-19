@@ -9,7 +9,9 @@
   - `sysq --fixtures builtin health overview` (live on the Mac: `sysq health overview`); every shipped recipe runs against fixtures in `go test ./internal/recipes`
 - [x] M3 sysqd: sampler, history, HTTP, clients — done when curl can read history and subscribe
   - `sysq/scripts/curl-demo.sh` against a running sysqd; `go test ./internal/daemon` does the same in-process
-- [ ] M4 Monitoring primitives (design §24) + Headroom group recipes — done when every group in headroom-spec §4 has live recipes
+- [x] M4 Monitoring primitives (design §24) + Headroom group recipes — done when every group in headroom-spec §4 has live recipes
+  - `go test ./internal/recipes -run Headroom` runs every groups.yaml binding (headline, detail, consumers, sparkline, attention) and every modes.yaml recipe
+  - needs the Mac: `ane.activity`/`thermal.pressure` need a sudoers rule for powermetrics; `ai.ollama_ps`/`ai.lmstudio_ps` need enabling in policy.yaml
 - [ ] M5 sysact: catalog, prepare/execute, confirmation requirement — done when tests prove execute fails without confirmation
 - [ ] M6 Headroom: config loader, GroupStore, small/large/drill-in views — done when the app shows live data from YAML groups
 - [ ] M7 Actions panel, Storage Explorer, Graphs
