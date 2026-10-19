@@ -35,6 +35,7 @@ extension AssistantStatus {
     }
 }
 
+@MainActor
 struct StatusDot: View {
     var status: GroupStatus
     var size: CGFloat = 8
@@ -57,6 +58,7 @@ struct VisualEffect: NSViewRepresentable {
     func updateNSView(_ v: NSVisualEffectView, context: Context) { v.material = material }
 }
 
+@MainActor
 struct Sparkline: View {
     var values: [Double]
     var color: Color
@@ -99,6 +101,7 @@ struct Sparkline: View {
 }
 
 /// The group box: same shape in the small view, large view and drill-in.
+@MainActor
 struct GroupBoxView: View {
     var vm: GroupViewModel
     var compact = true
@@ -163,6 +166,7 @@ struct GroupBoxView: View {
     }
 }
 
+@MainActor
 struct ConsumerRow: View {
     var vm: ConsumerViewModel
     var onActions: () -> Void
@@ -195,6 +199,7 @@ struct ConsumerRow: View {
 }
 
 /// Renders any sysq table: discovered columns, units, click-to-sort.
+@MainActor
 struct SysqTableView: View {
     var table: SysqTable
     var maxHeight: CGFloat? = 320
@@ -254,10 +259,10 @@ struct SysqTableView: View {
                                         .truncationMode(.middle)
                                         .frame(maxWidth: 360, alignment: c.isNumeric ? .trailing : .leading)
                                         .textSelection(.enabled)
+                                        .contentShape(Rectangle())
+                                        .onTapGesture { onRow?(t, i) }
                                 }
                             }
-                            .contentShape(Rectangle())
-                            .onTapGesture { onRow?(t, i) }
                         }
                     }
                     .padding(.vertical, 2)
@@ -274,6 +279,7 @@ struct SysqTableView: View {
     }
 }
 
+@MainActor
 struct BannerList: View {
     var banners: [Banner]
     var body: some View {
@@ -295,6 +301,7 @@ struct BannerList: View {
     }
 }
 
+@MainActor
 struct ModePicker: View {
     let model: HeadroomModel
     var body: some View {
@@ -308,6 +315,7 @@ struct ModePicker: View {
 }
 
 /// Shown instead of data when sysqd can't be reached.
+@MainActor
 struct ServiceDownCard: View {
     let model: HeadroomModel
     var body: some View {
@@ -324,6 +332,7 @@ struct ServiceDownCard: View {
 }
 
 /// Recipe output inline (▶ Run).
+@MainActor
 struct RecipeResultView: View {
     var run: RecipeRun
     var body: some View {

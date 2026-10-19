@@ -5,6 +5,7 @@ import SwiftUI
 /// Settings (headroom-spec §12, ui-design §12): every tab edits a YAML
 /// file — validated against its schema before it's saved — and offers
 /// "Edit file…"; external edits show up live.
+@MainActor
 struct SettingsView: View {
     let model: HeadroomModel
     let windows: WindowManager
@@ -25,6 +26,7 @@ struct SettingsView: View {
 }
 
 /// A YAML file in a text editor: Save validates first and reports the line.
+@MainActor
 struct YAMLEditor: View {
     let model: HeadroomModel
     let file: String
@@ -60,7 +62,9 @@ struct YAMLEditor: View {
         .onAppear { load() }
         .onChange(of: model.configStore.generation) { _, _ in
             // An external edit: reload unless there are unsaved changes.
-            if text == lastSavedText { load() }
+            // (Our own save also bumps the generation; the file then matches
+            // and "Saved and applied." stays up.)
+            if text == lastSavedText, model.configStore.loader.text(of: file) != text { load() }
         }
     }
 
@@ -80,6 +84,7 @@ struct YAMLEditor: View {
     }
 }
 
+@MainActor
 struct GeneralTab: View {
     let model: HeadroomModel
     @State private var launchAtLogin = LaunchAtLogin.enabled
@@ -118,6 +123,7 @@ struct GeneralTab: View {
     }
 }
 
+@MainActor
 struct AssistantTab: View {
     let model: HeadroomModel
     @State private var error: String?
@@ -166,6 +172,7 @@ struct AssistantTab: View {
 
 /// API settings and pairing (headroom-spec §11): approve first-contact
 /// requests by their code, list and revoke clients.
+@MainActor
 struct APITab: View {
     let model: HeadroomModel
     @State private var codes: [String: String] = [:]
@@ -235,6 +242,7 @@ struct APITab: View {
     }
 }
 
+@MainActor
 struct AdvancedTab: View {
     let model: HeadroomModel
     @State private var status: JSONValue?
@@ -246,8 +254,10 @@ struct AdvancedTab: View {
                     row("sysqd", model.services.sysq)
                     row("sysact", model.services.sysact)
                     if let s = status {
-                        Text("Enabled sensitivity: \(s["enabled_sensitivity"]?.array?.compactMap(\.string).joined(separator: ", ") ?? "—")").font(.system(size: 11))
-                        Text("sudo primitives: \(s["sudo"].map { $0.json } ?? "none")").font(.system(size: 11)).lineLimit(3)
+                        let classes: String = s["enabled_sensitivity"]?.array?.compactMap(\.string).joined(separator: ", ") ?? "—"
+                        let sudo: String = s["sudo"]?.json ?? "none"
+                        Text("Enabled sensitivity: " + classes).font(.system(size: 11))
+                        Text("sudo primitives: " + sudo).font(.system(size: 11)).lineLimit(3)
                         if s["fixtures"]?.bool == true { Text("sysqd is serving recorded fixtures, not live data.").font(.system(size: 11)).foregroundStyle(.orange) }
                     }
                     HStack {

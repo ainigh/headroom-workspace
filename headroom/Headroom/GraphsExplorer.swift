@@ -16,6 +16,7 @@ struct ChartPoint: Identifiable {
 }
 
 /// Graphs panel (headroom-spec §10, ui-design §10).
+@MainActor
 struct GraphsView: View {
     let model: HeadroomModel
     let ui: UIState
@@ -98,10 +99,11 @@ struct GraphsView: View {
     func chart(_ groups: [GroupConfig], normalized: Bool) -> some View {
         let series = groups.map { ChartSeries(id: $0.id, group: $0, pts: points($0, normalized: normalized)) }
         let events = model.history.events
+        let yLabel: String = normalized ? "Relative %" : "Value"
         return Chart {
             ForEach(series) { s in
                 ForEach(s.pts) { p in
-                    LineMark(x: .value("Time", p.date), y: .value(normalized ? "Relative %" : "Value", p.value))
+                    LineMark(x: .value("Time", p.date), y: .value(yLabel, p.value))
                         .foregroundStyle(by: .value("Group", s.group.name))
                         .interpolationMethod(.monotone)
                 }
@@ -145,6 +147,7 @@ struct GraphsView: View {
 }
 
 /// Storage Explorer (headroom-spec §9, ui-design §11).
+@MainActor
 struct ExplorerWindow: View {
     let model: HeadroomModel
     let windows: WindowManager
@@ -253,6 +256,7 @@ struct ExplorerWindow: View {
     }
 }
 
+@MainActor
 struct VolumeBars: View {
     var table: SysqTable
     var body: some View {
@@ -277,6 +281,7 @@ struct VolumeBars: View {
     }
 }
 
+@MainActor
 struct TreemapView: View {
     var items: [ExplorerItem]
     var onTap: (ExplorerItem) -> Void

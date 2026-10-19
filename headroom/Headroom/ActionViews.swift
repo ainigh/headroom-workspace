@@ -2,6 +2,7 @@ import HeadroomKit
 import SwiftUI
 
 /// The Actions panel (headroom-spec §7, ui-design §7) for one item.
+@MainActor
 struct ActionsPanel: View {
     let model: HeadroomModel
     let ui: UIState
@@ -86,6 +87,7 @@ struct ActionsPanel: View {
 }
 
 /// A read-only recipe: doc, derived cost/sensitivity, Run, Copy as CLI, Explain.
+@MainActor
 struct RecipeRow: View {
     let model: HeadroomModel
     let name: String
@@ -127,6 +129,7 @@ struct RecipeRow: View {
     }
 }
 
+@MainActor
 struct Badge: View {
     var text: String
     var body: some View {
@@ -136,6 +139,7 @@ struct Badge: View {
     }
 }
 
+@MainActor
 struct ExplainSheet: View {
     var name: String
     var plan: ExplainPlan?
@@ -163,6 +167,7 @@ struct ExplainSheet: View {
 }
 
 /// A sysact action row. Its button only ever opens the confirmation sheet.
+@MainActor
 struct ActionCatalogRow: View {
     let model: HeadroomModel
     let info: ActionInfo
@@ -185,7 +190,7 @@ struct ActionCatalogRow: View {
                 }
                 Button("Confirm…") { start() }
                     .controlSize(.small)
-                    .tint(risky ? .red : .orange)
+                    .tint(risky ? Color.red : Color.orange)
                     .buttonStyle(.bordered)
                     .disabled(model.actions.busy != nil || !missing.isEmpty)
                     .help(missing.isEmpty ? info.effect : "Needs \(missing.joined(separator: ", "))")
@@ -223,6 +228,7 @@ struct ActionCatalogRow: View {
 /// The one confirmation sheet (ui-design §8): exact action, params, effect,
 /// tier, undo, who asked, the model's explanation; Cancel is the default and
 /// Confirm stays disabled for the configured delay.
+@MainActor
 struct ConfirmationSheet: View {
     let flow: ConfirmationFlow
     let catalog: ActionStore
@@ -280,7 +286,7 @@ struct ConfirmationSheet: View {
                             Text("Confirm")
                         }
                     }
-                    .tint(p.tier == "risky" ? .red : .orange)
+                    .tint(p.tier == "risky" ? Color.red : Color.orange)
                     .buttonStyle(.borderedProminent)
                     .disabled(remaining > 0 || !flow.confirmEnabled)
                 }

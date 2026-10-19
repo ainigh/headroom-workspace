@@ -33,7 +33,7 @@ Running the install line again works too. Nothing depends on GitHub Actions work
 
 ## Using it
 
-- The menu bar item opens a menu; **Show Headroom** (or ⌥⌘H anywhere) toggles the floating panel
+- The menu bar item opens a menu; **Show Headroom** (or ⌃⌥H anywhere) toggles the floating panel
   with the four key groups and their top consumers. Click a group to drill in; `⋯` on a consumer
   opens its Actions panel.
 - Headroom starts `sysqd` and `sysact` as LaunchAgents from inside the app
