@@ -179,6 +179,9 @@ func Text(w io.Writer, t *table.Table) {
 
 // CSV renders raw (unhumanized) values.
 func CSV(w io.Writer, t *table.Table) error {
+	if t == nil {
+		return nil
+	}
 	cw := csv.NewWriter(w)
 	head := make([]string, len(t.Schema))
 	for i, c := range t.Schema {
@@ -204,6 +207,9 @@ func CSV(w io.Writer, t *table.Table) error {
 
 // Markdown renders a GitHub-style table.
 func Markdown(w io.Writer, t *table.Table) {
+	if t == nil {
+		return
+	}
 	head, rows := cells(t)
 	if len(head) == 0 {
 		fmt.Fprintln(w, "_(empty)_")
