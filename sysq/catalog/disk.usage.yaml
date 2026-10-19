@@ -1,0 +1,19 @@
+name: disk.usage
+doc: Directory sizes under a path, to a depth of at most 3 (du with a time budget; partial results are marked truncated).
+params:
+  path:  { type: path, default: "~", must_exist: true }
+  depth: { type: int, default: 1, min: 0, max: 3 }
+cost: expensive
+sensitivity: personal
+argv: ["/usr/bin/du", "-k", "-x", "-d", "{depth}", "{path}"]
+allow_exit: [1]
+parser: du
+timeout: 20s
+partial_ok: true
+cache_ttl: 10m
+fixture_params: { path: "~", depth: 1 }
+schema:
+  - { name: path,  type: path }
+  - { name: name,  type: str }
+  - { name: size,  type: bytes }
+  - { name: depth, type: int }

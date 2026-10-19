@@ -1,0 +1,26 @@
+name: sys.cpu
+doc: CPU brand, core counts (P/E), load averages, and overall usage from top's second sample.
+cost: moderate
+sensitivity: public
+commands:
+  - id: sysctl
+    argv: ["/usr/sbin/sysctl", "machdep.cpu.brand_string", "hw.ncpu", "hw.perflevel0.logicalcpu", "hw.perflevel1.logicalcpu", "vm.loadavg"]
+    allow_exit: [1]
+  - { id: top, argv: ["/usr/bin/top", "-l", "2", "-n", "0", "-s", "1"] }
+parser: sys_cpu
+timeout: 6s
+cache_ttl: 2s
+schema:
+  - { name: brand,     type: str }
+  - { name: cores,     type: int }
+  - { name: p_cores,   type: int }
+  - { name: e_cores,   type: int }
+  - { name: user_pct,  type: float, unit: "%" }
+  - { name: sys_pct,   type: float, unit: "%" }
+  - { name: idle_pct,  type: float, unit: "%" }
+  - { name: load_pct,  type: float, unit: "%" }
+  - { name: load1,     type: float }
+  - { name: load5,     type: float }
+  - { name: load15,    type: float }
+  - { name: processes, type: int }
+  - { name: threads,   type: int }

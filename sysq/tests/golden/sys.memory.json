@@ -1,0 +1,120 @@
+{
+  "schema": [
+    {
+      "name": "total",
+      "type": "bytes"
+    },
+    {
+      "name": "used",
+      "type": "bytes"
+    },
+    {
+      "name": "available",
+      "type": "bytes"
+    },
+    {
+      "name": "free",
+      "type": "bytes"
+    },
+    {
+      "name": "app",
+      "type": "bytes"
+    },
+    {
+      "name": "wired",
+      "type": "bytes"
+    },
+    {
+      "name": "compressed",
+      "type": "bytes"
+    },
+    {
+      "name": "cached",
+      "type": "bytes"
+    },
+    {
+      "name": "purgeable",
+      "type": "bytes"
+    },
+    {
+      "name": "inactive",
+      "type": "bytes"
+    },
+    {
+      "name": "swap_total",
+      "type": "bytes"
+    },
+    {
+      "name": "swap_used",
+      "type": "bytes"
+    },
+    {
+      "name": "pressure",
+      "type": "enum",
+      "values": [
+        "normal",
+        "warn",
+        "critical"
+      ]
+    },
+    {
+      "name": "pressure_pct",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "free_pct",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "page_size",
+      "type": "bytes"
+    },
+    {
+      "name": "pageouts",
+      "type": "int"
+    },
+    {
+      "name": "swapins",
+      "type": "int"
+    },
+    {
+      "name": "swapouts",
+      "type": "int"
+    }
+  ],
+  "rows": [
+    [
+      68719476736,
+      43815796736,
+      24903680000,
+      4915200000,
+      28344320000,
+      9830400000,
+      5641076736,
+      19988480000,
+      327680000,
+      22937600000,
+      3221225472,
+      2266234880,
+      "normal",
+      42,
+      58,
+      16384,
+      34567,
+      12345,
+      23456
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "sys.memory"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

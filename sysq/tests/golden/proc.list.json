@@ -1,0 +1,179 @@
+{
+  "schema": [
+    {
+      "name": "pid",
+      "type": "pid"
+    },
+    {
+      "name": "ppid",
+      "type": "pid"
+    },
+    {
+      "name": "user",
+      "type": "str"
+    },
+    {
+      "name": "cpu",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "mem_pct",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "rss",
+      "type": "bytes"
+    },
+    {
+      "name": "started",
+      "type": "ts"
+    },
+    {
+      "name": "name",
+      "type": "str"
+    },
+    {
+      "name": "exe",
+      "type": "path"
+    },
+    {
+      "name": "command",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      1,
+      0,
+      "root",
+      0,
+      0,
+      28835840,
+      "2026-10-05T08:01:12-07:00",
+      "launchd",
+      "/sbin/launchd",
+      "/sbin/launchd"
+    ],
+    [
+      412,
+      1,
+      "_postgres",
+      0.1,
+      0.1,
+      67108864,
+      "2026-10-05T08:01:40-07:00",
+      "postgres",
+      "/opt/homebrew/opt/postgresql@17/bin/postgres",
+      "/opt/homebrew/opt/postgresql@17/bin/postgres -D /opt/homebrew/var/postgresql@17"
+    ],
+    [
+      873,
+      1,
+      "me",
+      0,
+      0.2,
+      134217728,
+      "2026-10-05T08:02:10-07:00",
+      "Finder",
+      "/System/Library/CoreServices/Finder.app/Contents/MacOS/Finder",
+      "/System/Library/CoreServices/Finder.app/Contents/MacOS/Finder"
+    ],
+    [
+      1502,
+      1,
+      "me",
+      0.2,
+      34.1,
+      24051816448,
+      "2026-10-18T21:10:00-07:00",
+      "ollama",
+      "/Applications/Ollama.app/Contents/Resources/ollama",
+      "/Applications/Ollama.app/Contents/Resources/ollama runner --model /Users/me/.ollama/models/blobs/sha256-a1b2c3 --ctx-size 8192 --port 54123"
+    ],
+    [
+      2210,
+      1,
+      "me",
+      12.4,
+      4.1,
+      2936012800,
+      "2026-10-19T08:30:01-07:00",
+      "Google Chrome",
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    ],
+    [
+      2244,
+      2210,
+      "me",
+      9.8,
+      2.3,
+      1651507200,
+      "2026-10-19T08:30:03-07:00",
+      "Google Chrome Helper (Renderer)",
+      "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/140.0.7339.80/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+      "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/140.0.7339.80/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer) --type=renderer"
+    ],
+    [
+      3001,
+      1,
+      "me",
+      0.5,
+      5.5,
+      3984588800,
+      "2026-10-19T09:01:00-07:00",
+      "Xcode",
+      "/Applications/Xcode.app/Contents/MacOS/Xcode",
+      "/Applications/Xcode.app/Contents/MacOS/Xcode"
+    ],
+    [
+      3320,
+      1,
+      "me",
+      98.2,
+      0.6,
+      419430400,
+      "2026-10-19T10:31:45-07:00",
+      "photoanalysisd",
+      "/System/Library/PrivateFrameworks/PhotoAnalysis.framework/Versions/A/Support/photoanalysisd",
+      "/System/Library/PrivateFrameworks/PhotoAnalysis.framework/Versions/A/Support/photoanalysisd"
+    ],
+    [
+      4011,
+      873,
+      "me",
+      0,
+      0,
+      4194304,
+      "2026-10-19T10:40:01-07:00",
+      "curl",
+      "/usr/bin/curl",
+      "/usr/bin/curl -s https://api.example.com/v1?token=[REDACTED]"
+    ],
+    [
+      4100,
+      1,
+      "me",
+      1.1,
+      0.1,
+      100663296,
+      "2026-10-19T10:45:12-07:00",
+      "Headroom",
+      "/Applications/Headroom.app/Contents/MacOS/Headroom",
+      "/Applications/Headroom.app/Contents/MacOS/Headroom"
+    ]
+  ],
+  "meta": {
+    "rows": 10,
+    "truncated": false,
+    "source": [
+      "proc.list"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true,
+    "redacted": 2
+  }
+}

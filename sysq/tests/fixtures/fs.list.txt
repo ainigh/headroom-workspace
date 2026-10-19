@@ -1,0 +1,17 @@
+total 48
+drwxr-x---+ 42 me    staff   1344 Oct 19 09:12:44 2026 .
+drwxr-xr-x   6 root  admin    192 Sep 30 08:01:02 2026 ..
+-r--------   1 me    staff      7 Mar  3 11:20:15 2025 .CFUserTextEncoding
+-rw-r--r--@  1 me    staff  18436 Oct 18 22:41:09 2026 .DS_Store
+drwx------+  4 me    staff    128 Oct 19 10:02:31 2026 .Trash
+drwxr-xr-x   9 me    staff    288 Oct 12 14:55:00 2026 .ollama
+lrwxr-xr-x   1 me    staff     27 Jun  1 09:00:00 2026 Code -> /Users/me/Developer/Projects
+drwx------@  6 me    staff    192 Oct 18 17:30:12 2026 Desktop
+drwx------+ 14 me    staff    448 Oct 17 08:22:41 2026 Documents
+drwx------@ 87 me    staff   2784 Oct 19 08:59:03 2026 Downloads
+drwx------@ 98 me    staff   3136 Oct 19 10:40:55 2026 Library
+drwx------   5 me    staff    160 Aug 21 19:03:17 2026 Movies
+drwx------+  6 me    staff    192 Sep  2 12:10:00 2026 Music
+drwx------+  7 me    staff    224 Oct  4 16:44:21 2026 Pictures
+drwxr-xr-x+  4 me    staff    128 Mar  3 11:20:15 2025 Public
+-rw-r--r--   1 me    staff   4211 Oct 15 21:07:33 2026 notes from call.txt

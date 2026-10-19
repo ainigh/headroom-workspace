@@ -1,0 +1,24 @@
+name: fs.list
+doc: Entries of one directory with kind, size, owner and modification time (glob filters names).
+params:
+  path: { type: path, default: "~", must_exist: true }
+  glob: { type: str, max_len: 128 }
+cost: cheap
+sensitivity: personal
+argv: ["/bin/ls", "-laT", "{path}"]
+allow_exit: [1]
+parser: ls_long
+timeout: 5s
+cache_ttl: 5s
+fixture_params: { path: "~" }
+schema:
+  - { name: name,        type: str }
+  - { name: path,        type: path }
+  - { name: kind,        type: enum, values: [file, dir, link, other] }
+  - { name: size,        type: bytes }
+  - { name: mode,        type: str }
+  - { name: owner,       type: str }
+  - { name: group,       type: str }
+  - { name: modified,    type: ts }
+  - { name: link_target, type: str }
+  - { name: hidden,      type: bool }

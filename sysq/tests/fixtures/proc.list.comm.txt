@@ -1,0 +1,10 @@
+    1 /sbin/launchd
+  412 /opt/homebrew/opt/postgresql@17/bin/postgres
+  873 /System/Library/CoreServices/Finder.app/Contents/MacOS/Finder
+ 1502 /Applications/Ollama.app/Contents/Resources/ollama
+ 2210 /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+ 2244 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/140.0.7339.80/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)
+ 3001 /Applications/Xcode.app/Contents/MacOS/Xcode
+ 3320 /System/Library/PrivateFrameworks/PhotoAnalysis.framework/Versions/A/Support/photoanalysisd
+ 4011 /usr/bin/curl
+ 4100 /Applications/Headroom.app/Contents/MacOS/Headroom

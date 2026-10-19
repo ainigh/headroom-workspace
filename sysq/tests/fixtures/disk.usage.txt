@@ -1,0 +1,11 @@
+312456	/Users/me/Music
+48213456	/Users/me/Library
+1024	/Users/me/.ssh
+8	/Users/me/Public
+12873456	/Users/me/Downloads
+2345678	/Users/me/Documents
+45678	/Users/me/Desktop
+98765432	/Users/me/.ollama
+3456789	/Users/me/Developer
+765432	/Users/me/Pictures
+166854061	/Users/me

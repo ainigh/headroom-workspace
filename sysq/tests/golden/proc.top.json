@@ -1,0 +1,93 @@
+{
+  "schema": [
+    {
+      "name": "pid",
+      "type": "pid"
+    },
+    {
+      "name": "command",
+      "type": "str"
+    },
+    {
+      "name": "cpu",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "mem",
+      "type": "bytes"
+    },
+    {
+      "name": "power",
+      "type": "float"
+    }
+  ],
+  "rows": [
+    [
+      3320,
+      "photoanalysisd",
+      98.2,
+      419430400,
+      61.3
+    ],
+    [
+      0,
+      "kernel_task",
+      24.1,
+      12582912,
+      0
+    ],
+    [
+      2244,
+      "Google Chrome He",
+      9.8,
+      1651507200,
+      12.4
+    ],
+    [
+      2210,
+      "Google Chrome",
+      7.6,
+      2936012800,
+      8.9
+    ],
+    [
+      4100,
+      "Headroom",
+      1.1,
+      100663296,
+      0.8
+    ],
+    [
+      3001,
+      "Xcode",
+      0.5,
+      3984588800,
+      0.6
+    ],
+    [
+      1502,
+      "ollama",
+      0.2,
+      23622320128,
+      0.1
+    ],
+    [
+      873,
+      "Finder",
+      0,
+      134217728,
+      0
+    ]
+  ],
+  "meta": {
+    "rows": 8,
+    "truncated": false,
+    "source": [
+      "proc.top"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

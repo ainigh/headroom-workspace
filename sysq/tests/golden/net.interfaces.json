@@ -1,0 +1,140 @@
+{
+  "schema": [
+    {
+      "name": "name",
+      "type": "str"
+    },
+    {
+      "name": "hardware_port",
+      "type": "str"
+    },
+    {
+      "name": "mac",
+      "type": "str"
+    },
+    {
+      "name": "ipv4",
+      "type": "str"
+    },
+    {
+      "name": "ipv6",
+      "type": "str"
+    },
+    {
+      "name": "status",
+      "type": "str"
+    },
+    {
+      "name": "mtu",
+      "type": "int"
+    },
+    {
+      "name": "up",
+      "type": "bool"
+    },
+    {
+      "name": "flags",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      "lo0",
+      "",
+      "",
+      "127.0.0.1",
+      "::1",
+      "",
+      16384,
+      true,
+      "UP,LOOPBACK,RUNNING,MULTICAST"
+    ],
+    [
+      "gif0",
+      "",
+      "",
+      "",
+      "",
+      "",
+      1280,
+      false,
+      "POINTOPOINT,MULTICAST"
+    ],
+    [
+      "stf0",
+      "",
+      "",
+      "",
+      "",
+      "",
+      1280,
+      false,
+      ""
+    ],
+    [
+      "anpi0",
+      "",
+      "2a:8c:4e:01:02:03",
+      "",
+      "",
+      "inactive",
+      1500,
+      true,
+      "UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST"
+    ],
+    [
+      "en0",
+      "Wi-Fi",
+      "3c:a6:f6:12:34:56",
+      "192.168.1.23",
+      "2601:640:8100:9e0:1cd4:2b11:aa01:3f22",
+      "active",
+      1500,
+      true,
+      "UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST"
+    ],
+    [
+      "en1",
+      "Thunderbolt 1",
+      "36:a1:0b:9c:00:01",
+      "",
+      "",
+      "inactive",
+      1500,
+      true,
+      "UP,BROADCAST,SMART,RUNNING,PROMISC,SIMPLEX,MULTICAST"
+    ],
+    [
+      "bridge0",
+      "Thunderbolt Bridge",
+      "36:a1:0b:9c:00:00",
+      "",
+      "",
+      "inactive",
+      1500,
+      true,
+      "UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST"
+    ],
+    [
+      "utun0",
+      "",
+      "",
+      "",
+      "fe80::d3a1:22e4:8a3b:51c0",
+      "",
+      1380,
+      true,
+      "UP,POINTOPOINT,RUNNING,MULTICAST"
+    ]
+  ],
+  "meta": {
+    "rows": 8,
+    "truncated": false,
+    "source": [
+      "net.interfaces"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

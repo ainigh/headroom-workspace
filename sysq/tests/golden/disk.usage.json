@@ -1,0 +1,98 @@
+{
+  "schema": [
+    {
+      "name": "path",
+      "type": "path"
+    },
+    {
+      "name": "name",
+      "type": "str"
+    },
+    {
+      "name": "size",
+      "type": "bytes"
+    },
+    {
+      "name": "depth",
+      "type": "int"
+    }
+  ],
+  "rows": [
+    [
+      "/Users/me/Music",
+      "Music",
+      319954944,
+      1
+    ],
+    [
+      "/Users/me/Library",
+      "Library",
+      49370578944,
+      1
+    ],
+    [
+      "/Users/me/.ssh",
+      ".ssh",
+      1048576,
+      1
+    ],
+    [
+      "/Users/me/Public",
+      "Public",
+      8192,
+      1
+    ],
+    [
+      "/Users/me/Downloads",
+      "Downloads",
+      13182418944,
+      1
+    ],
+    [
+      "/Users/me/Documents",
+      "Documents",
+      2401974272,
+      1
+    ],
+    [
+      "/Users/me/Desktop",
+      "Desktop",
+      46774272,
+      1
+    ],
+    [
+      "/Users/me/.ollama",
+      ".ollama",
+      101135802368,
+      1
+    ],
+    [
+      "/Users/me/Developer",
+      "Developer",
+      3539751936,
+      1
+    ],
+    [
+      "/Users/me/Pictures",
+      "Pictures",
+      783802368,
+      1
+    ],
+    [
+      "/Users/me",
+      "me",
+      170858558464,
+      0
+    ]
+  ],
+  "meta": {
+    "rows": 11,
+    "truncated": false,
+    "source": [
+      "disk.usage"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

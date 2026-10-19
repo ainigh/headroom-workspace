@@ -22,7 +22,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 	"unicode/utf8"
 )
 
@@ -331,8 +330,6 @@ var durRe = regexp.MustCompile(`^([0-9]+(?:\.[0-9]+)?)(ms|s|m|h|d|w)?$`)
 func ParseDuration(v any) (float64, error) {
 	switch x := v.(type) {
 	case Seconds:
-		return x.Seconds(), nil
-	case time.Duration:
 		return x.Seconds(), nil
 	case int, int64, float64:
 		return toFloat(x)

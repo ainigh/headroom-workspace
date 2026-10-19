@@ -1,0 +1,192 @@
+{
+  "schema": [
+    {
+      "name": "name",
+      "type": "str"
+    },
+    {
+      "name": "device",
+      "type": "str"
+    },
+    {
+      "name": "mount",
+      "type": "path"
+    },
+    {
+      "name": "fstype",
+      "type": "str"
+    },
+    {
+      "name": "size",
+      "type": "bytes"
+    },
+    {
+      "name": "used",
+      "type": "bytes"
+    },
+    {
+      "name": "free",
+      "type": "bytes"
+    },
+    {
+      "name": "used_pct",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "mounted",
+      "type": "bool"
+    },
+    {
+      "name": "readonly",
+      "type": "bool"
+    },
+    {
+      "name": "local",
+      "type": "bool"
+    },
+    {
+      "name": "internal",
+      "type": "bool",
+      "doc": "an APFS system volume under /System/Volumes"
+    }
+  ],
+  "rows": [
+    [
+      "Macintosh HD",
+      "/dev/disk3s1s1",
+      "/",
+      "apfs",
+      994662584320,
+      901389053952,
+      93273530368,
+      90.6,
+      true,
+      true,
+      true,
+      false
+    ],
+    [
+      "VM",
+      "/dev/disk3s6",
+      "/System/Volumes/VM",
+      "apfs",
+      994662584320,
+      901389053952,
+      93273530368,
+      90.6,
+      true,
+      false,
+      true,
+      true
+    ],
+    [
+      "Preboot",
+      "/dev/disk3s2",
+      "/System/Volumes/Preboot",
+      "apfs",
+      994662584320,
+      901389053952,
+      93273530368,
+      90.6,
+      true,
+      false,
+      true,
+      true
+    ],
+    [
+      "Update",
+      "/dev/disk3s4",
+      "/System/Volumes/Update",
+      "apfs",
+      994662584320,
+      901389053952,
+      93273530368,
+      90.6,
+      true,
+      false,
+      true,
+      true
+    ],
+    [
+      "xarts",
+      "/dev/disk1s2",
+      "/System/Volumes/xarts",
+      "apfs",
+      524288000,
+      21950464,
+      502337536,
+      4.2,
+      true,
+      false,
+      true,
+      true
+    ],
+    [
+      "iSCPreboot",
+      "/dev/disk1s1",
+      "/System/Volumes/iSCPreboot",
+      "apfs",
+      524288000,
+      21950464,
+      502337536,
+      4.2,
+      true,
+      false,
+      true,
+      true
+    ],
+    [
+      "Hardware",
+      "/dev/disk1s3",
+      "/System/Volumes/Hardware",
+      "apfs",
+      524288000,
+      21950464,
+      502337536,
+      4.2,
+      true,
+      false,
+      true,
+      true
+    ],
+    [
+      "Data",
+      "/dev/disk3s5",
+      "/System/Volumes/Data",
+      "apfs",
+      994662584320,
+      901389053952,
+      93273530368,
+      90.6,
+      true,
+      false,
+      true,
+      true
+    ],
+    [
+      "Archive Drive",
+      "/dev/disk5s1",
+      "/Volumes/Archive Drive",
+      "apfs",
+      2000398934016,
+      1128801974272,
+      871596959744,
+      56.4,
+      true,
+      false,
+      true,
+      false
+    ]
+  ],
+  "meta": {
+    "rows": 9,
+    "truncated": false,
+    "source": [
+      "disk.volumes"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

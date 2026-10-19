@@ -1,0 +1,13 @@
+name: svc.launchd
+doc: launchd jobs in this user's domain with pid (when running) and last exit status.
+cost: cheap
+sensitivity: personal
+argv: ["/bin/launchctl", "list"]
+parser: launchctl_list
+timeout: 5s
+cache_ttl: 10s
+schema:
+  - { name: label,     type: str }
+  - { name: pid,       type: pid }
+  - { name: last_exit, type: int }
+  - { name: running,   type: bool }

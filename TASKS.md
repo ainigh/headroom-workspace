@@ -1,6 +1,8 @@
 # Milestones (from docs/implementation.md §6)
 
-- [ ] M0 sysq core: catalog loader, executor + seatbelt, fixture tool, 12 primitives, Table, `describe`/`run` CLI — done when fixtures pass and sandbox write-denial test passes
+- [x] M0 sysq core: catalog loader, executor + seatbelt, fixture tool, 12 primitives, Table, `describe`/`run` CLI — done when fixtures pass and sandbox write-denial test passes
+  - fixtures/goldens pass; sandbox render tests pass on Linux; the darwin write/network/excluded-read denial tests (`internal/exec/sandbox_darwin_test.go`) run on the Mac and in macOS CI
+  - on the Mac: `sysq fixture capture --all` then `go test ./internal/parsers -update` to replace synthetic fixtures
 - [ ] M1 Starlark + sugar + operators + fuel; `explain` — done when sugar goldens pass and the design §16 script runs
 - [ ] M2 Recipe loader, derived metadata, generated CLI, starter library — done when `sysq health overview` works
 - [ ] M3 sysqd: sampler, history, HTTP, clients — done when curl can read history and subscribe

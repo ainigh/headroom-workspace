@@ -85,7 +85,7 @@ type Meta struct {
 	CostMS         int64     `json:"cost_ms"`
 	Sensitivity    string    `json:"sensitivity,omitempty"`
 	DroppedByLimit int       `json:"dropped_by_limit,omitempty"`
-	SnapshotTS     time.Time `json:"snapshot_ts,omitempty"`
+	SnapshotTS     time.Time `json:"snapshot_ts,omitzero"`
 	Cached         bool      `json:"cached,omitempty"`
 	Error          string    `json:"error,omitempty"`
 	Unavailable    string    `json:"unavailable,omitempty"`
@@ -97,9 +97,9 @@ type Meta struct {
 
 // Table is a schema, rows, and meta.
 type Table struct {
-	Schema []Col    `json:"schema"`
-	Rows   [][]any  `json:"rows"`
-	Meta   Meta     `json:"meta"`
+	Schema []Col   `json:"schema"`
+	Rows   [][]any `json:"rows"`
+	Meta   Meta    `json:"meta"`
 }
 
 // New returns an empty table with the given schema.

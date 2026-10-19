@@ -1,0 +1,22 @@
+name: proc.list
+doc: Every process with parent, user, cpu, memory, start time and command line (arguments redacted).
+cost: cheap
+sensitivity: personal
+commands:
+  - { id: ps, argv: ["/bin/ps", "-axww", "-o", "pid=,ppid=,user=,%cpu=,%mem=,rss=,lstart=,command="] }
+  - { id: comm, argv: ["/bin/ps", "-axww", "-o", "pid=,comm="] }
+parser: ps_list
+timeout: 5s
+cache_ttl: 2s
+redact: true
+schema:
+  - { name: pid,     type: pid }
+  - { name: ppid,    type: pid }
+  - { name: user,    type: str }
+  - { name: cpu,     type: float, unit: "%" }
+  - { name: mem_pct, type: float, unit: "%" }
+  - { name: rss,     type: bytes }
+  - { name: started, type: ts }
+  - { name: name,    type: str }
+  - { name: exe,     type: path }
+  - { name: command, type: str }

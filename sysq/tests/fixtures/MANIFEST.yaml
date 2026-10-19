@@ -1,0 +1,21 @@
+# Provenance of each fixture. "synthetic" fixtures were written from the
+# documented output format of each macOS command (the workspace was built on
+# a Linux host). Replace them with real output on the Mac:
+#   sysq fixture capture --all && (cd sysq && go test ./internal/parsers -update)
+# `sysq fixture status` lists which are still synthetic.
+captured_at: 2026-10-19T10:47:02-07:00
+timezone: America/Los_Angeles
+home: /Users/me
+fixtures:
+  sys.info: synthetic
+  sys.memory: synthetic
+  sys.cpu: synthetic
+  disk.volumes: synthetic
+  disk.usage: synthetic
+  fs.list: synthetic
+  proc.list: synthetic
+  proc.top: synthetic
+  net.listeners: synthetic
+  net.interfaces: synthetic
+  svc.launchd: synthetic
+  log.system: synthetic

@@ -1,0 +1,23 @@
+name: sys.info
+doc: Hardware and OS facts (macOS version, model, chip, memory, core counts).
+cost: cheap
+sensitivity: public
+commands:
+  - { id: sw_vers, argv: ["/usr/bin/sw_vers"] }
+  - id: sysctl
+    argv: ["/usr/sbin/sysctl", "hw.model", "hw.memsize", "hw.ncpu", "hw.perflevel0.physicalcpu", "hw.perflevel1.physicalcpu", "machdep.cpu.brand_string", "kern.osrelease"]
+    allow_exit: [1]
+parser: sys_info
+timeout: 5s
+cache_ttl: 1h
+schema:
+  - { name: os,         type: str }
+  - { name: os_version, type: str }
+  - { name: build,      type: str }
+  - { name: model,      type: str }
+  - { name: chip,       type: str }
+  - { name: memory,     type: bytes }
+  - { name: cpus,       type: int }
+  - { name: p_cores,    type: int }
+  - { name: e_cores,    type: int }
+  - { name: kernel,     type: str }

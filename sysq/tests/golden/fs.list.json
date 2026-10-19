@@ -1,0 +1,230 @@
+{
+  "schema": [
+    {
+      "name": "name",
+      "type": "str"
+    },
+    {
+      "name": "path",
+      "type": "path"
+    },
+    {
+      "name": "kind",
+      "type": "enum",
+      "values": [
+        "file",
+        "dir",
+        "link",
+        "other"
+      ]
+    },
+    {
+      "name": "size",
+      "type": "bytes"
+    },
+    {
+      "name": "mode",
+      "type": "str"
+    },
+    {
+      "name": "owner",
+      "type": "str"
+    },
+    {
+      "name": "group",
+      "type": "str"
+    },
+    {
+      "name": "modified",
+      "type": "ts"
+    },
+    {
+      "name": "link_target",
+      "type": "str"
+    },
+    {
+      "name": "hidden",
+      "type": "bool"
+    }
+  ],
+  "rows": [
+    [
+      ".CFUserTextEncoding",
+      "/Users/me/.CFUserTextEncoding",
+      "file",
+      7,
+      "-r--------",
+      "me",
+      "staff",
+      "2025-03-03T11:20:15-08:00",
+      "",
+      true
+    ],
+    [
+      ".DS_Store",
+      "/Users/me/.DS_Store",
+      "file",
+      18436,
+      "-rw-r--r--",
+      "me",
+      "staff",
+      "2026-10-18T22:41:09-07:00",
+      "",
+      true
+    ],
+    [
+      ".Trash",
+      "/Users/me/.Trash",
+      "dir",
+      128,
+      "drwx------",
+      "me",
+      "staff",
+      "2026-10-19T10:02:31-07:00",
+      "",
+      true
+    ],
+    [
+      ".ollama",
+      "/Users/me/.ollama",
+      "dir",
+      288,
+      "drwxr-xr-x",
+      "me",
+      "staff",
+      "2026-10-12T14:55:00-07:00",
+      "",
+      true
+    ],
+    [
+      "Code",
+      "/Users/me/Code",
+      "link",
+      27,
+      "lrwxr-xr-x",
+      "me",
+      "staff",
+      "2026-06-01T09:00:00-07:00",
+      "/Users/me/Developer/Projects",
+      false
+    ],
+    [
+      "Desktop",
+      "/Users/me/Desktop",
+      "dir",
+      192,
+      "drwx------",
+      "me",
+      "staff",
+      "2026-10-18T17:30:12-07:00",
+      "",
+      false
+    ],
+    [
+      "Documents",
+      "/Users/me/Documents",
+      "dir",
+      448,
+      "drwx------",
+      "me",
+      "staff",
+      "2026-10-17T08:22:41-07:00",
+      "",
+      false
+    ],
+    [
+      "Downloads",
+      "/Users/me/Downloads",
+      "dir",
+      2784,
+      "drwx------",
+      "me",
+      "staff",
+      "2026-10-19T08:59:03-07:00",
+      "",
+      false
+    ],
+    [
+      "Library",
+      "/Users/me/Library",
+      "dir",
+      3136,
+      "drwx------",
+      "me",
+      "staff",
+      "2026-10-19T10:40:55-07:00",
+      "",
+      false
+    ],
+    [
+      "Movies",
+      "/Users/me/Movies",
+      "dir",
+      160,
+      "drwx------",
+      "me",
+      "staff",
+      "2026-08-21T19:03:17-07:00",
+      "",
+      false
+    ],
+    [
+      "Music",
+      "/Users/me/Music",
+      "dir",
+      192,
+      "drwx------",
+      "me",
+      "staff",
+      "2026-09-02T12:10:00-07:00",
+      "",
+      false
+    ],
+    [
+      "Pictures",
+      "/Users/me/Pictures",
+      "dir",
+      224,
+      "drwx------",
+      "me",
+      "staff",
+      "2026-10-04T16:44:21-07:00",
+      "",
+      false
+    ],
+    [
+      "Public",
+      "/Users/me/Public",
+      "dir",
+      128,
+      "drwxr-xr-x",
+      "me",
+      "staff",
+      "2025-03-03T11:20:15-08:00",
+      "",
+      false
+    ],
+    [
+      "notes from call.txt",
+      "/Users/me/notes from call.txt",
+      "file",
+      4211,
+      "-rw-r--r--",
+      "me",
+      "staff",
+      "2026-10-15T21:07:33-07:00",
+      "",
+      false
+    ]
+  ],
+  "meta": {
+    "rows": 14,
+    "truncated": false,
+    "source": [
+      "fs.list"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

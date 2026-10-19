@@ -1,0 +1,5 @@
+machdep.cpu.brand_string: Apple M4 Pro
+hw.ncpu: 14
+hw.perflevel0.logicalcpu: 10
+hw.perflevel1.logicalcpu: 4
+vm.loadavg: { 3.21 2.98 2.75 }

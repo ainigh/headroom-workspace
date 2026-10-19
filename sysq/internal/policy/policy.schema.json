@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "sysq policy.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "allowed_roots": { "type": "array", "items": { "type": "string", "pattern": "^(~|/)" } },
+    "excluded_paths": { "type": "array", "items": { "type": "string", "pattern": "^(~|/)" } },
+    "enabled_sensitivity": { "type": "array", "items": { "enum": ["public", "personal", "secret"] } },
+    "network_primitives": { "type": "array", "items": { "type": "string" } },
+    "caps": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rows": { "type": "integer", "minimum": 1, "maximum": 5000 },
+        "bytes": { "type": "integer", "minimum": 1024, "maximum": 2097152 },
+        "depth": { "type": "integer", "minimum": 1, "maximum": 4 }
+      }
+    },
+    "cost_budget": { "type": "integer", "minimum": 1 },
+    "step_budget": { "type": "integer", "minimum": 1000 }
+  }
+}

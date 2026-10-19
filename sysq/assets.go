@@ -7,5 +7,5 @@ import "embed"
 
 // Assets holds the shipped defaults.
 //
-//go:embed catalog sandbox recipes
+//go:embed catalog sandbox recipes tests/fixtures
 var Assets embed.FS
