@@ -349,6 +349,7 @@ func (c *Clients) Approve(pendingID, code, privacy string, allowScripts bool, or
 func (c *Clients) Collect(pendingID string) (token string, approved bool, err error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	c.expire()
 	p, ok := c.pending[pendingID]
 	if !ok {
 		return "", false, ErrNotFound
