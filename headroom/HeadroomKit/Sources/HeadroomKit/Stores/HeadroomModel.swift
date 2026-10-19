@@ -36,6 +36,7 @@ public final class HeadroomModel {
     public let recipes: RecipeStore
     public let history: HistoryStore
     public let pairing: PairingStore
+    public let explorer: ExplorerStore
     public let assistant: AssistantStore
     @ObservationIgnored public let notifications: NotificationStore
 
@@ -56,6 +57,7 @@ public final class HeadroomModel {
         recipes = RecipeStore()
         history = HistoryStore()
         pairing = PairingStore(admin: services.admin)
+        explorer = ExplorerStore()
         notifications = NotificationStore(notifier: notifier)
         assistant = AssistantStore(summaries: summaries, log: log)
         mode = c.modeOrder.first ?? "view"
@@ -92,6 +94,7 @@ public final class HeadroomModel {
         groups.attach(services.ui)
         recipes.attach(services.ui)
         history.attach(services.ui)
+        explorer.attach(services.ui, config: config.groups.explorer)
         assistant.attach(sysq: services.assistant, chat: services.chat, actions: ActionBridge(actions), config: config)
     }
 
@@ -107,6 +110,7 @@ public final class HeadroomModel {
 
     func configChanged(_ c: AppConfig) {
         groups.update(config: c)
+        explorer.attach(services.ui, config: c.groups.explorer)
         actions.flow.delay = c.assistant.confirmDelay
         let gen = services.generation
         Task {

@@ -30,8 +30,9 @@ func TestHeadroomGroupBindings(t *testing.T) {
 		t.Skip("no headroom/config next to sysq")
 	}
 	var groups struct {
-		Overview    string `yaml:"overview"`
-		ItemProfile string `yaml:"item_profile"`
+		Overview    string         `yaml:"overview"`
+		ItemProfile string         `yaml:"item_profile"`
+		Explorer    map[string]any `yaml:"explorer"`
 		Groups      []struct {
 			ID        string  `yaml:"id"`
 			Headline  binding `yaml:"headline"`
@@ -75,6 +76,27 @@ func TestHeadroomGroupBindings(t *testing.T) {
 	t.Run("item_profile", func(t *testing.T) {
 		run(t, binding{Recipe: groups.ItemProfile, Params: map[string]any{"kind": "process", "id": "1"}}, "")
 	})
+	// Storage Explorer bindings: each recipe runs with its fixed params.
+	for key, v := range groups.Explorer {
+		var list []any
+		switch x := v.(type) {
+		case map[string]any:
+			list = []any{x}
+		case []any:
+			if key != "suggestions" {
+				continue
+			}
+			list = x
+		default:
+			continue
+		}
+		for _, item := range list {
+			m, _ := item.(map[string]any)
+			name, _ := m["recipe"].(string)
+			params, _ := m["params"].(map[string]any)
+			t.Run("explorer/"+key+"/"+name, func(t *testing.T) { run(t, binding{Recipe: name, Params: params}, "") })
+		}
+	}
 	adata, err := os.ReadFile(filepath.Join(cfg, "assistant.yaml"))
 	if err != nil {
 		t.Fatal(err)

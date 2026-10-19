@@ -52,7 +52,37 @@ public struct GroupsFile: Codable, Sendable {
     public var version: Int
     public var overview: String?
     public var item_profile: String?
+    public var explorer: ExplorerConfig?
     public var groups: [GroupConfig]
+}
+
+/// A recipe the Storage Explorer runs, and the names of its parameters.
+public struct ExplorerBinding: Codable, Hashable, Sendable {
+    public var recipe: String
+    public var params: [String: JSONValue]?
+    public var root: String?
+    public var min: String?
+    public var age: String?
+
+    /// Params for a run: fixed ones plus the explorer's filters.
+    public func params(root r: String?, minBytes: Double?, ageSeconds: Double?) -> [String: JSONValue] {
+        var p = params ?? [:]
+        if let root, let r { p[root] = .string(r) }
+        if let min, let m = minBytes, m > 0 { p[min] = .number(m) }
+        if let age, let a = ageSeconds, a > 0 { p[age] = .string("\(Int(a))s") }
+        return p
+    }
+}
+
+public struct ExplorerConfig: Codable, Hashable, Sendable {
+    public var group: String?
+    public var roots: [String]?
+    public var volumes: ExplorerBinding
+    public var purgeable: ExplorerBinding?
+    public var folders: ExplorerBinding
+    public var files: ExplorerBinding?
+    public var by_type: ExplorerBinding?
+    public var suggestions: [ExplorerBinding]?
 }
 
 public struct LayoutFile: Codable, Sendable {

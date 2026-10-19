@@ -202,3 +202,30 @@ final class NotificationTests: XCTestCase {
         XCTAssertEqual(r.posted.count, 3)
     }
 }
+
+final class ExplorerTests: XCTestCase {
+    func testTreemapFillsTheBoxProportionally() {
+        let rects = Treemap.layout([6, 6, 4, 3, 2, 2, 1, 0], width: 600, height: 400)
+        XCTAssertEqual(rects.count, 7, "zero-size items are left out")
+        let area = rects.reduce(0) { $0 + $1.w * $1.h }
+        XCTAssertEqual(area, 240_000, accuracy: 0.5)
+        let first = rects.first { $0.index == 0 }!
+        XCTAssertEqual(first.w * first.h, 240_000 * 6 / 24, accuracy: 0.5)
+        for r in rects {
+            XCTAssertGreaterThanOrEqual(r.x, -0.001); XCTAssertGreaterThanOrEqual(r.y, -0.001)
+            XCTAssertLessThanOrEqual(r.x + r.w, 600.001); XCTAssertLessThanOrEqual(r.y + r.h, 400.001)
+        }
+        XCTAssertTrue(Treemap.layout([], width: 10, height: 10).isEmpty)
+    }
+
+    func testBindingParamsAndItems() {
+        let c = loadShipped()
+        let files = c.groups.explorer!.files!
+        XCTAssertEqual(files.params(root: "~/Downloads", minBytes: 1e9, ageSeconds: 86400),
+                       ["root": "~/Downloads", "min": 1e9, "since": "86400s", "limit": 100])
+        let t = table([("path", "path"), ("size", "bytes"), ("modified", "ts")], [["/Users/me/Downloads/big.dmg", 4e9, "2026-10-01T00:00:00Z"]])
+        let items = ExplorerStore.items(t)
+        XCTAssertEqual(items.first?.name, "big.dmg")
+        XCTAssertEqual(items.first?.size, 4e9)
+    }
+}

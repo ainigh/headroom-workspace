@@ -11,6 +11,21 @@ version: 1
 # (process, app, path, model) for the Actions panel and the assistant.
 overview: health.overview
 item_profile: item.profile
+# Storage Explorer (headroom-spec §9): which recipes back each view, and the
+# names of their root / minimum-size / age parameters.
+explorer:
+  group: storage
+  roots: ["~", "~/Library", "~/Downloads", "~/Developer", "/Applications"]
+  volumes:   { recipe: disk.volumes }
+  purgeable: { recipe: disk.purgeable }
+  folders:   { recipe: disk.hogs, root: root, min: min, params: { depth: 2, limit: 50 } }
+  files:     { recipe: disk.recent_big, root: root, min: min, age: since, params: { limit: 100 } }
+  by_type:   { recipe: disk.by_type, root: root, min: min }
+  suggestions:
+    - { recipe: disk.caches }
+    - { recipe: disk.recent_big, root: root, params: { since: 90d } }
+    - { recipe: disk.duplicates, root: root }
+    - { recipe: ai.stale_model_files }
 groups:
   - id: memory
     name: Memory
