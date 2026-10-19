@@ -1,0 +1,8 @@
+name: mem.purge
+doc: Free inactive memory and flush the disk cache (admin password required).
+tier: caution
+requires_admin: true
+argv: ["/usr/sbin/purge"]
+effect: "Drops cached file data and inactive memory. Apps may feel slower briefly while caches refill."
+undo_hint: "Nothing to undo; caches refill on their own."
+timeout: 120s

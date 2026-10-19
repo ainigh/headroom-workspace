@@ -1,0 +1,7 @@
+name: tm.start_backup
+doc: Start a Time Machine backup now.
+tier: caution
+argv: ["/usr/bin/tmutil", "startbackup", "--auto"]
+effect: "Starts a Time Machine backup to the configured destination. It uses disk and network until it finishes."
+undo_hint: "Stop it from the Time Machine menu."
+timeout: 30s

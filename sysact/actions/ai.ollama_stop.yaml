@@ -1,0 +1,7 @@
+name: ai.ollama_stop
+doc: Quit the Ollama app, unloading every model it holds.
+tier: caution
+kind: quit_app_named
+target: "Ollama"
+effect: "Quits Ollama; all loaded models are unloaded and local apps that use Ollama stop working until it is opened again."
+undo_hint: "Open Ollama from Applications."

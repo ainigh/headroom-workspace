@@ -23,15 +23,15 @@ func TestExecuteRequiresConfirmation(t *testing.T) {
 	good := confirm.Sign(s.key, confirm.Record{PlanID: plan.ID, PlanHash: plan.Hash, ConfirmedAt: time.Now().UTC(), Via: "test", Nonce: "n1"})
 
 	cases := map[string][]confirm.Record{
-		"none":         nil,
-		"empty list":   {},
-		"unsigned":     {{PlanID: plan.ID, PlanHash: plan.Hash, ConfirmedAt: time.Now().UTC(), Via: "test", Nonce: "n2"}},
-		"wrong key":    {confirm.Sign([]byte("not the host key, not the host key"), confirm.Record{PlanID: plan.ID, PlanHash: plan.Hash, ConfirmedAt: time.Now().UTC(), Via: "test", Nonce: "n3"})},
-		"other plan":   {confirm.Sign(s.key, confirm.Record{PlanID: "plan-nope", PlanHash: plan.Hash, ConfirmedAt: time.Now().UTC(), Via: "test", Nonce: "n4"})},
-		"tampered":     {func() confirm.Record { r := good; r.PlanHash = strings.Repeat("0", 64); return r }()},
-		"stale":        {confirm.Sign(s.key, confirm.Record{PlanID: plan.ID, PlanHash: plan.Hash, ConfirmedAt: time.Now().Add(-10 * time.Minute).UTC(), Via: "test", Nonce: "n5"})},
-		"future":       {confirm.Sign(s.key, confirm.Record{PlanID: plan.ID, PlanHash: plan.Hash, ConfirmedAt: time.Now().Add(10 * time.Minute).UTC(), Via: "test", Nonce: "n6"})},
-		"no nonce":     {confirm.Sign(s.key, confirm.Record{PlanID: plan.ID, PlanHash: plan.Hash, ConfirmedAt: time.Now().UTC(), Via: "test"})},
+		"none":       nil,
+		"empty list": {},
+		"unsigned":   {{PlanID: plan.ID, PlanHash: plan.Hash, ConfirmedAt: time.Now().UTC(), Via: "test", Nonce: "n2"}},
+		"wrong key":  {confirm.Sign([]byte("not the host key, not the host key"), confirm.Record{PlanID: plan.ID, PlanHash: plan.Hash, ConfirmedAt: time.Now().UTC(), Via: "test", Nonce: "n3"})},
+		"other plan": {confirm.Sign(s.key, confirm.Record{PlanID: "plan-nope", PlanHash: plan.Hash, ConfirmedAt: time.Now().UTC(), Via: "test", Nonce: "n4"})},
+		"tampered":   {func() confirm.Record { r := good; r.PlanHash = strings.Repeat("0", 64); return r }()},
+		"stale":      {confirm.Sign(s.key, confirm.Record{PlanID: plan.ID, PlanHash: plan.Hash, ConfirmedAt: time.Now().Add(-10 * time.Minute).UTC(), Via: "test", Nonce: "n5"})},
+		"future":     {confirm.Sign(s.key, confirm.Record{PlanID: plan.ID, PlanHash: plan.Hash, ConfirmedAt: time.Now().Add(10 * time.Minute).UTC(), Via: "test", Nonce: "n6"})},
+		"no nonce":   {confirm.Sign(s.key, confirm.Record{PlanID: plan.ID, PlanHash: plan.Hash, ConfirmedAt: time.Now().UTC(), Via: "test"})},
 	}
 	for name, recs := range cases {
 		if _, err := s.Execute(ctx, plan.ID, recs); err == nil {

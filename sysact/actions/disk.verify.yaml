@@ -1,0 +1,9 @@
+name: disk.verify
+doc: Verify a volume's file system (read-only check; does not repair).
+tier: safe
+params:
+  volume: { type: str, pattern: "^(/|/Volumes/[^/\\x00]+)$", default: "/" }
+argv: ["/usr/sbin/diskutil", "verifyVolume", "{volume}"]
+effect: "Checks {volume} for file-system problems; the volume may be briefly unresponsive. Nothing is changed."
+undo_hint: "Nothing to undo."
+timeout: 600s

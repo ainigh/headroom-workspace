@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "sysact action",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "doc", "tier", "effect"],
+  "properties": {
+    "name": { "type": "string" },
+    "doc": { "type": "string", "minLength": 1 },
+    "tier": { "enum": ["safe", "caution", "risky"] },
+    "requires_admin": { "type": "boolean" },
+    "params": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type"],
+        "properties": {
+          "type": { "enum": ["str", "int", "enum", "path", "pid", "bool"] },
+          "values": { "type": "array", "items": { "type": "string" } },
+          "default": {},
+          "min": { "type": "number" },
+          "max": { "type": "number" },
+          "pattern": { "type": "string" },
+          "max_len": { "type": "integer" },
+          "required": { "type": "boolean" },
+          "doc": { "type": "string" },
+          "must_exist": { "type": "boolean" }
+        }
+      }
+    },
+    "kind": { "enum": ["argv", "trash", "quit_app", "quit_app_named"] },
+    "argv": { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }] } },
+    "binary_paths": { "type": "array", "items": { "type": "string", "pattern": "^/" } },
+    "target": { "type": "string" },
+    "within": { "type": "array", "items": { "type": "string" } },
+    "must_exist": { "type": "boolean" },
+    "lookup": { "enum": ["process"] },
+    "effect": { "type": "string", "minLength": 1 },
+    "undo_hint": { "type": "string" },
+    "timeout": { "type": "string", "pattern": "^[0-9]+(s|m)$" }
+  }
+}

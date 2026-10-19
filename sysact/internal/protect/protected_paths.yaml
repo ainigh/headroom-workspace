@@ -1,0 +1,57 @@
+# Locations sysact refuses at prepare. Users may add entries in
+# ~/Library/Application Support/sysact/protected_paths.yaml; shipped entries
+# always apply.
+version: 1
+exact:
+  - /
+  - /Applications
+  - /Users
+  - /Volumes
+  - /Library
+  - "~"
+  - ~/Library
+  - ~/Desktop
+  - ~/Documents
+  - ~/Downloads
+  - ~/Movies
+  - ~/Music
+  - ~/Pictures
+  - ~/Applications
+  - ~/Library/Caches
+  - ~/Library/Application Support
+  - ~/Library/Containers
+  - ~/Library/Group Containers
+  - ~/Library/Preferences
+  - ~/Library/Mobile Documents
+trees:
+  - /System
+  - /bin
+  - /sbin
+  - /usr
+  - /etc
+  - /var
+  - /private/etc
+  - /private/var
+  - /opt/homebrew/bin
+  - /Library/Apple
+  - /Library/Keychains
+  - /Library/Security
+  - /Library/LaunchDaemons
+  - /Library/Extensions
+  - /Library/SystemExtensions
+  - /Applications/Utilities
+  - /System/Applications
+  - ~/.ssh
+  - ~/.gnupg
+  - ~/.aws
+  - ~/.config/gh
+  - ~/Library/Keychains
+  - ~/Library/Mail
+  - ~/Library/Messages
+  - ~/Library/Photos
+  - ~/Library/Safari
+  - ~/Library/Application Support/sysq
+  - ~/Library/Application Support/sysact
+  - ~/Library/Application Support/Headroom
+  - ~/Library/Application Support/1Password
+  - ~/Library/Group Containers/2BUA8C4S2C.com.1password

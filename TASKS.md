@@ -12,7 +12,8 @@
 - [x] M4 Monitoring primitives (design §24) + Headroom group recipes — done when every group in headroom-spec §4 has live recipes
   - `go test ./internal/recipes -run Headroom` runs every groups.yaml binding (headline, detail, consumers, sparkline, attention) and every modes.yaml recipe
   - needs the Mac: `ane.activity`/`thermal.pressure` need a sudoers rule for powermetrics; `ai.ollama_ps`/`ai.lmstudio_ps` need enabling in policy.yaml
-- [ ] M5 sysact: catalog, prepare/execute, confirmation requirement — done when tests prove execute fails without confirmation
+- [x] M5 sysact: catalog, prepare/execute, confirmation requirement — done when tests prove execute fails without confirmation
+  - `cd sysact && go test ./...` (confirm_required_test.go was committed before the server)
 - [ ] M6 Headroom: config loader, GroupStore, small/large/drill-in views — done when the app shows live data from YAML groups
 - [ ] M7 Actions panel, Storage Explorer, Graphs
 - [ ] M8 Assistant (tools + text fallback), confirmation flow, logging, summary history — done when the headroom-spec §8.9 example turn reproduces
