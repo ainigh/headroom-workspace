@@ -1,0 +1,29 @@
+MODE: {View | Optimize | Deep Dive | Repair}
+SCOPE: {key groups | all groups | <group> | <item>}
+TIME: {now}
+PRIVACY: {aggregates | +consumers | +files}
+
+CURRENT STATE:
+{recipe outputs for scope, as compact tables}
+
+ATTENTION:
+{attention() rows for scope}
+
+RESOURCE HISTORY:
+{history.narrative(2h)}
+
+SUMMARY HISTORY (most recent {N}, oldest first):
+{timestamp} — {summary}
+
+QUERY RESULTS (this conversation):
+{call} → {table, trimmed}
+
+ACTION RESULTS (this conversation):
+{action(params)} — {approved and ran | declined}
+{output, trimmed}
+
+AVAILABLE RECIPES: {name — doc, ...}
+AVAILABLE ACTIONS: {name(params) — doc — tier, ...}
+
+QUESTION:
+{typed question or mode default}

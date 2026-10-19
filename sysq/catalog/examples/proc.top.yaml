@@ -1,0 +1,18 @@
+name: proc.top
+doc: Top processes by cpu or mem (uses the second sample of top).
+params:
+  by: { type: enum, values: [cpu, mem], default: cpu }
+  n:  { type: int, default: 20, max: 200 }
+cost: moderate
+sensitivity: personal
+network: false
+argv: ["/usr/bin/top", "-l", "2", "-n", "{n}", "-o", "{by}", "-stats", "pid,command,cpu,mem,power"]
+parser: top_table
+timeout: 5s
+sandbox: read-only-default
+schema:
+  - { name: pid,     type: pid }
+  - { name: command, type: str }
+  - { name: cpu,     type: float, unit: "%" }
+  - { name: mem,     type: bytes }
+  - { name: power,   type: float }

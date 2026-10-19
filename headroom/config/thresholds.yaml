@@ -1,0 +1,10 @@
+version: 1
+# amber/red boundaries; direction says whether higher is worse
+memory:   { metric: pressure_pct, amber: 60,     red: 85,      direction: up }
+cpu:      { metric: load_pct,     amber: 70,     red: 90,      direction: up }
+gpu:      { metric: utilization,  amber: 80,     red: 95,      direction: up }
+storage:  { metric: free,         amber: 50GB,   red: 20GB,    direction: down }
+network:  { metric: throughput,   amber: 50MB/s, red: 100MB/s, direction: up }
+battery:  { metric: level,        amber: 30,     red: 10,      direction: down }
+thermal:  { metric: level,        amber: 1,      red: 2,       direction: up }
+local_ai: { metric: memory_held,  amber: 24GB,   red: 40GB,    direction: up }

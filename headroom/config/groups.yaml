@@ -1,0 +1,66 @@
+version: 1
+groups:
+  - id: memory
+    name: Memory
+    symbol: memorychip
+    headline:  { recipe: mem.headline, column: available }
+    detail:    { recipe: mem.detail }
+    consumers: { recipe: proc.top, params: { by: mem }, value: mem }
+    sparkline: { recipe: mem.headline, column: available, range: 5m }
+    attention: attention.memory
+  - id: cpu
+    name: CPU
+    symbol: cpu
+    headline:  { recipe: cpu.headline, column: load_pct }
+    detail:    { recipe: cpu.cores }
+    consumers: { recipe: proc.top, params: { by: cpu }, value: cpu }
+    sparkline: { recipe: cpu.headline, column: load_pct, range: 5m }
+    attention: attention.cpu
+  - id: gpu
+    name: GPU & Neural Engine
+    symbol: sparkles
+    headline:  { recipe: gpu.headline, column: utilization }
+    detail:    { recipe: gpu.stats }
+    consumers: { recipe: ai.gpu_holders, value: gpu_mem }
+    sparkline: { recipe: gpu.headline, column: utilization, range: 5m }
+    attention: attention.gpu
+  - id: storage
+    name: Storage
+    symbol: internaldrive
+    headline:  { recipe: disk.headline, column: free }
+    detail:    { recipe: disk.volumes }
+    consumers: { recipe: disk.hogs, params: { root: "~", depth: 1 }, value: size }
+    sparkline: { recipe: disk.headline, column: free, range: 24h }
+    attention: attention.storage
+  - id: network
+    name: Network
+    symbol: network
+    headline:  { recipe: net.headline, column: throughput }
+    detail:    { recipe: net.throughput }
+    consumers: { recipe: net.by_process, value: bytes }
+    sparkline: { recipe: net.headline, column: throughput, range: 5m }
+    attention: attention.network
+  - id: battery
+    name: Battery & Power
+    symbol: battery.75
+    headline:  { recipe: battery.headline, column: level }
+    detail:    { recipe: battery.state }
+    consumers: { recipe: proc.energy, value: power }
+    sparkline: { recipe: battery.headline, column: level, range: 24h }
+    attention: attention.battery
+  - id: thermal
+    name: Thermals
+    symbol: thermometer
+    headline:  { recipe: thermal.headline, column: state }
+    detail:    { recipe: thermal.state }
+    consumers: { recipe: proc.top, params: { by: cpu }, value: cpu }
+    sparkline: { recipe: thermal.headline, column: level, range: 1h }
+    attention: attention.thermal
+  - id: local_ai
+    name: Local AI
+    symbol: brain
+    headline:  { recipe: ai.headline, column: models_loaded }
+    detail:    { recipe: ai.ollama }
+    consumers: { recipe: ai.ollama, value: memory }
+    sparkline: { recipe: ai.headline, column: memory_held, range: 1h }
+    attention: attention.local_ai

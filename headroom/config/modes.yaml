@@ -1,0 +1,28 @@
+version: 1
+modes:
+  view:
+    label: View
+    question: Summarize the current state of this Mac in plain language.
+    groups: {}
+  optimize:
+    label: Optimize
+    question: What can I reclaim or speed up right now, and what has the most impact?
+    rank_by: reclaimable
+    groups:
+      memory:   { recipes: [mem.inactive_holders], actions: [app.quit, mem.purge] }
+      storage:  { recipes: [disk.caches, disk.recent_big, disk.duplicates], actions: [fs.trash] }
+      local_ai: { recipes: [ai.idle_models, ai.stale_model_files], actions: [ai.ollama_unload] }
+  deep_dive:
+    label: Deep Dive
+    question: Explain what is driving the current usage and whether it is normal.
+    history_range: 24h
+    groups:
+      network: { recipes: [net.by_process, net.destinations] }
+      cpu:     { recipes: [cpu.cores, proc.hogs] }
+  repair:
+    label: Repair
+    question: Does anything look broken, stuck, or unhealthy, and how do I fix it?
+    groups:
+      storage: { recipes: [disk.health], actions: [disk.verify, spotlight.rebuild] }
+      memory:  { recipes: [mem.health] }
+      backup:  { recipes: [backup.status] }

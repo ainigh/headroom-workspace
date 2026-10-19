@@ -1,0 +1,13 @@
+version: 1
+enabled: true
+model: ""                 # chosen in settings; empty = ask on first use
+privacy_level: consumers  # aggregates | consumers | files
+summary_window: 10
+action_requests: true
+confirm_delay_seconds: 2
+fuel_budget: 2000
+max_tool_calls: 25
+max_turn_seconds: 90
+system_prompt: prompts/system.md
+request_template: prompts/request.md.tmpl
+unload_after_minutes: 10

@@ -1,0 +1,6 @@
+version: 1
+enabled: false
+port: 11435
+default_privacy: aggregates
+exposed_recipes: [health.overview, headroom.check, "*.headline", "*.detail"]
+clients: []

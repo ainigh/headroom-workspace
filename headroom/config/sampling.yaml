@@ -1,0 +1,6 @@
+version: 1
+rates:
+  view_open:   { headline: 2s, detail: 5s, consumers: 5s }
+  idle:        { headline: 30s, detail: 60s, consumers: 60s }
+  on_battery:  { headline: 15s, detail: 60s, consumers: 120s }
+hidden_groups: { headline: 300s }
