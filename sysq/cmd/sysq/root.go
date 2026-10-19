@@ -33,6 +33,7 @@ func newRoot() *cobra.Command {
 	root := &cobra.Command{
 		Use:           "sysq",
 		Short:         "Read-only queries over this Mac",
+		Version:       version,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}

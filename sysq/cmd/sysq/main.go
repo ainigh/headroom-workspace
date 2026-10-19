@@ -8,6 +8,9 @@ import (
 	"os"
 )
 
+// version is set at build time (-ldflags "-X main.version=..."), as for sysqd.
+var version = "dev"
+
 func main() {
 	root := newRoot()
 	if err := root.Execute(); err != nil {
