@@ -1,0 +1,21 @@
+; Read-only for narrow-sudo primitives (powermetrics). sudo itself may update
+; its timestamp directory; nothing else is writable. These primitives only
+; run when `sudo -n -l` confirms a NOPASSWD rule for the exact binary+flags.
+(version 1)
+(deny default)
+(allow process-fork)
+__EXEC__
+(allow file-read*)
+__DENY_READ__
+(allow file-write* (literal "/dev/null") (subpath "__SCRATCH__") (subpath "/private/var/db/sudo"))
+(allow file-ioctl (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(deny network*)
+(deny user-preference-write)
+(allow sysctl-read)
+(allow mach-lookup)
+(allow iokit-open)
+(allow process-info*)
+(allow ipc-posix-shm-read-data)
+(allow signal (target self))
+(allow user-preference-read)
+(allow system-audit)
