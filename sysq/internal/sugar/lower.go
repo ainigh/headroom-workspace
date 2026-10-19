@@ -299,7 +299,7 @@ func (l *lowerer) segment(a, b int, rk regionKind, callee string, argIndex int, 
 		return lead + l.gap(first) + name, nil
 	}
 	// any(T, pred) / all(T, pred): the predicate argument.
-	if rk == rCall && argIndex == 1 && (callee == "any" || callee == "all") {
+	if rk == rCall && argIndex == 1 && (callee == "any" || callee == "all") && !(l.is(first, "expr") && l.is(l.nextSig(first), "(")) && l.toks[first].k != kStr {
 		e, err := l.exprCall(sig[0], sig[len(sig)-1]+1, "filter")
 		if err != nil {
 			return "", err

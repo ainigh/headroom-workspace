@@ -68,7 +68,8 @@ func Analyze(lowered string, r Resolver) (*Plan, error) {
 		return nil, err
 	}
 	p := &Plan{Lowered: lowered, Cost: "cheap", Sensitivity: "public"}
-	a := &analyzer{p: p, r: r, prims: map[string]bool{}, recipes: map[string]bool{}, unknown: map[string]bool{}}
+	a := &analyzer{p: p, r: r, prims: map[string]bool{}, recipes: map[string]bool{}, unknown: map[string]bool{}, locals: map[string]bool{}}
+	collectLocals(f, a.locals)
 	for _, st := range f.Stmts {
 		a.stmt(st, 1)
 	}
@@ -82,6 +83,7 @@ func Analyze(lowered string, r Resolver) (*Plan, error) {
 }
 
 type analyzer struct {
+	locals  map[string]bool // names a script binds itself (they shadow namespaces)
 	p       *Plan
 	r       Resolver
 	prims   map[string]bool
@@ -146,6 +148,9 @@ func dotted(e syntax.Expr) (string, bool) {
 }
 
 func (a *analyzer) name(n string, mult int) bool {
+	if a.locals[strings.SplitN(n, ".", 2)[0]] {
+		return false
+	}
 	n = strings.TrimPrefix(n, "recipes.")
 	if p, ok := a.r.Primitive(n); ok {
 		a.prims[n] = true
@@ -255,7 +260,64 @@ func looksLikeCatalog(n string) bool {
 }
 
 func (a *analyzer) maybeUnknown(n string) {
-	a.unknown[n] = true
+	if !a.locals[strings.SplitN(n, ".", 2)[0]] {
+		a.unknown[n] = true
+	}
+}
+
+// collectLocals records every name the file assigns, loops over, defines
+// or takes as a parameter.
+func collectLocals(f *syntax.File, out map[string]bool) {
+	var target func(e syntax.Expr)
+	target = func(e syntax.Expr) {
+		switch x := e.(type) {
+		case *syntax.Ident:
+			out[x.Name] = true
+		case *syntax.TupleExpr:
+			for _, it := range x.List {
+				target(it)
+			}
+		case *syntax.ListExpr:
+			for _, it := range x.List {
+				target(it)
+			}
+		case *syntax.ParenExpr:
+			target(x.X)
+		}
+	}
+	var stmts func([]syntax.Stmt)
+	stmts = func(ss []syntax.Stmt) {
+		for _, s := range ss {
+			switch x := s.(type) {
+			case *syntax.AssignStmt:
+				target(x.LHS)
+			case *syntax.ForStmt:
+				target(x.Vars)
+				stmts(x.Body)
+			case *syntax.IfStmt:
+				stmts(x.True)
+				stmts(x.False)
+			case *syntax.DefStmt:
+				out[x.Name.Name] = true
+				for _, p := range x.Params {
+					switch pp := p.(type) {
+					case *syntax.Ident:
+						out[pp.Name] = true
+					case *syntax.BinaryExpr:
+						target(pp.X)
+					case *syntax.UnaryExpr:
+						target(pp.X)
+					}
+				}
+				stmts(x.Body)
+			case *syntax.LoadStmt:
+				for _, id := range x.To {
+					out[id.Name] = true
+				}
+			}
+		}
+	}
+	stmts(f.Stmts)
 }
 
 // pushdown reports filter(expr("...")) / limit(n) applied directly to a

@@ -16,6 +16,7 @@ import (
 	"github.com/ainigh/headroom-workspace/sysq/internal/engine"
 	"github.com/ainigh/headroom-workspace/sysq/internal/exec"
 	"github.com/ainigh/headroom-workspace/sysq/internal/policy"
+	"github.com/ainigh/headroom-workspace/sysq/internal/recipes"
 	"github.com/ainigh/headroom-workspace/sysq/pkg/audit"
 )
 
@@ -35,7 +36,20 @@ type Env struct {
 	Engine      *engine.Engine
 	Audit       *audit.Log
 	FixtureDir  string
+	Recipes     *recipes.Library
+	RecipesErr  error
+	// FixtureEngine serves the shipped fixtures; used to derive recipe output
+	// schemas by dry run without executing anything live.
+	FixtureEngine *engine.Engine
 }
+
+// RecipeEnv returns what running recipes needs.
+func (e *Env) RecipeEnv() recipes.Env {
+	return recipes.Env{Engine: e.Engine, SnapshotDir: filepath.Join(e.Dir, "snapshots")}
+}
+
+// UserRecipeDir is where promoted and proposed recipes live.
+func (e *Env) UserRecipeDir() string { return filepath.Join(e.Dir, "recipes") }
 
 // Manifest describes a fixture directory.
 type Manifest struct {
@@ -106,5 +120,20 @@ func Open(o Options) (*Env, error) {
 		}
 	}
 	env.Engine = e
+
+	fx, err := fs.Sub(sysq.Assets, "tests/fixtures")
+	if err != nil {
+		return nil, err
+	}
+	env.FixtureEngine = &engine.Engine{Catalog: env.Catalog, Policy: env.Policy, Home: "/Users/me", Fixtures: fx}
+	shippedRecipes, err := fs.Sub(sysq.Assets, "recipes")
+	if err != nil {
+		return nil, err
+	}
+	rroots := []fs.FS{shippedRecipes}
+	if st, err := os.Stat(env.UserRecipeDir()); err == nil && st.IsDir() {
+		rroots = append(rroots, os.DirFS(env.UserRecipeDir()))
+	}
+	env.Recipes, env.RecipesErr = recipes.Load(recipes.Options{Catalog: env.Catalog, Policy: env.Policy, Roots: rroots})
 	return env, nil
 }

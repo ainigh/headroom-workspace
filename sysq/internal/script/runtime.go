@@ -84,6 +84,24 @@ type Runtime struct {
 	items  []Item
 	loads  map[string]*loadEntry
 	depth  int
+	pre    starlark.StringDict
+	ext    map[any]any
+}
+
+// Ext returns per-run state stored by extensions (the recipe library).
+func (rt *Runtime) Ext(key any) any { return rt.ext[key] }
+
+// SetExt stores per-run extension state.
+func (rt *Runtime) SetExt(key, v any) {
+	if rt.ext == nil {
+		rt.ext = map[any]any{}
+	}
+	rt.ext[key] = v
+}
+
+// Attention is implemented by recipe libraries that have rule recipes.
+type Attention interface {
+	Attention(rt *Runtime, severity string) (*table.Table, error)
 }
 
 type loadEntry struct {
@@ -231,8 +249,36 @@ func (rt *Runtime) insert(root map[string]*Namespace, full string, v starlark.Va
 	}
 }
 
-// Predeclared returns the builtins visible to scripts and recipes.
+// Predeclared returns the builtins visible to scripts and recipes (built
+// once per run).
 func (rt *Runtime) Predeclared() starlark.StringDict {
+	if rt.pre != nil {
+		return rt.pre
+	}
+	rt.pre = rt.predeclared()
+	return rt.pre
+}
+
+// PredeclaredNames lists builtin names for a catalog and recipe set without a
+// run (the recipe compiler needs them).
+func PredeclaredNames(cat interface{ Namespaces() []string }, recipeNames []string) map[string]bool {
+	out := map[string]bool{"recipes": true, "history": true, "attention": true}
+	for _, n := range builtinNames {
+		out[n] = true
+	}
+	for _, n := range cat.Namespaces() {
+		out[n] = true
+	}
+	for _, n := range recipeNames {
+		out[strings.SplitN(n, ".", 2)[0]] = true
+	}
+	return out
+}
+
+var builtinNames = []string{"emit", "expr", "now", "ago", "humanize", "try_", "fallback", "scalar", "num", "count",
+	"any", "all", "assert_", "snapshot", "watch", "table", "record", "Duration", "Bytes", "Path"}
+
+func (rt *Runtime) predeclared() starlark.StringDict {
 	d := starlark.StringDict{
 		"emit":     starlark.NewBuiltin("emit", rt.emit),
 		"expr":     starlark.NewBuiltin("expr", exprBuiltin),
@@ -242,6 +288,7 @@ func (rt *Runtime) Predeclared() starlark.StringDict {
 		"try_":     starlark.NewBuiltin("try_", tryBuiltin),
 		"fallback": starlark.NewBuiltin("fallback", fallback),
 		"scalar":   starlark.NewBuiltin("scalar", scalarBuiltin),
+		"num":      starlark.NewBuiltin("num", numBuiltin),
 		"count":    starlark.NewBuiltin("count", countBuiltin),
 		"any":      starlark.NewBuiltin("any", rt.anyAll),
 		"all":      starlark.NewBuiltin("all", rt.anyAll),
@@ -271,6 +318,19 @@ func (rt *Runtime) Predeclared() starlark.StringDict {
 		}
 		top.entries["search"] = starlark.NewBuiltin("recipes.search", rt.searchRecipes)
 		d["recipes"] = top
+	}
+	if att, ok := rt.Recipes.(Attention); ok && rt.Recipes != nil {
+		d["attention"] = starlark.NewBuiltin("attention", func(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
+			sev := ""
+			if err := starlark.UnpackArgs(fn.Name(), args, kwargs, "severity?", &sev); err != nil {
+				return nil, err
+			}
+			t, err := att.Attention(rt, sev)
+			if err != nil {
+				return nil, err
+			}
+			return rt.wrap(t), nil
+		})
 	}
 	if rt.History != nil {
 		h, ok := root["history"]
@@ -672,6 +732,41 @@ func scalarBuiltin(thread *starlark.Thread, fn *starlark.Builtin, args starlark.
 	return nil, fmt.Errorf("scalar: table has %d columns; pick one (t.col)", len(r.Schema))
 }
 
+// num(x) turns Bytes, Duration, a 1×1 table or a number into a float
+// (None stays None), for arithmetic and comparisons with plain numbers.
+func numBuiltin(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
+	var v starlark.Value
+	if err := starlark.UnpackPositionalArgs(fn.Name(), args, kwargs, 1, &v); err != nil {
+		return nil, err
+	}
+	if t, ok := v.(*Table); ok {
+		s, err := scalarBuiltin(thread, fn, starlark.Tuple{t}, nil)
+		if err != nil {
+			return nil, err
+		}
+		v = s
+	}
+	switch x := v.(type) {
+	case starlark.NoneType:
+		return starlark.None, nil
+	case Bytes:
+		return starlark.Float(x), nil
+	case Duration:
+		return starlark.Float(x), nil
+	case starlark.Int, starlark.Float:
+		f, _ := starlark.AsFloat(x)
+		return starlark.Float(f), nil
+	case starlark.Bool:
+		if x {
+			return starlark.Float(1), nil
+		}
+		return starlark.Float(0), nil
+	case starlark.String:
+		return nil, fmt.Errorf("num: %q is not a number", string(x))
+	}
+	return nil, fmt.Errorf("num: cannot convert %s", v.Type())
+}
+
 func countBuiltin(thread *starlark.Thread, fn *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
 	var v starlark.Value
 	if err := starlark.UnpackPositionalArgs(fn.Name(), args, kwargs, 1, &v); err != nil {
@@ -918,13 +1013,14 @@ func (rt *Runtime) load(thread *starlark.Thread, module string) (starlark.String
 		rt.loads[clean] = &loadEntry{err: fmt.Errorf("load %s: %w", clean, err)}
 		return nil, rt.loads[clean].err
 	}
-	pre := rt.Predeclared()
-	pre["recipe"] = starlark.NewBuiltin("recipe", func(*starlark.Thread, *starlark.Builtin, starlark.Tuple, []starlark.Tuple) (starlark.Value, error) {
+	pre := starlark.StringDict{}
+	for k, v := range rt.Predeclared() {
+		pre[k] = v
+	}
+	noop := starlark.NewBuiltin("noop", func(*starlark.Thread, *starlark.Builtin, starlark.Tuple, []starlark.Tuple) (starlark.Value, error) {
 		return starlark.None, nil
 	})
-	pre["param"] = starlark.NewBuiltin("param", func(*starlark.Thread, *starlark.Builtin, starlark.Tuple, []starlark.Tuple) (starlark.Value, error) {
-		return starlark.None, nil
-	})
+	pre["recipe"], pre["param"] = noop, noop
 	g, err := starlark.ExecFileOptions(FileOptions, thread, clean, lowered, pre)
 	rt.loads[clean] = &loadEntry{globals: g, err: err}
 	return g, err
@@ -942,18 +1038,31 @@ func Run(ctx context.Context, src string, o Options) (*Result, error) {
 	}
 	ctx, cancel := context.WithTimeout(ctx, o.Timeout)
 	defer cancel()
-	start := time.Now()
 	lowered, err := Lower(src)
-	res := &Result{Lowered: lowered}
 	if err != nil {
-		res.Error = err.Error()
-		return res, err
+		return &Result{Lowered: lowered, Error: err.Error()}, err
 	}
+	return runLowered(ctx, lowered, o)
+}
+
+// RunLowered executes Starlark that has already been lowered.
+func RunLowered(ctx context.Context, lowered string, o Options) (*Result, error) {
+	if o.Timeout == 0 {
+		o.Timeout = 60 * time.Second
+	}
+	ctx, cancel := context.WithTimeout(ctx, o.Timeout)
+	defer cancel()
+	return runLowered(ctx, lowered, o)
+}
+
+func runLowered(ctx context.Context, lowered string, o Options) (*Result, error) {
+	start := time.Now()
+	res := &Result{Lowered: lowered}
 	rt := NewRuntime(ctx, o)
 	thread := rt.Thread()
 	stop := context.AfterFunc(ctx, func() { thread.Cancel("deadline or stop") })
 	defer stop()
-	_, err = starlark.ExecFileOptions(FileOptions, thread, "script.star", lowered, rt.Predeclared())
+	_, err := starlark.ExecFileOptions(FileOptions, thread, "script.star", lowered, rt.withRecipeBuiltins())
 	res.Items = rt.items
 	res.Steps = thread.ExecutionSteps()
 	res.Cost, res.Calls, res.Source = rt.CallOpts.Ledger.Snapshot()
@@ -963,6 +1072,20 @@ func Run(ctx context.Context, src string, o Options) (*Result, error) {
 		return res, fmt.Errorf("%s", res.Error)
 	}
 	return res, nil
+}
+
+// withRecipeBuiltins adds no-op recipe()/param() so a recipe file's body can
+// run as a script (dry runs of proposals).
+func (rt *Runtime) withRecipeBuiltins() starlark.StringDict {
+	pre := starlark.StringDict{}
+	for k, v := range rt.Predeclared() {
+		pre[k] = v
+	}
+	noop := starlark.NewBuiltin("noop", func(*starlark.Thread, *starlark.Builtin, starlark.Tuple, []starlark.Tuple) (starlark.Value, error) {
+		return starlark.None, nil
+	})
+	pre["recipe"], pre["param"] = noop, noop
+	return pre
 }
 
 // Items returns what has been emitted so far.

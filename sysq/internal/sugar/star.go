@@ -7,8 +7,7 @@ import (
 // star lowers Starlark-with-sugar: statements stay as written; expression
 // regions are rewritten in place.
 func (l *lowerer) star() (string, error) {
-	scopes := l.starScopes()
-	l.scope = func(k int) map[string]bool { return scopes[k] }
+	l.scope = l.starScopes()
 	var out strings.Builder
 	k := 0
 	for k < len(l.toks) && l.toks[k].k != kEOF {
@@ -144,18 +143,25 @@ func (l *lowerer) inlineBody(a, b int) (string, error) {
 	return s, err
 }
 
-// starScopes computes, for each token, the variable names visible there:
-// module-level names plus the enclosing function's parameters and locals.
-func (l *lowerer) starScopes() []map[string]bool {
+// starScopes computes, for each token, the variable names bound before it:
+// module-level names plus the enclosing function's parameters and locals,
+// each counted from the end of the statement that first assigns it (so a
+// predicate never references a local before assignment).
+func (l *lowerer) starScopes() func(k int) map[string]bool {
 	type fn struct {
 		indent int
-		names  map[string]bool
+		names  map[string]int // name -> token index from which it is bound
 		start  int
 		end    int
 	}
-	module := map[string]bool{}
+	module := map[string]int{}
 	var fns []*fn
 	var stack []*fn
+	bind := func(m map[string]int, name string, at int) {
+		if _, ok := m[name]; !ok {
+			m[name] = at
+		}
+	}
 	k := 0
 	for k < len(l.toks) && l.toks[k].k != kEOF {
 		end := k
@@ -176,15 +182,15 @@ func (l *lowerer) starScopes() []map[string]bool {
 			}
 			switch {
 			case l.is(f, "def") && l.toks[f+1].k == kIdent:
-				target[l.text(f+1)] = true
-				nf := &fn{indent: indent, names: map[string]bool{}, start: f}
+				bind(target, l.text(f+1), end)
+				nf := &fn{indent: indent, names: map[string]int{}, start: f}
 				if l.is(f+2, "(") {
 					m := l.match(f + 2)
 					for j := f + 3; j < m; j++ {
 						if l.toks[j].k == kIdent && l.toks[j].depth == l.toks[f+3].depth {
 							p := j - 1
 							if p == f+2 || l.is(p, ",") || l.is(p, "*") || l.is(p, "**") {
-								nf.names[l.text(j)] = true
+								bind(nf.names, l.text(j), f)
 							}
 						}
 					}
@@ -197,7 +203,7 @@ func (l *lowerer) starScopes() []map[string]bool {
 						break
 					}
 					if l.toks[j].k == kIdent {
-						target[l.text(j)] = true
+						bind(target, l.text(j), end)
 					}
 				}
 			case l.is(f, "load") && l.is(f+1, "("):
@@ -205,10 +211,10 @@ func (l *lowerer) starScopes() []map[string]bool {
 				for j := f + 2; j < m; j++ {
 					t := l.toks[j]
 					if t.k == kStr && j > f+2 {
-						target[strings.Trim(t.text, `"'`)] = true
+						bind(target, strings.Trim(t.text, `"'`), end)
 					}
 					if t.k == kIdent && l.is(j+1, "=") {
-						target[t.text] = true
+						bind(target, t.text, end)
 					}
 				}
 			default:
@@ -220,7 +226,7 @@ func (l *lowerer) starScopes() []map[string]bool {
 								break
 							}
 							if l.toks[x].k == kIdent {
-								target[l.text(x)] = true
+								bind(target, l.text(x), end)
 							}
 						}
 						break
@@ -236,26 +242,24 @@ func (l *lowerer) starScopes() []map[string]bool {
 	for _, f := range stack {
 		f.end = len(l.toks)
 	}
-	out := make([]map[string]bool, len(l.toks))
-	for i := range out {
-		out[i] = module
+	return func(k int) map[string]bool {
+		out := map[string]bool{}
+		for n, at := range module {
+			if at <= k {
+				out[n] = true
+			}
+		}
+		for _, f := range fns {
+			if k >= f.start && (f.end == 0 || k < f.end) {
+				for n, at := range f.names {
+					if at <= k {
+						out[n] = true
+					}
+				}
+			}
+		}
+		return out
 	}
-	for _, f := range fns {
-		if f.end == 0 {
-			f.end = len(l.toks)
-		}
-		m := map[string]bool{}
-		for n := range module {
-			m[n] = true
-		}
-		for n := range f.names {
-			m[n] = true
-		}
-		for i := f.start; i < f.end && i < len(out); i++ {
-			out[i] = m
-		}
-	}
-	return out
 }
 
 func lineStart(src string, pos int) int {
