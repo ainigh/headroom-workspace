@@ -31,6 +31,20 @@ always builds.
 (GitHub's build when there is one for that exact commit, otherwise it builds that commit here).
 Running the install line again works too. Nothing depends on GitHub Actions working.
 
+## Using it
+
+- The menu bar item opens a menu; **Show Headroom** (or ⌥⌘H anywhere) toggles the floating panel
+  with the four key groups and their top consumers. Click a group to drill in; `⋯` on a consumer
+  opens its Actions panel.
+- Headroom starts `sysqd` and `sysact` as LaunchAgents from inside the app
+  (`~/Library/LaunchAgents/com.ainigh.headroom.*.plist`), so history keeps recording while the app
+  is closed. Logs: `~/Library/Logs/Headroom/`.
+- **Ask AI** needs [Ollama](https://ollama.com) running locally; pick the model in Settings →
+  Assistant. It reads through sysq and can only *request* an action, which you confirm.
+- Everything is YAML under `~/Library/Application Support/Headroom/config/`; Settings edits the
+  same files and changes made in an editor apply at once.
+- Idle cost check (no Headroom window open): `headroom/scripts/perf-check.sh 120`.
+
 ## Build from source
 
 ```bash
