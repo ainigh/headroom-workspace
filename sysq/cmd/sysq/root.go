@@ -188,16 +188,13 @@ var runName = func(ctx context.Context, env *setup.Env, name string, params map[
 }
 
 func runCmd() *cobra.Command {
+	var scriptText, scriptFile string
+	var showLowered bool
 	cmd := &cobra.Command{
-		Use:   "run <name> [param=value ...]",
-		Short: "Run a primitive or recipe",
-		Args:  cobra.MinimumNArgs(1),
+		Use:   "run <name> [param=value ...] | run -e '<script>' | run -f script.sysq",
+		Short: "Run a primitive, recipe or sysq-script",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			env, err := openEnv()
-			if err != nil {
-				return err
-			}
-			params, err := parseKV(args[1:])
 			if err != nil {
 				return err
 			}
@@ -205,7 +202,39 @@ func runCmd() *cobra.Command {
 			defer cancel()
 			start := time.Now()
 			ledger := &engine.Ledger{Budget: env.Policy.CostBudget}
-			items, err := runName(ctx, env, args[0], params, engine.CallOpts{Ledger: ledger, Fresh: flagFresh})
+			opts := engine.CallOpts{Ledger: ledger, Fresh: flagFresh}
+			if scriptFile != "" {
+				b, err := os.ReadFile(scriptFile)
+				if err != nil {
+					return err
+				}
+				scriptText = string(b)
+			}
+			if scriptText != "" {
+				res, err := runScript(ctx, env, scriptText, opts)
+				var items []render.Item
+				if res != nil {
+					for _, it := range res.Items {
+						items = append(items, render.Item{Label: it.Label, Table: it.Table})
+					}
+					if showLowered {
+						fmt.Fprintln(os.Stderr, res.Lowered)
+					}
+				}
+				auditRun(env, "script", "", scriptText, nil, ledger, start, items, err)
+				if werr := render.Write(os.Stdout, flagFormat, items); werr != nil {
+					return werr
+				}
+				return err
+			}
+			if len(args) == 0 {
+				return fmt.Errorf("name a primitive or recipe, or pass -e '<script>'")
+			}
+			params, err := parseKV(args[1:])
+			if err != nil {
+				return err
+			}
+			items, err := runName(ctx, env, args[0], params, opts)
 			auditRun(env, "run", args[0], "", params, ledger, start, items, err)
 			if err != nil {
 				return err
@@ -213,6 +242,9 @@ func runCmd() *cobra.Command {
 			return render.Write(os.Stdout, flagFormat, items)
 		},
 	}
+	cmd.Flags().StringVarP(&scriptText, "script", "e", "", "sysq-script (or Starlark) to run")
+	cmd.Flags().StringVarP(&scriptFile, "file", "f", "", "read the script from a file")
+	cmd.Flags().BoolVar(&showLowered, "lowered", false, "print the lowered Starlark to stderr")
 	return cmd
 }
 

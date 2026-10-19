@@ -19,3 +19,6 @@ fixtures:
   net.interfaces: synthetic
   svc.launchd: synthetic
   log.system: synthetic
+  sys.thermal: synthetic
+  net.connections: synthetic
+  proc.info: synthetic

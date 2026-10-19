@@ -909,4 +909,3 @@ func EvalAgg(n Node, t *table.Table, rows [][]any, base *Env) (Value, error) {
 	}
 	return Eval(n, &env)
 }
-

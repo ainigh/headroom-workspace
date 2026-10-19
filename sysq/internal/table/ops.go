@@ -332,6 +332,12 @@ func (t *Table) Intersect(o *Table) (*Table, error) {
 // column (added, removed, changed) and changed rows carry before values in
 // <col>_before columns.
 func (t *Table) Diff(before *Table, on []string) (*Table, error) {
+	if len(before.Schema) == 0 {
+		// A missing snapshot: everything is new.
+		empty := t.WithRows(nil)
+		empty.Meta = before.Meta
+		before = empty
+	}
 	b := align(t, before)
 	if len(on) == 0 {
 		for _, c := range t.Schema {

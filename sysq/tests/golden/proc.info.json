@@ -1,0 +1,180 @@
+{
+  "schema": [
+    {
+      "name": "pid",
+      "type": "pid"
+    },
+    {
+      "name": "ppid",
+      "type": "pid"
+    },
+    {
+      "name": "user",
+      "type": "str"
+    },
+    {
+      "name": "cpu",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "mem_pct",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "rss",
+      "type": "bytes"
+    },
+    {
+      "name": "started",
+      "type": "ts"
+    },
+    {
+      "name": "command",
+      "type": "str"
+    },
+    {
+      "name": "open_files",
+      "type": "table",
+      "schema": [
+        {
+          "name": "fd",
+          "type": "str"
+        },
+        {
+          "name": "kind",
+          "type": "str"
+        },
+        {
+          "name": "path",
+          "type": "path"
+        }
+      ]
+    },
+    {
+      "name": "sockets",
+      "type": "table",
+      "schema": [
+        {
+          "name": "fd",
+          "type": "str"
+        },
+        {
+          "name": "family",
+          "type": "str"
+        },
+        {
+          "name": "proto",
+          "type": "str"
+        },
+        {
+          "name": "address",
+          "type": "str"
+        },
+        {
+          "name": "state",
+          "type": "str"
+        }
+      ]
+    }
+  ],
+  "rows": [
+    [
+      2210,
+      1,
+      "me",
+      12.4,
+      4.1,
+      2936012800,
+      "2026-10-19T08:30:01-07:00",
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      {
+        "schema": [
+          {
+            "name": "fd",
+            "type": "str"
+          },
+          {
+            "name": "kind",
+            "type": "str"
+          },
+          {
+            "name": "path",
+            "type": "path"
+          }
+        ],
+        "rows": [
+          [
+            "cwd",
+            "DIR",
+            "/"
+          ],
+          [
+            "txt",
+            "REG",
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+          ],
+          [
+            "3",
+            "REG",
+            "/Users/me/Library/Application Support/Google/Chrome/Default/History"
+          ],
+          [
+            "4",
+            "REG",
+            "/Users/me/Library/Application Support/Google/Chrome/Default/Cookies"
+          ],
+          [
+            "60",
+            "REG",
+            "/private/var/folders/xy/abc123/T/.com.google.Chrome.XYZ"
+          ]
+        ]
+      },
+      {
+        "schema": [
+          {
+            "name": "fd",
+            "type": "str"
+          },
+          {
+            "name": "family",
+            "type": "str"
+          },
+          {
+            "name": "proto",
+            "type": "str"
+          },
+          {
+            "name": "address",
+            "type": "str"
+          },
+          {
+            "name": "state",
+            "type": "str"
+          }
+        ],
+        "rows": [
+          [
+            "41",
+            "IPv4",
+            "TCP",
+            "192.168.1.23:54001-\u003e142.250.72.14:443",
+            "ESTABLISHED"
+          ]
+        ]
+      }
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "proc.info"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

@@ -150,10 +150,10 @@ var boundaryOps = map[string]bool{
 type regionKind int
 
 const (
-	rPlain regionKind = iota
-	rCall             // (...) after a callee: kwarg colons
-	rRecord           // {...} in sysq-script: bare keys
-	rBraces           // {...} in Starlark: dict/set
+	rPlain  regionKind = iota
+	rCall              // (...) after a callee: kwarg colons
+	rRecord            // {...} in sysq-script: bare keys
+	rBraces            // {...} in Starlark: dict/set
 )
 
 // region lowers tokens [a,b) that sit at one bracket depth. It writes the gap

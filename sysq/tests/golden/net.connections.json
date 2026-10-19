@@ -1,0 +1,140 @@
+{
+  "schema": [
+    {
+      "name": "pid",
+      "type": "pid"
+    },
+    {
+      "name": "command",
+      "type": "str"
+    },
+    {
+      "name": "uid",
+      "type": "uid"
+    },
+    {
+      "name": "family",
+      "type": "str"
+    },
+    {
+      "name": "proto",
+      "type": "str"
+    },
+    {
+      "name": "address",
+      "type": "str"
+    },
+    {
+      "name": "port",
+      "type": "port"
+    },
+    {
+      "name": "remote_address",
+      "type": "str"
+    },
+    {
+      "name": "remote_port",
+      "type": "port"
+    },
+    {
+      "name": "state",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      412,
+      "postgres",
+      74,
+      "IPv6",
+      "TCP",
+      "::1",
+      5432,
+      null,
+      null,
+      "LISTEN"
+    ],
+    [
+      1502,
+      "ollama",
+      501,
+      "IPv4",
+      "TCP",
+      "127.0.0.1",
+      11434,
+      null,
+      null,
+      "LISTEN"
+    ],
+    [
+      1502,
+      "ollama",
+      501,
+      "IPv4",
+      "TCP",
+      "127.0.0.1",
+      11434,
+      "127.0.0.1",
+      54210,
+      "ESTABLISHED"
+    ],
+    [
+      2210,
+      "Google",
+      501,
+      "IPv4",
+      "TCP",
+      "192.168.1.23",
+      54001,
+      "142.250.72.14",
+      443,
+      "ESTABLISHED"
+    ],
+    [
+      2210,
+      "Google",
+      501,
+      "IPv4",
+      "TCP",
+      "192.168.1.23",
+      54002,
+      "151.101.1.140",
+      443,
+      "ESTABLISHED"
+    ],
+    [
+      2210,
+      "Google",
+      501,
+      "IPv4",
+      "UDP",
+      "*",
+      5353,
+      null,
+      null,
+      null
+    ],
+    [
+      4100,
+      "Headroom",
+      501,
+      "IPv4",
+      "TCP",
+      "127.0.0.1",
+      54210,
+      "127.0.0.1",
+      11434,
+      "ESTABLISHED"
+    ]
+  ],
+  "meta": {
+    "rows": 7,
+    "truncated": false,
+    "source": [
+      "net.connections"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

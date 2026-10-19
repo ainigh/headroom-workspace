@@ -18,3 +18,15 @@ One line per choice the docs left open. Format: `YYYY-MM-DD — area — decisio
 2026-10-19 — sysq/engine — Parsers emit rows keyed by column name; a key not in the YAML schema fails the golden test — the schema is the parser's contract.
 2026-10-19 — sysq/engine — Shipped fixtures are embedded in the binary (`--fixtures builtin`) so Headroom and HTTP tests run anywhere without a Mac.
 2026-10-19 — sysq/policy — User `policy.yaml` can only add excluded paths, never remove shipped ones; caps can only be lowered — the human loosens sensitivity, but structural limits stay.
+2026-10-19 — sysq/sugar — Two input syntaxes: sysq-script (`let`, `{ }` blocks, `fn`, `emit x`, design §14.2) and Starlark-with-sugar (recipes, §19); `Detect` picks Starlark when it sees `def`/`load(`/`recipe(`/colon blocks — both appear in the design.
+2026-10-19 — sysq/sugar — Lowering is an edit-based text transform: unchanged source (comments, layout) is copied, only sugar spans are rewritten — keeps `explain` output readable and line-faithful.
+2026-10-19 — sysq/sugar — `t ?? other` lowers to `fallback(t, lambda: other)` rather than `t if count(t) > 0 else other` — evaluates `t` once; same meaning.
+2026-10-19 — sysq/sugar — `t.cpu` stays `t.cpu`: Table's attribute lookup returns the column (the documented `t.col("cpu")`), so lowering needs no type knowledge; a 1-row table's nested-table column drills in (§12.2).
+2026-10-19 — sysq/sugar — In sysq-script, a dotted name on either side of a comparison is wrapped in `scalar()` (`hot.level >= 2` → `scalar(hot.level) >= 2`); Starlark can't compare a table with an int, and `scalar` is the identity on non-tables.
+2026-10-19 — sysq/sugar — Predicates/projections lower to `expr("<text>", v=v, …)`: free identifiers that are script variables in scope are passed as bindings; at evaluation a column of the input wins over a variable of the same name (design §16 uses `cpu` as both).
+2026-10-19 — sysq/sugar — Keyword-named kwargs get a trailing underscore (`for: 30s` → `for_=`); `except` stage → `.except_()` — Starlark reserves those words.
+2026-10-19 — sysq/script — Pushdown is runtime-lazy: a primitive reference stays unexecuted until a non-pushable op; pushable conjuncts of `filter` go into the predicate/bound params and limit into the limit param, and the full filter/limit still runs after — correctness never depends on the dialect.
+2026-10-19 — sysq/script — `try_` never catches fuel, budget or cancellation errors; recursion and `while` stay disabled (starlark-go FileOptions without Recursion/While).
+2026-10-19 — sysq/script — `watch` is bounded to ≥1 s intervals, ≤60 samples, ≤2 min; in fixture mode it doesn't sleep.
+2026-10-19 — sysq/script — `emit({...})`: a record whose values are all tables becomes one labeled item per key; any other record becomes a one-row table (nested tables as table cells).
+2026-10-19 — sysq/plan — Static explain counts a call inside a `for` loop as 10 calls when estimating cost units; cost class and sensitivity are maxima over everything reachable.

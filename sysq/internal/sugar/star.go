@@ -73,7 +73,7 @@ func (l *lowerer) starLine(a, b int) (string, error) {
 			if err != nil {
 				return "", err
 			}
-			return lead + l.copyRange(f, in+1) + iter + l.gap(colon) + ":" + tail, nil
+			return lead + w + l.copyRange(f+1, in+1) + iter + l.gap(colon) + ":" + tail, nil
 		}
 		cond, err := l.region(f+1, colon, rPlain, "")
 		if err != nil {
@@ -124,7 +124,7 @@ func (l *lowerer) starLine(a, b int) (string, error) {
 			if err != nil {
 				return "", err
 			}
-			return lead + strings.TrimLeft(l.copyRange(f, j), " ") + l.gap(j) + t.text + v, nil
+			return lead + l.text(f) + l.copyRange(f+1, j) + l.gap(j) + t.text + v, nil
 		}
 	}
 	s, err := l.region(f, b, rPlain, "")
