@@ -6,3 +6,4 @@ build/
 /sysq/bin/
 /sysact/bin/
 *.test
+.testhome-*
