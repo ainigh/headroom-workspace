@@ -1,0 +1,58 @@
+{
+  "schema": [
+    {
+      "name": "key",
+      "type": "str"
+    },
+    {
+      "name": "value",
+      "type": "str"
+    },
+    {
+      "name": "type",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      "autohide",
+      "true",
+      "bool"
+    ],
+    [
+      "magnification",
+      "false",
+      "bool"
+    ],
+    [
+      "mod-count",
+      "211",
+      "int"
+    ],
+    [
+      "orientation",
+      "bottom",
+      "string"
+    ],
+    [
+      "persistent-apps",
+      "{\"tile-data\":{\"file-label\":\"Safari\"}}",
+      "array"
+    ],
+    [
+      "tilesize",
+      "48",
+      "int"
+    ]
+  ],
+  "meta": {
+    "rows": 6,
+    "truncated": false,
+    "source": [
+      "prefs.read"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

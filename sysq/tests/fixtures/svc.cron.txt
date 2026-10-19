@@ -1,0 +1,4 @@
+# m h dom mon dow command
+SHELL=/bin/zsh
+*/30 * * * * /Users/me/bin/sync-notes.sh --token=abc123secretvalue
+@reboot /opt/homebrew/bin/redis-server /opt/homebrew/etc/redis.conf

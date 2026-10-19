@@ -130,9 +130,11 @@ Append-only JSONL at `~/Library/Application Support/sysq/audit/`: caller id, scr
 - Validates against JSON Schemas (committed in the repo); invalid file → keep last good config, show a non-blocking banner.
 - Hot reload on change; publishes a new immutable `AppConfig` value.
 - **MUST**: adding a resource group, changing a threshold, rebinding a mode, or editing the system prompt requires no code change.
+- Beyond the group bindings, groups.yaml names the `overview` recipe (large-view header), the `item_profile` recipe (Actions panel, assistant item scope) and the Storage Explorer's recipes (`explorer:` with the names of their root/min/age parameters); assistant.yaml names the `preflight_recipe` run before a model loads. sampling.yaml's `narrative` and `events` pass through to sysqd's schedules.yaml.
 
 ### 5.2 Data layer
 - `SysqClient`: typed wrapper over sysq HTTP; `runRecipe`, `run`, `describe`, `explain`, `history`, `subscribe`.
+- Headroom keeps sysqd and sysact running as per-user LaunchAgents (binaries inside the app bundle) and registers its own two sysqd clients (`headroom-ui`, `headroom-assistant`) over the admin socket at each launch; tokens stay in memory.
 - `GroupStore`: for each configured group, subscribes to headline/detail/consumer recipes at the rate from `sampling.yaml` (adjusted for view open / battery), holds the latest `GroupState{headline, status, sparkline, metrics, consumers}`.
 - **MUST**: UI code never calls `SysqClient` directly; it observes `GroupStore` and related stores (see `separation-of-concerns.md`).
 

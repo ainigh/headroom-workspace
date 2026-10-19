@@ -1,0 +1,16 @@
+name: proc.energy
+doc: Processes by energy impact (top's POWER column, second sample).
+params:
+  n: { type: int, default: 20, min: 1, max: 200 }
+cost: moderate
+sensitivity: personal
+argv: ["/usr/bin/top", "-l", "2", "-n", "{n}", "-o", "power", "-stats", "pid,command,power,cpu"]
+parser: top_energy
+timeout: 6s
+cache_ttl: 2s
+pushdown: { limit: n }
+schema:
+  - { name: pid,     type: pid }
+  - { name: command, type: str }
+  - { name: power,   type: float }
+  - { name: cpu,     type: float, unit: "%" }

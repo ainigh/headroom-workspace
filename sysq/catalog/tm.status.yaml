@@ -1,0 +1,16 @@
+name: tm.status
+doc: Time Machine — whether a backup is running, its phase and progress, and the latest completed backup.
+cost: cheap
+sensitivity: public
+commands:
+  - { id: status, argv: ["/usr/bin/tmutil", "status"] }
+  - { id: latest, argv: ["/usr/bin/tmutil", "latestbackup"], optional: true }
+parser: tm_status
+timeout: 10s
+cache_ttl: 1m
+schema:
+  - { name: running,                 type: bool }
+  - { name: phase,                   type: str }
+  - { name: percent,                 type: float, unit: "%" }
+  - { name: last_backup,             type: ts }
+  - { name: hours_since_last_backup, type: float }

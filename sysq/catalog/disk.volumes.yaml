@@ -1,0 +1,24 @@
+name: disk.volumes
+doc: Mounted local volumes with size, used, free (APFS used = size - free).
+cost: cheap
+sensitivity: public
+commands:
+  - { id: df, argv: ["/bin/df", "-k", "-P"] }
+  - { id: mount, argv: ["/sbin/mount"] }
+  - { id: diskutil, argv: ["/usr/sbin/diskutil", "info", "-plist", "/"], optional: true }
+parser: disk_volumes
+timeout: 5s
+cache_ttl: 30s
+schema:
+  - { name: name,     type: str }
+  - { name: device,   type: str }
+  - { name: mount,    type: path }
+  - { name: fstype,   type: str }
+  - { name: size,     type: bytes }
+  - { name: used,     type: bytes }
+  - { name: free,     type: bytes }
+  - { name: used_pct, type: float, unit: "%" }
+  - { name: mounted,  type: bool }
+  - { name: readonly, type: bool }
+  - { name: local,    type: bool }
+  - { name: internal, type: bool, doc: "an APFS system volume under /System/Volumes" }

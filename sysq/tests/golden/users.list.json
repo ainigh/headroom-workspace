@@ -1,0 +1,68 @@
+{
+  "schema": [
+    {
+      "name": "name",
+      "type": "str"
+    },
+    {
+      "name": "uid",
+      "type": "uid"
+    },
+    {
+      "name": "system",
+      "type": "bool"
+    }
+  ],
+  "rows": [
+    [
+      "_amavisd",
+      83,
+      true
+    ],
+    [
+      "_appleevents",
+      55,
+      true
+    ],
+    [
+      "_www",
+      70,
+      true
+    ],
+    [
+      "daemon",
+      1,
+      true
+    ],
+    [
+      "me",
+      501,
+      false
+    ],
+    [
+      "nobody",
+      -2,
+      true
+    ],
+    [
+      "root",
+      0,
+      true
+    ],
+    [
+      "guest",
+      201,
+      true
+    ]
+  ],
+  "meta": {
+    "rows": 8,
+    "truncated": false,
+    "source": [
+      "users.list"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

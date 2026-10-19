@@ -1,0 +1,63 @@
+{
+  "schema": [
+    {
+      "name": "model",
+      "type": "str"
+    },
+    {
+      "name": "id",
+      "type": "str"
+    },
+    {
+      "name": "size",
+      "type": "bytes"
+    },
+    {
+      "name": "processor",
+      "type": "str"
+    },
+    {
+      "name": "gpu_pct",
+      "type": "int",
+      "unit": "%"
+    },
+    {
+      "name": "context",
+      "type": "int"
+    },
+    {
+      "name": "until",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      "gemma3:27b",
+      "a418f5838eaf",
+      22000000000,
+      "100% GPU",
+      100,
+      8192,
+      "4 minutes from now"
+    ],
+    [
+      "qwen3:32b",
+      "e1c9f234c6eb",
+      16000000000,
+      "100% GPU",
+      100,
+      4096,
+      "Forever"
+    ]
+  ],
+  "meta": {
+    "rows": 2,
+    "truncated": false,
+    "source": [
+      "ai.ollama_ps"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

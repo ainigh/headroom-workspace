@@ -1,0 +1,98 @@
+{
+  "schema": [
+    {
+      "name": "pid",
+      "type": "pid"
+    },
+    {
+      "name": "command",
+      "type": "str"
+    },
+    {
+      "name": "uid",
+      "type": "uid"
+    },
+    {
+      "name": "family",
+      "type": "str"
+    },
+    {
+      "name": "proto",
+      "type": "str"
+    },
+    {
+      "name": "address",
+      "type": "str"
+    },
+    {
+      "name": "port",
+      "type": "port"
+    },
+    {
+      "name": "state",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      412,
+      "postgres",
+      74,
+      "IPv6",
+      "TCP",
+      "::1",
+      5432,
+      "LISTEN"
+    ],
+    [
+      412,
+      "postgres",
+      74,
+      "IPv4",
+      "TCP",
+      "127.0.0.1",
+      5432,
+      "LISTEN"
+    ],
+    [
+      1502,
+      "ollama",
+      501,
+      "IPv4",
+      "TCP",
+      "127.0.0.1",
+      11434,
+      "LISTEN"
+    ],
+    [
+      2210,
+      "Google",
+      501,
+      "IPv4",
+      "TCP",
+      "*",
+      7000,
+      "LISTEN"
+    ],
+    [
+      4100,
+      "Headroom",
+      501,
+      "IPv4",
+      "TCP",
+      "127.0.0.1",
+      11435,
+      "LISTEN"
+    ]
+  ],
+  "meta": {
+    "rows": 5,
+    "truncated": false,
+    "source": [
+      "net.listeners"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

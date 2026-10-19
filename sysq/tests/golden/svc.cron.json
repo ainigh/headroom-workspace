@@ -1,0 +1,33 @@
+{
+  "schema": [
+    {
+      "name": "schedule",
+      "type": "str"
+    },
+    {
+      "name": "command",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      "*/30 * * * *",
+      "/Users/me/bin/sync-notes.sh --token=[REDACTED]"
+    ],
+    [
+      "@reboot",
+      "/opt/homebrew/bin/redis-server /opt/homebrew/etc/redis.conf"
+    ]
+  ],
+  "meta": {
+    "rows": 2,
+    "truncated": false,
+    "source": [
+      "svc.cron"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true,
+    "redacted": 1
+  }
+}

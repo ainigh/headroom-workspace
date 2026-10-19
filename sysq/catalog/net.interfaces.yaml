@@ -1,0 +1,20 @@
+name: net.interfaces
+doc: Network interfaces with hardware port, MAC, addresses and status.
+cost: cheap
+sensitivity: personal
+commands:
+  - { id: ifconfig, argv: ["/sbin/ifconfig", "-a"] }
+  - { id: networksetup, argv: ["/usr/sbin/networksetup", "-listallhardwareports"], optional: true }
+parser: ifconfig
+timeout: 5s
+cache_ttl: 30s
+schema:
+  - { name: name,          type: str }
+  - { name: hardware_port, type: str }
+  - { name: mac,           type: str }
+  - { name: ipv4,          type: str }
+  - { name: ipv6,          type: str }
+  - { name: status,        type: str }
+  - { name: mtu,           type: int }
+  - { name: up,            type: bool }
+  - { name: flags,         type: str }

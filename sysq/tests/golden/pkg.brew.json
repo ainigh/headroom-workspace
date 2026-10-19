@@ -1,0 +1,97 @@
+{
+  "schema": [
+    {
+      "name": "name",
+      "type": "str"
+    },
+    {
+      "name": "kind",
+      "type": "enum",
+      "values": [
+        "formula",
+        "cask"
+      ]
+    },
+    {
+      "name": "version",
+      "type": "str"
+    },
+    {
+      "name": "versions",
+      "type": "int",
+      "doc": "versions of this package kept on disk"
+    },
+    {
+      "name": "path",
+      "type": "path"
+    }
+  ],
+  "rows": [
+    [
+      "docker-desktop",
+      "cask",
+      "4.46.0",
+      1,
+      "/opt/homebrew/Caskroom/docker-desktop/4.46.0"
+    ],
+    [
+      "git",
+      "formula",
+      "2.51.0",
+      1,
+      "/opt/homebrew/Cellar/git/2.51.0"
+    ],
+    [
+      "go",
+      "formula",
+      "1.27.1",
+      1,
+      "/opt/homebrew/Cellar/go/1.27.1"
+    ],
+    [
+      "node",
+      "formula",
+      "24.9.0",
+      2,
+      "/opt/homebrew/Cellar/node/24.9.0"
+    ],
+    [
+      "node",
+      "formula",
+      "24.8.0",
+      2,
+      "/opt/homebrew/Cellar/node/24.8.0"
+    ],
+    [
+      "postgresql@17",
+      "formula",
+      "17.6",
+      1,
+      "/opt/homebrew/Cellar/postgresql@17/17.6"
+    ],
+    [
+      "python@3.13",
+      "formula",
+      "3.13.7",
+      1,
+      "/opt/homebrew/Cellar/python@3.13/3.13.7"
+    ],
+    [
+      "visual-studio-code",
+      "cask",
+      "1.105.0",
+      1,
+      "/opt/homebrew/Caskroom/visual-studio-code/1.105.0"
+    ]
+  ],
+  "meta": {
+    "rows": 8,
+    "truncated": false,
+    "source": [
+      "pkg.brew"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

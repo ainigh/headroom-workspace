@@ -1,0 +1,11 @@
+name: cache.clear
+doc: Move one app's cache folder (~/Library/Caches/<id>) to the Trash; the app rebuilds it as needed.
+tier: caution
+params:
+  app: { type: str, pattern: "^[A-Za-z0-9][A-Za-z0-9._-]*$", max_len: 200, required: true }
+kind: trash
+target: "~/Library/Caches/{app}"
+within: ["~/Library/Caches"]
+must_exist: true
+effect: "Moves ~/Library/Caches/{app} to the Trash. The app recreates its cache; first launches may be slower."
+undo_hint: "Put Back from the Trash (quit the app first)."

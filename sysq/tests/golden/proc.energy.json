@@ -1,0 +1,63 @@
+{
+  "schema": [
+    {
+      "name": "pid",
+      "type": "pid"
+    },
+    {
+      "name": "command",
+      "type": "str"
+    },
+    {
+      "name": "power",
+      "type": "float"
+    },
+    {
+      "name": "cpu",
+      "type": "float",
+      "unit": "%"
+    }
+  ],
+  "rows": [
+    [
+      3320,
+      "photoanalysisd",
+      61.3,
+      98.2
+    ],
+    [
+      2244,
+      "Google Chrome He",
+      12.4,
+      9.8
+    ],
+    [
+      2210,
+      "Google Chrome",
+      8.9,
+      7.6
+    ],
+    [
+      4100,
+      "Headroom",
+      0.8,
+      1.1
+    ],
+    [
+      1502,
+      "ollama",
+      0.1,
+      0.2
+    ]
+  ],
+  "meta": {
+    "rows": 5,
+    "truncated": false,
+    "source": [
+      "proc.energy"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

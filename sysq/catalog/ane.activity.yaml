@@ -1,0 +1,17 @@
+name: ane.activity
+doc: Neural Engine, GPU and CPU power draw from one powermetrics sample. Needs a NOPASSWD sudoers rule for exactly this powermetrics command; otherwise unavailable.
+cost: moderate
+sensitivity: public
+requires_sudo: { binary: /usr/bin/powermetrics, args: ["--samplers", "cpu_power,gpu_power,ane_power", "-n", "1", "-i", "1000"] }
+argv: ["/usr/bin/sudo", "-n", "/usr/bin/powermetrics", "--samplers", "cpu_power,gpu_power,ane_power", "-n", "1", "-i", "1000"]
+sandbox: read-only-sudo
+sandbox_exec: ["/usr/bin/powermetrics"]
+parser: powermetrics_power
+timeout: 6s
+cache_ttl: 3s
+schema:
+  - { name: ane_mw,      type: float, unit: mW }
+  - { name: gpu_mw,      type: float, unit: mW }
+  - { name: cpu_mw,      type: float, unit: mW }
+  - { name: combined_mw, type: float, unit: mW }
+  - { name: ane_active,  type: bool }

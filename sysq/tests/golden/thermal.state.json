@@ -1,0 +1,57 @@
+{
+  "schema": [
+    {
+      "name": "level",
+      "type": "int",
+      "doc": "0 nominal, 1 fair, 2 serious, 3 critical"
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "values": [
+        "nominal",
+        "fair",
+        "serious",
+        "critical"
+      ]
+    },
+    {
+      "name": "speed_limit",
+      "type": "int",
+      "unit": "%"
+    },
+    {
+      "name": "warning",
+      "type": "str"
+    },
+    {
+      "name": "cpu_thermal_level",
+      "type": "int"
+    },
+    {
+      "name": "fan_rpm",
+      "type": "int",
+      "doc": "needs sudo (powermetrics); empty otherwise"
+    }
+  ],
+  "rows": [
+    [
+      0,
+      "nominal",
+      100,
+      "",
+      null,
+      null
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "thermal.state"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

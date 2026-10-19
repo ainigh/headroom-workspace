@@ -1,0 +1,22 @@
+; Read-only, outbound network allowed. Only primitives declaring
+; network: true use this, and they are disabled until policy.yaml enables
+; them by name (implementation.md §3.1).
+(version 1)
+(deny default)
+(allow process-fork)
+__EXEC__
+(allow file-read*)
+__DENY_READ__
+(allow file-write* (literal "/dev/null") (subpath "__SCRATCH__"))
+(allow file-ioctl (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow network-outbound)
+(allow system-socket)
+(deny network-bind network-inbound)
+(deny user-preference-write)
+(allow sysctl-read)
+(allow mach-lookup)
+(allow iokit-open)
+(allow process-info*)
+(allow ipc-posix-shm-read-data)
+(allow signal (target self))
+(allow user-preference-read)

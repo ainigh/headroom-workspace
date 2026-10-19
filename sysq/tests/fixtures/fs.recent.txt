@@ -1,0 +1,3 @@
+ 62233412  3417968 -rw-r--r--@   1 me               staff             3500000000 Oct 18 22:41 /Users/me/Downloads/Xcode_26.dmg
+ 62233499      296 -rw-r--r--@   1 me               staff                 301234 Oct 19 08:59 /Users/me/Downloads/invoice-2026-10.pdf
+ 62233501    16384 -rw-r--r--@   1 me               staff               16777216 Oct 15 21:07 /Users/me/Downloads/node-v24.9.0.pkg

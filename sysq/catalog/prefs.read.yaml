@@ -1,0 +1,16 @@
+name: prefs.read
+doc: Top-level keys of one preferences domain (defaults export), values as text; secrets redacted.
+params:
+  domain: { type: str, required: true, pattern: "^[A-Za-z0-9][A-Za-z0-9._-]*$", max_len: 128 }
+cost: cheap
+sensitivity: personal
+argv: ["/usr/bin/defaults", "export", "{domain}", "-"]
+parser: plist_kv
+timeout: 5s
+redact: true
+cache_ttl: 30s
+fixture_params: { domain: com.apple.dock }
+schema:
+  - { name: key,   type: str }
+  - { name: value, type: str }
+  - { name: type,  type: str }

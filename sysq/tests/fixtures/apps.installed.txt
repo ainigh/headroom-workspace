@@ -1,0 +1,37 @@
+{
+  "SPApplicationsDataType" : [
+    {
+      "_name" : "Safari",
+      "arch_kind" : "arch_arm_i64",
+      "lastModified" : "2026-09-15T15:00:00Z",
+      "obtained_from" : "apple",
+      "path" : "/Applications/Safari.app",
+      "signed_by" : ["Software Signing", "Apple Code Signing Certification Authority", "Apple Root CA"],
+      "version" : "26.0"
+    },
+    {
+      "_name" : "Xcode",
+      "arch_kind" : "arch_arm_i64",
+      "lastModified" : "2026-09-20T18:22:10Z",
+      "obtained_from" : "mac_app_store",
+      "path" : "/Applications/Xcode.app",
+      "version" : "26.0.1"
+    },
+    {
+      "_name" : "Google Chrome",
+      "arch_kind" : "arch_arm_i64",
+      "lastModified" : "2026-10-14T03:12:44Z",
+      "obtained_from" : "identified_developer",
+      "path" : "/Applications/Google Chrome.app",
+      "version" : "140.0.7339.80"
+    },
+    {
+      "_name" : "Ollama",
+      "arch_kind" : "arch_arm",
+      "lastModified" : "2026-10-02T11:00:00Z",
+      "obtained_from" : "identified_developer",
+      "path" : "/Applications/Ollama.app",
+      "version" : "0.12.3"
+    }
+  ]
+}

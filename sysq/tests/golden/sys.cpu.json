@@ -1,0 +1,87 @@
+{
+  "schema": [
+    {
+      "name": "brand",
+      "type": "str"
+    },
+    {
+      "name": "cores",
+      "type": "int"
+    },
+    {
+      "name": "p_cores",
+      "type": "int"
+    },
+    {
+      "name": "e_cores",
+      "type": "int"
+    },
+    {
+      "name": "user_pct",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "sys_pct",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "idle_pct",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "load_pct",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "load1",
+      "type": "float"
+    },
+    {
+      "name": "load5",
+      "type": "float"
+    },
+    {
+      "name": "load15",
+      "type": "float"
+    },
+    {
+      "name": "processes",
+      "type": "int"
+    },
+    {
+      "name": "threads",
+      "type": "int"
+    }
+  ],
+  "rows": [
+    [
+      "Apple M4 Pro",
+      14,
+      10,
+      4,
+      21.43,
+      12.84,
+      65.72,
+      34.3,
+      3.21,
+      2.98,
+      2.75,
+      642,
+      3318
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "sys.cpu"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

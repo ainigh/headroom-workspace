@@ -1,0 +1,13 @@
+name: sys.thermal
+doc: Thermal state from pmset (level 0 nominal … 3 critical) and any CPU speed limit in force.
+cost: cheap
+sensitivity: public
+argv: ["/usr/bin/pmset", "-g", "therm"]
+parser: pmset_therm
+timeout: 5s
+cache_ttl: 5s
+schema:
+  - { name: level,       type: int, doc: "0 nominal, 1 fair, 2 serious, 3 critical" }
+  - { name: state,       type: enum, values: [nominal, fair, serious, critical] }
+  - { name: speed_limit, type: int, unit: "%" }
+  - { name: warning,     type: str }

@@ -1,0 +1,176 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Headroom sampling.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "rates"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "rates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "view_open",
+        "idle"
+      ],
+      "properties": {
+        "view_open": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "headline": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            },
+            "detail": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            },
+            "consumers": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            }
+          }
+        },
+        "idle": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "headline": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            },
+            "detail": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            },
+            "consumers": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            }
+          }
+        },
+        "on_battery": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "headline": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            },
+            "detail": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            },
+            "consumers": {
+              "type": "string",
+              "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+            }
+          }
+        }
+      }
+    },
+    "hidden_groups": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "headline": {
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+        },
+        "detail": {
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+        },
+        "consumers": {
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+        }
+      }
+    },
+    "narrative": {
+      "type": "array",
+      "description": "Passed through to sysqd's schedules.yaml: series the resource narrative describes.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "recipe",
+          "column",
+          "label"
+        ],
+        "properties": {
+          "recipe": {
+            "type": "string"
+          },
+          "column": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "unit": {
+            "enum": [
+              "",
+              "%",
+              "bytes",
+              "bytes/s"
+            ]
+          },
+          "high": {
+            "type": "number"
+          },
+          "low": {
+            "type": "number"
+          },
+          "trend": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "description": "Passed through to sysqd's schedules.yaml: value changes recorded as events (graph markers).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "column",
+          "kind",
+          "message"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "column": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "pattern": "^[a-z_]+$"
+          },
+          "message": {
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "info",
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

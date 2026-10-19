@@ -1,0 +1,17 @@
+name: thermal.state
+doc: Thermal state from pmset (level 0 nominal … 3 critical), CPU speed limit, and the Intel CPU thermal level where it exists. Fan speed needs sudo (powermetrics) and is left empty.
+cost: cheap
+sensitivity: public
+commands:
+  - { id: therm, argv: ["/usr/bin/pmset", "-g", "therm"] }
+  - { id: sysctl, argv: ["/usr/sbin/sysctl", "-n", "machdep.xcpm.cpu_thermal_level"], optional: true }
+parser: thermal_state
+timeout: 5s
+cache_ttl: 5s
+schema:
+  - { name: level,             type: int, doc: "0 nominal, 1 fair, 2 serious, 3 critical" }
+  - { name: state,             type: enum, values: [nominal, fair, serious, critical] }
+  - { name: speed_limit,       type: int, unit: "%" }
+  - { name: warning,           type: str }
+  - { name: cpu_thermal_level, type: int }
+  - { name: fan_rpm,           type: int, doc: "needs sudo (powermetrics); empty otherwise" }

@@ -1,0 +1,9 @@
+name: app.quit
+doc: Ask an app to quit normally (it can ask you to save documents).
+tier: caution
+params:
+  bundle_id: { type: str, pattern: "^[A-Za-z0-9][A-Za-z0-9.-]*\\.[A-Za-z0-9.-]+$", required: true }
+kind: quit_app
+target: "{bundle_id}"
+effect: "Asks {bundle_id} to quit. It may prompt to save open documents."
+undo_hint: "Open the app again."

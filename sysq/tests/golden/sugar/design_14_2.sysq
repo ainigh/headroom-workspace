@@ -1,0 +1,37 @@
+# bindings
+let hogs = proc.top(by: "cpu", n: 20) | filter cpu > 30
+let total_home = disk.usage("~", depth: 1) | group {} { sum(size) as bytes }
+
+# scalars and tables mix freely
+let threshold = 50
+let big = hogs | filter cpu > threshold
+
+# control flow
+if count(big) > 0 {
+  emit big
+} else if count(hogs) > 0 {
+  emit "Moderate load only" , hogs | limit 5
+} else {
+  emit "Idle"
+}
+
+# bounded iteration (row bound, fuel bound)
+for p in big | limit 5 {
+  let files = proc.info(p.pid).open_files | filter kind == "REG" and path startswith "~"
+  emit { pid: p.pid, command: p.command, home_files: files | limit 10 }
+}
+
+# pure functions (no recursion)
+fn listening_by(cmd) {
+  net.listeners | join proc.list on pid | filter command contains cmd
+}
+emit listening_by("node")
+
+# snapshots and time
+let before = snapshot("launchd_morning")
+let drift  = svc.launchd | diff before on label
+if count(drift) > 0 { emit drift }
+
+# watch produces a table with a `t` column; window ops work on it
+let mem = watch(sys.memory, every: 2s, for: 30s)
+emit mem | select t, pressure, free | window avg(free) over (order by t rows 5)

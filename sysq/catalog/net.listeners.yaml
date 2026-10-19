@@ -1,0 +1,18 @@
+name: net.listeners
+doc: TCP sockets in LISTEN state with owning process (this user's processes).
+cost: moderate
+sensitivity: personal
+argv: ["/usr/sbin/lsof", "-nP", "-iTCP", "-sTCP:LISTEN", "-FpcuftPnT"]
+allow_exit: [1]
+parser: lsof_net
+timeout: 8s
+cache_ttl: 10s
+schema:
+  - { name: pid,     type: pid }
+  - { name: command, type: str }
+  - { name: uid,     type: uid }
+  - { name: family,  type: str }
+  - { name: proto,   type: str }
+  - { name: address, type: str }
+  - { name: port,    type: port }
+  - { name: state,   type: str }

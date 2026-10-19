@@ -1,0 +1,10 @@
+name: spotlight.rebuild
+doc: Erase and rebuild the Spotlight index of a volume (admin password required).
+tier: risky
+requires_admin: true
+params:
+  volume: { type: str, values: ["/"], default: "/" }
+argv: ["/usr/bin/mdutil", "-E", "{volume}"]
+effect: "Erases the Spotlight index on {volume}; search results are incomplete and indexing uses CPU until the rebuild finishes (often an hour or more)."
+undo_hint: "Not reversible; the index rebuilds itself."
+timeout: 60s

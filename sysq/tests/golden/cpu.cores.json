@@ -1,0 +1,69 @@
+{
+  "schema": [
+    {
+      "name": "cluster",
+      "type": "str"
+    },
+    {
+      "name": "kind",
+      "type": "enum",
+      "values": [
+        "P",
+        "E"
+      ]
+    },
+    {
+      "name": "cores",
+      "type": "int"
+    },
+    {
+      "name": "l2_cache",
+      "type": "bytes"
+    },
+    {
+      "name": "load_pct",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "user_pct",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "sys_pct",
+      "type": "float",
+      "unit": "%"
+    }
+  ],
+  "rows": [
+    [
+      "Performance",
+      "P",
+      10,
+      16777216,
+      34.3,
+      21.43,
+      12.84
+    ],
+    [
+      "Efficiency",
+      "E",
+      4,
+      4194304,
+      34.3,
+      21.43,
+      12.84
+    ]
+  ],
+  "meta": {
+    "rows": 2,
+    "truncated": false,
+    "source": [
+      "cpu.cores"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Headroom modes.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "modes"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "modes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "label",
+          "question"
+        ],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "rank_by": {
+            "enum": [
+              "reclaimable"
+            ]
+          },
+          "tint": {
+            "enum": [
+              "reclaimable",
+              "warnings"
+            ]
+          },
+          "history_range": {
+            "type": "string",
+            "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+          },
+          "consumers": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "groups": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "recipes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+                  }
+                },
+                "actions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+                  }
+                },
+                "emphasis": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

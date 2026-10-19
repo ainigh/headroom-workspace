@@ -1,0 +1,14 @@
+name: disk.io
+doc: Disk activity per device over one second (iostat second sample).
+cost: moderate
+sensitivity: public
+argv: ["/usr/sbin/iostat", "-d", "-c", "2", "-w", "1"]
+parser: iostat
+timeout: 5s
+cache_ttl: 2s
+schema:
+  - { name: disk,            type: str }
+  - { name: kb_per_transfer, type: float }
+  - { name: tps,             type: float }
+  - { name: mb_per_s,        type: float, unit: "MB/s" }
+  - { name: bytes_per_s,     type: bytes, unit: "/s" }

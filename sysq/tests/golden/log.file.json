@@ -1,0 +1,37 @@
+{
+  "schema": [
+    {
+      "name": "line",
+      "type": "int"
+    },
+    {
+      "name": "text",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      1,
+      "2026-10-19T09:00:01-07:00 checking for updates (main)"
+    ],
+    [
+      2,
+      "2026-10-19T09:00:02-07:00 up to date at 7b23648"
+    ],
+    [
+      3,
+      "2026-10-19T10:41:55-07:00 gh auth token used: [REDACTED]"
+    ]
+  ],
+  "meta": {
+    "rows": 3,
+    "truncated": false,
+    "source": [
+      "log.file"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true,
+    "redacted": 1
+  }
+}

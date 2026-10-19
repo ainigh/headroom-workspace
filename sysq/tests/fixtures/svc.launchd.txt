@@ -1,0 +1,8 @@
+PID	Status	Label
+-	0	com.apple.SafariHistoryServiceAgent
+873	0	com.apple.Finder
+-	-9	com.apple.mdworker.shared.0A000000-0000-0000-0000-000000000000
+1502	0	application.com.electron.ollama.12345678.12345679
+-	78	homebrew.mxcl.postgresql@17
+4100	0	com.ainigh.headroom.sysqd
+-	1	com.example.broken-agent

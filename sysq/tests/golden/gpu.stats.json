@@ -1,0 +1,56 @@
+{
+  "schema": [
+    {
+      "name": "model",
+      "type": "str"
+    },
+    {
+      "name": "cores",
+      "type": "int"
+    },
+    {
+      "name": "utilization",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "renderer",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "tiler",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "in_use_mem",
+      "type": "bytes"
+    },
+    {
+      "name": "alloc_mem",
+      "type": "bytes"
+    }
+  ],
+  "rows": [
+    [
+      "Apple M4 Pro",
+      20,
+      62,
+      61,
+      48,
+      12884901888,
+      13421772800
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "gpu.stats"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

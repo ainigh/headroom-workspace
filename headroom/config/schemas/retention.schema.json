@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Headroom retention.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "assistant_log_days": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "graph_ranges": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "schema": [
+    {
+      "name": "level",
+      "type": "int",
+      "doc": "0 nominal, 1 fair, 2 serious, 3 critical"
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "values": [
+        "nominal",
+        "fair",
+        "serious",
+        "critical"
+      ]
+    },
+    {
+      "name": "speed_limit",
+      "type": "int",
+      "unit": "%"
+    },
+    {
+      "name": "warning",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      0,
+      "nominal",
+      100,
+      ""
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "sys.thermal"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "schema": [
+    {
+      "name": "name",
+      "type": "str"
+    },
+    {
+      "name": "up",
+      "type": "bool"
+    },
+    {
+      "name": "mtu",
+      "type": "int"
+    },
+    {
+      "name": "ipkts",
+      "type": "int"
+    },
+    {
+      "name": "ibytes",
+      "type": "bytes"
+    },
+    {
+      "name": "ierrs",
+      "type": "int"
+    },
+    {
+      "name": "opkts",
+      "type": "int"
+    },
+    {
+      "name": "obytes",
+      "type": "bytes"
+    },
+    {
+      "name": "oerrs",
+      "type": "int"
+    }
+  ],
+  "rows": [
+    [
+      "lo0",
+      true,
+      16384,
+      1834521,
+      987654321,
+      0,
+      1834521,
+      987654321,
+      0
+    ],
+    [
+      "gif0",
+      false,
+      1280,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      "anpi0",
+      true,
+      1500,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      "en0",
+      true,
+      1500,
+      45678901,
+      51234567890,
+      0,
+      23456789,
+      4567890123,
+      0
+    ],
+    [
+      "utun0",
+      true,
+      1380,
+      1234,
+      345678,
+      0,
+      2345,
+      456789,
+      0
+    ]
+  ],
+  "meta": {
+    "rows": 5,
+    "truncated": false,
+    "source": [
+      "net.netstat"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

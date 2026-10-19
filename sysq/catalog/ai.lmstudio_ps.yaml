@@ -1,0 +1,16 @@
+name: ai.lmstudio_ps
+doc: Models LM Studio has loaded (lms ps --json, loopback only). Only found when lms is on a standard Homebrew/usr-local path.
+cost: cheap
+sensitivity: personal
+network: true
+sandbox: read-only-loopback
+argv: ["{binary}", "ps", "--json"]
+binary_paths: ["/opt/homebrew/bin/lms", "/usr/local/bin/lms"]
+parser: lms_ps
+timeout: 5s
+cache_ttl: 2s
+schema:
+  - { name: model, type: str }
+  - { name: path,  type: str }
+  - { name: size,  type: bytes }
+  - { name: type,  type: str }

@@ -1,0 +1,3 @@
+/Users/me/Developer/headroom/headroom/web/node_modules
+/Users/me/Developer/old-site/node_modules
+/Users/me/Developer/tools/cli/node_modules

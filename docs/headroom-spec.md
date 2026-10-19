@@ -165,6 +165,8 @@ The model never sees its previous full messages.
 
 For models without tool calling, the same loop runs through text: a `## QUERY` section containing a sysq-script, which Headroom executes and returns under `QUERY RESULTS`, repeating until the model emits a final five-part response. Budget and caps are identical.
 
+On the wire the tools are named `sysq_describe`, `sysq_run_recipe`, `sysq_run`, `sysq_explain` and `headroom_request_action` (some runtimes reject dots in function names); dotted names are accepted. The text loop also accepts `## RECIPE` (one named recipe call, `name(param=value)`) and `## DESCRIBE` (a recipe or primitive name), since sysq-script has no describe builtin. The wording of the loop's own messages lives in `config/prompts/notices.md`.
+
 ### 8.7 Action requests
 - Shown with exact action, params, and explanation from the catalog **and** from the model.
 - **One confirmation, every time:** a sheet showing the exact action, params, catalog effect statement, tier, undo note, and the model's explanation. Its confirm button is disabled for a short configurable delay (default 2 s) so it can't be clicked through by reflex.

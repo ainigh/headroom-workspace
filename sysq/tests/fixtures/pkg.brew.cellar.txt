@@ -1,0 +1,6 @@
+/opt/homebrew/Cellar/git/2.51.0
+/opt/homebrew/Cellar/go/1.27.1
+/opt/homebrew/Cellar/node/24.9.0
+/opt/homebrew/Cellar/node/24.8.0
+/opt/homebrew/Cellar/postgresql@17/17.6
+/opt/homebrew/Cellar/python@3.13/3.13.7

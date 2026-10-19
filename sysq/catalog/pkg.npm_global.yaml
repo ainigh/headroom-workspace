@@ -1,0 +1,13 @@
+name: pkg.npm_global
+doc: Globally installed npm packages (Homebrew node's global node_modules).
+cost: cheap
+sensitivity: public
+argv: ["/usr/bin/find", "/opt/homebrew/lib/node_modules", "/usr/local/lib/node_modules", "-mindepth", "1", "-maxdepth", "2", "-type", "d"]
+allow_exit: [1]
+parser: npm_dirs
+timeout: 10s
+cache_ttl: 10m
+schema:
+  - { name: name,  type: str }
+  - { name: scope, type: str }
+  - { name: path,  type: path }

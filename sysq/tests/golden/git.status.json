@@ -1,0 +1,58 @@
+{
+  "schema": [
+    {
+      "name": "path",
+      "type": "path"
+    },
+    {
+      "name": "branch",
+      "type": "str"
+    },
+    {
+      "name": "upstream",
+      "type": "str"
+    },
+    {
+      "name": "ahead",
+      "type": "int"
+    },
+    {
+      "name": "behind",
+      "type": "int"
+    },
+    {
+      "name": "changed",
+      "type": "int"
+    },
+    {
+      "name": "untracked",
+      "type": "int"
+    },
+    {
+      "name": "clean",
+      "type": "bool"
+    }
+  ],
+  "rows": [
+    [
+      "/Users/me/Developer/headroom",
+      "main",
+      "origin/main",
+      2,
+      0,
+      2,
+      1,
+      false
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "git.status"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

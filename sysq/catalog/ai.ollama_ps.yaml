@@ -1,0 +1,19 @@
+name: ai.ollama_ps
+doc: Models Ollama has loaded in memory now (ollama ps, loopback only), with size, processor split and unload time.
+cost: cheap
+sensitivity: personal
+network: true
+sandbox: read-only-loopback
+argv: ["{binary}", "ps"]
+binary_paths: ["/opt/homebrew/bin/ollama", "/usr/local/bin/ollama", "/Applications/Ollama.app/Contents/Resources/ollama"]
+parser: ollama_ps
+timeout: 5s
+cache_ttl: 2s
+schema:
+  - { name: model,     type: str }
+  - { name: id,        type: str }
+  - { name: size,      type: bytes }
+  - { name: processor, type: str }
+  - { name: gpu_pct,   type: int, unit: "%" }
+  - { name: context,   type: int }
+  - { name: until,     type: str }

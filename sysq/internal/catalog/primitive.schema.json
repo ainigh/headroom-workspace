@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "primitive.schema.json",
+  "title": "sysq primitive",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "doc", "cost", "sensitivity", "schema"],
+  "properties": {
+    "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$" },
+    "doc": { "type": "string", "minLength": 1 },
+    "params": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/definitions/param" }
+    },
+    "cost": { "enum": ["cheap", "moderate", "expensive"] },
+    "sensitivity": { "enum": ["public", "personal", "secret"] },
+    "network": { "type": "boolean" },
+    "argv": { "$ref": "#/definitions/argv" },
+    "binary_paths": { "type": "array", "items": { "type": "string" } },
+    "allow_exit": { "type": "array", "items": { "type": "integer" } },
+    "commands": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "argv"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "argv": { "$ref": "#/definitions/argv" },
+          "binary_paths": { "type": "array", "items": { "type": "string" } },
+          "optional": { "type": "boolean" },
+          "allow_exit": { "type": "array", "items": { "type": "integer" } }
+        }
+      }
+    },
+    "builtin": { "type": "string" },
+    "parser": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "timeout": { "type": "string", "pattern": "^[0-9]+(ms|s|m)$" },
+    "partial_ok": { "type": "boolean" },
+    "max_bytes": { "type": "integer", "minimum": 1024 },
+    "schema": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/col" }
+    },
+    "sandbox": { "enum": ["read-only-default", "read-only-network", "read-only-loopback", "read-only-sudo"] },
+    "sandbox_exec": { "type": "array", "items": { "type": "string", "pattern": "^/" } },
+    "cache_ttl": { "type": "string", "pattern": "^[0-9]+(ms|s|m|h)$" },
+    "requires_sudo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["binary", "args"],
+      "properties": {
+        "binary": { "type": "string", "pattern": "^/" },
+        "args": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "redact": { "type": "boolean" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "fixture_params": { "type": "object" },
+    "pushdown": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "limit": { "type": "string" },
+        "filter": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "predicate": { "type": "string" },
+            "bounds": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["column", "ops", "param"],
+                "properties": {
+                  "column": { "type": "string" },
+                  "ops": { "type": "array", "items": { "enum": [">", ">=", "<", "<=", "=="] } },
+                  "param": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "argv": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          { "type": "array", "minItems": 1, "items": { "type": "string" } }
+        ]
+      }
+    },
+    "param": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["str", "int", "float", "bool", "enum", "path", "duration", "bytes", "predicate", "pid"] },
+        "values": { "type": "array", "items": { "type": "string" } },
+        "default": {},
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "pattern": { "type": "string" },
+        "max_len": { "type": "integer" },
+        "required": { "type": "boolean" },
+        "doc": { "type": "string" },
+        "allow_dash": { "type": "boolean" },
+        "render": { "enum": ["seconds", "minutes", "log", "find_mtime", "bytes", "kilobytes", "find_k"] },
+        "within": { "type": "array", "items": { "type": "string", "pattern": "^(~|/)" } },
+        "must_exist": { "type": "boolean" },
+        "dialect": { "enum": ["nspredicate", "mdquery"] },
+        "fields": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+    "col": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z_][a-z0-9_]*$" },
+        "type": { "enum": ["int", "float", "bool", "str", "ts", "duration", "bytes", "path", "pid", "port", "uid", "json", "table", "enum"] },
+        "unit": { "type": "string" },
+        "values": { "type": "array", "items": { "type": "string" } },
+        "doc": { "type": "string" },
+        "schema": { "type": "array", "items": { "$ref": "#/definitions/col" } }
+      }
+    }
+  }
+}

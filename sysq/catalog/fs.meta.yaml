@@ -1,0 +1,15 @@
+name: fs.meta
+doc: Spotlight metadata attributes of one path (mdls), one row per attribute.
+params:
+  path: { type: path, required: true, must_exist: true }
+cost: cheap
+sensitivity: personal
+argv: ["/usr/bin/mdls", "-plist", "-", "{path}"]
+parser: plist_kv
+timeout: 5s
+cache_ttl: 1m
+fixture_params: { path: "~/Downloads/Xcode_26.dmg" }
+schema:
+  - { name: key,   type: str }
+  - { name: value, type: str }
+  - { name: type,  type: str }

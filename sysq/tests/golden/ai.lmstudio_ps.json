@@ -1,0 +1,38 @@
+{
+  "schema": [
+    {
+      "name": "model",
+      "type": "str"
+    },
+    {
+      "name": "path",
+      "type": "str"
+    },
+    {
+      "name": "size",
+      "type": "bytes"
+    },
+    {
+      "name": "type",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      "qwen2.5-7b-instruct",
+      "lmstudio-community/Qwen2.5-7B-Instruct-GGUF/Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+      4683073536,
+      "llm"
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "ai.lmstudio_ps"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

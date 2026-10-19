@@ -1,0 +1,85 @@
+{
+  "schema": [
+    {
+      "name": "has_battery",
+      "type": "bool"
+    },
+    {
+      "name": "percent",
+      "type": "int",
+      "unit": "%"
+    },
+    {
+      "name": "state",
+      "type": "str"
+    },
+    {
+      "name": "plugged",
+      "type": "bool"
+    },
+    {
+      "name": "charging",
+      "type": "bool"
+    },
+    {
+      "name": "remaining",
+      "type": "duration"
+    },
+    {
+      "name": "cycle_count",
+      "type": "int"
+    },
+    {
+      "name": "health_pct",
+      "type": "float",
+      "unit": "%"
+    },
+    {
+      "name": "temperature_c",
+      "type": "float",
+      "unit": "°C"
+    },
+    {
+      "name": "voltage_v",
+      "type": "float",
+      "unit": "V"
+    },
+    {
+      "name": "amps",
+      "type": "float",
+      "unit": "A"
+    },
+    {
+      "name": "watts",
+      "type": "float",
+      "unit": "W",
+      "doc": "positive charging, negative discharging"
+    }
+  ],
+  "rows": [
+    [
+      true,
+      87,
+      "charging",
+      true,
+      true,
+      2520,
+      142,
+      92,
+      30.5,
+      12.634,
+      1.52,
+      19.2
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "battery.state"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

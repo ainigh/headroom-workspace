@@ -1,0 +1,28 @@
+{
+  "schema": [
+    {
+      "name": "path",
+      "type": "path"
+    },
+    {
+      "name": "sha256",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      "/Users/me/Downloads/Xcode_26.dmg",
+      "a3f1c2e4b5d6978812345678901234567890abcdefabcdefabcdefabcdef1234"
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "fs.hash"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

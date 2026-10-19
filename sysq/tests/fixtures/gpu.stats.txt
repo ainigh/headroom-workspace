@@ -1,0 +1,10 @@
++-o AGXAcceleratorG16X  <class AGXAcceleratorG16X, id 0x10000052a, registered, matched, active, busy 0 (1205 ms), retain 117>
+    {
+      "IOClass" = "AGXAcceleratorG16X"
+      "CFBundleIdentifier" = "com.apple.AGXG16X"
+      "IOProviderClass" = "AppleARMIODevice"
+      "model" = "Apple M4 Pro"
+      "gpu-core-count" = 20
+      "PerformanceStatistics" = {"In use system memory (driver)"=0,"Alloc system memory"=13421772800,"Tiler Utilization %"=48,"recoveryCount"=0,"lastRecoveryTime"=0,"Renderer Utilization %"=61,"TiledSceneBytes"=1048576,"Device Utilization %"=62,"SplitSceneCount"=0,"Allocated PB Size"=245760,"In use system memory"=12884901888}
+      "IOGeneralInterest" = "IOCommand is not serializable"
+    }

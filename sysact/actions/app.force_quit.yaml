@@ -1,0 +1,10 @@
+name: app.force_quit
+doc: Force-quit a process you own (SIGKILL). Unsaved work in it is lost.
+tier: risky
+params:
+  pid: { type: pid, required: true, min: 2 }
+argv: ["/bin/kill", "-9", "{pid}"]
+lookup: process
+effect: "Immediately ends {process} (pid {pid}). Anything unsaved in it is lost."
+undo_hint: "Not reversible; reopen the app."
+timeout: 10s

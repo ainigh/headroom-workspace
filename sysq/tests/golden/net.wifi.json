@@ -1,0 +1,43 @@
+{
+  "schema": [
+    {
+      "name": "ssid",
+      "type": "str"
+    },
+    {
+      "name": "connected",
+      "type": "bool"
+    },
+    {
+      "name": "ip",
+      "type": "str"
+    },
+    {
+      "name": "router",
+      "type": "str"
+    },
+    {
+      "name": "mac",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      "HomeNet 5G",
+      true,
+      "192.168.1.23",
+      "192.168.1.1",
+      "3c:a6:f6:12:34:56"
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "net.wifi"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

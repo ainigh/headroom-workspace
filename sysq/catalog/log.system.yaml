@@ -1,0 +1,27 @@
+name: log.system
+doc: Unified log entries from the recent past. Filters on process, subsystem, category, level and message are pushed into log's predicate.
+params:
+  since: { type: duration, default: 10m, max: 86400, render: log }
+  where: { type: predicate, dialect: nspredicate, fields: { process: process, subsystem: subsystem, category: category, level: messageType, message: eventMessage, pid: processIdentifier } }
+  limit: { type: int, default: 500, min: 1, max: 5000 }
+cost: expensive
+sensitivity: personal
+argv: ["/usr/bin/log", "show", "--style", "ndjson", "--last", "{since}", ["--predicate", "{where}"]]
+parser: log_ndjson
+timeout: 15s
+partial_ok: true
+max_bytes: 16777216
+redact: true
+cache_ttl: 30s
+pushdown:
+  filter: { predicate: where }
+  limit: limit
+fixture_params: { since: 2m }
+schema:
+  - { name: ts,        type: ts }
+  - { name: process,   type: str }
+  - { name: pid,       type: pid }
+  - { name: subsystem, type: str }
+  - { name: category,  type: str }
+  - { name: level,     type: enum, values: [default, info, debug, error, fault] }
+  - { name: message,   type: str }

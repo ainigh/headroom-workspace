@@ -1,0 +1,25 @@
+Machine model: Mac16,7
+OS version: 25A362
+Boot arguments:
+Boot time: Mon Oct  5 08:01:12 2026
+
+
+
+*** Sampled system activity (Mon Oct 19 10:47:02 2026 -0700) (1003.42ms elapsed) ***
+
+
+**** Processor usage ****
+
+E-Cluster HW active frequency: 1890 MHz
+P0-Cluster HW active frequency: 3204 MHz
+
+CPU Power: 4213 mW
+GPU Power: 6120 mW
+ANE Power: 845 mW
+Combined Power (CPU + GPU + ANE): 11178 mW
+
+**** GPU usage ****
+
+GPU HW active frequency: 1398 MHz
+GPU HW active residency:  62.11%
+GPU Power: 6120 mW

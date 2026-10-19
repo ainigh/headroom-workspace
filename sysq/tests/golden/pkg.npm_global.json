@@ -1,0 +1,48 @@
+{
+  "schema": [
+    {
+      "name": "name",
+      "type": "str"
+    },
+    {
+      "name": "scope",
+      "type": "str"
+    },
+    {
+      "name": "path",
+      "type": "path"
+    }
+  ],
+  "rows": [
+    [
+      "npm",
+      "",
+      "/opt/homebrew/lib/node_modules/npm"
+    ],
+    [
+      "corepack",
+      "",
+      "/opt/homebrew/lib/node_modules/corepack"
+    ],
+    [
+      "@anthropic-ai/claude-code",
+      "@anthropic-ai",
+      "/opt/homebrew/lib/node_modules/@anthropic-ai/claude-code"
+    ],
+    [
+      "typescript",
+      "",
+      "/opt/homebrew/lib/node_modules/typescript"
+    ]
+  ],
+  "meta": {
+    "rows": 4,
+    "truncated": false,
+    "source": [
+      "pkg.npm_global"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

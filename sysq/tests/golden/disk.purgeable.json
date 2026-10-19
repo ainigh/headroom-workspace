@@ -1,0 +1,48 @@
+{
+  "schema": [
+    {
+      "name": "volume",
+      "type": "str"
+    },
+    {
+      "name": "container_size",
+      "type": "bytes"
+    },
+    {
+      "name": "container_free",
+      "type": "bytes"
+    },
+    {
+      "name": "volume_free",
+      "type": "bytes"
+    },
+    {
+      "name": "purgeable",
+      "type": "bytes"
+    },
+    {
+      "name": "local_snapshots",
+      "type": "int"
+    }
+  ],
+  "rows": [
+    [
+      "Macintosh HD",
+      994662584320,
+      93273530368,
+      93273530368,
+      null,
+      2
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "disk.purgeable"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

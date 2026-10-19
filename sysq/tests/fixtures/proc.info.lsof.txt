@@ -1,0 +1,24 @@
+p2210
+fcwd
+tDIR
+n/
+ftxt
+tREG
+n/Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+f3
+tREG
+n/Users/me/Library/Application Support/Google/Chrome/Default/History
+f4
+tREG
+n/Users/me/Library/Application Support/Google/Chrome/Default/Cookies
+f5
+tunix
+n->0x1a2b3c4d5e6f7a8b
+f41
+tIPv4
+PTCP
+n192.168.1.23:54001->142.250.72.14:443
+TST=ESTABLISHED
+f60
+tREG
+n/private/var/folders/xy/abc123/T/.com.google.Chrome.XYZ

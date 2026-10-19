@@ -64,7 +64,7 @@ All under `~/Library/Application Support/Headroom/config/`, each with a JSON Sch
 | `modes.yaml` | per mode per group: recipes, actions, default question, emphasis | ViewModels, Orchestrator |
 | `sampling.yaml` | refresh rates by state; written through to sysqd `schedules.yaml` | GroupStore, sysqd |
 | `assistant.yaml` | model, privacy level, N summaries, fuel, delays, prompt file path, tools on/off | Orchestrator |
-| `prompts/system.md`, `prompts/request.md.tmpl` | prompt text and template | Orchestrator |
+| `prompts/system.md`, `prompts/request.md.tmpl`, `prompts/text-tools.md`, `prompts/notices.md` | prompt text, template, text-loop instructions, the loop's short messages | Orchestrator |
 | `api.yaml` | port, privacy, clients, exposed recipes | sysqd client table |
 | `notifications.yaml`, `retention.yaml` | per-group notifications; history/summary retention | stores |
 

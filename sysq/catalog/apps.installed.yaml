@@ -1,0 +1,17 @@
+name: apps.installed
+doc: Installed applications with version, location, source and last modification (system_profiler; slow, cached for an hour).
+cost: expensive
+sensitivity: personal
+argv: ["/usr/sbin/system_profiler", "SPApplicationsDataType", "-json"]
+parser: sp_applications
+timeout: 60s
+max_bytes: 16777216
+cache_ttl: 1h
+sandbox_exec: ["/System/Library/SystemProfiler/"]
+schema:
+  - { name: name,          type: str }
+  - { name: version,       type: str }
+  - { name: path,          type: path }
+  - { name: obtained_from, type: str }
+  - { name: last_modified, type: ts }
+  - { name: arch,          type: str }

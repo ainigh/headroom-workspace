@@ -1,0 +1,68 @@
+{
+  "schema": [
+    {
+      "name": "os",
+      "type": "str"
+    },
+    {
+      "name": "os_version",
+      "type": "str"
+    },
+    {
+      "name": "build",
+      "type": "str"
+    },
+    {
+      "name": "model",
+      "type": "str"
+    },
+    {
+      "name": "chip",
+      "type": "str"
+    },
+    {
+      "name": "memory",
+      "type": "bytes"
+    },
+    {
+      "name": "cpus",
+      "type": "int"
+    },
+    {
+      "name": "p_cores",
+      "type": "int"
+    },
+    {
+      "name": "e_cores",
+      "type": "int"
+    },
+    {
+      "name": "kernel",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      "macOS",
+      "26.0.1",
+      "25A362",
+      "Mac16,7",
+      "Apple M4 Pro",
+      68719476736,
+      14,
+      10,
+      4,
+      "25.0.0"
+    ]
+  ],
+  "meta": {
+    "rows": 1,
+    "truncated": false,
+    "source": [
+      "sys.info"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

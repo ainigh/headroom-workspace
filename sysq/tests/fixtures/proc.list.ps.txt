@@ -1,0 +1,11 @@
+    1     0 root  Ss                 0.0  0.0  28160 Mon Oct  5 08:01:12 2026     /sbin/launchd
+  412     1 _postgres  Ss            0.1  0.1  65536 Mon Oct  5 08:01:40 2026     /opt/homebrew/opt/postgresql@17/bin/postgres -D /opt/homebrew/var/postgresql@17
+  873     1 me  S                    0.0  0.2 131072 Mon Oct  5 08:02:10 2026     /System/Library/CoreServices/Finder.app/Contents/MacOS/Finder
+ 1502     1 me  S                    0.2 34.1 23488102 Sun Oct 18 21:10:00 2026     /Applications/Ollama.app/Contents/Resources/ollama runner --model /Users/me/.ollama/models/blobs/sha256-a1b2c3 --ctx-size 8192 --port 54123
+ 2210     1 me  S                   12.4  4.1 2867200 Mon Oct 19 08:30:01 2026     /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+ 2244  2210 me  S                    9.8  2.3 1612800 Mon Oct 19 08:30:03 2026     /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/140.0.7339.80/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer) --type=renderer
+ 3001     1 me  S                    0.5  5.5 3891200 Mon Oct 19 09:01:00 2026     /Applications/Xcode.app/Contents/MacOS/Xcode
+ 3320     1 me  R                   98.2  0.6 409600 Mon Oct 19 10:31:45 2026     /System/Library/PrivateFrameworks/PhotoAnalysis.framework/Versions/A/Support/photoanalysisd
+ 4011   873 me  S                    0.0  0.0   4096 Mon Oct 19 10:40:01 2026     /usr/bin/curl -s https://api.example.com/v1?token=ghp_abcdefghijklmnopqrstuvwxyz0123456789
+ 4100     1 me  S                    1.1  0.1  98304 Mon Oct 19 10:45:12 2026     /Applications/Headroom.app/Contents/MacOS/Headroom
+ 4380  2210 me               Z      0.0  0.0      0 Mon Oct 19 10:41:07 2026     <defunct>

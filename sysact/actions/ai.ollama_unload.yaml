@@ -1,0 +1,11 @@
+name: ai.ollama_unload
+doc: Unload a model from Ollama's memory. Files stay on disk; the model reloads on next use.
+tier: caution
+requires_admin: false
+params:
+  model: { type: str, pattern: "^[A-Za-z0-9._:/-]+$", required: true }
+argv: ["{binary}", "stop", "{model}"]
+binary_paths: ["/opt/homebrew/bin/ollama", "/usr/local/bin/ollama", "/Applications/Ollama.app/Contents/Resources/ollama"]
+effect: "Frees the memory held by {model}. Reversible: run the model again."
+undo_hint: "ollama run {model}"
+timeout: 30s

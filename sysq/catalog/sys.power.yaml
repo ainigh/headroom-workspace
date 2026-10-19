@@ -1,0 +1,17 @@
+name: sys.power
+doc: Power source, battery percent and state, time remaining, and Low Power Mode.
+cost: cheap
+sensitivity: public
+commands:
+  - { id: batt, argv: ["/usr/bin/pmset", "-g", "batt"] }
+  - { id: settings, argv: ["/usr/bin/pmset", "-g"], optional: true }
+parser: sys_power
+timeout: 5s
+cache_ttl: 10s
+schema:
+  - { name: source,         type: enum, values: [ac, battery, ups] }
+  - { name: has_battery,    type: bool }
+  - { name: percent,        type: int, unit: "%" }
+  - { name: state,          type: str, doc: "charging, discharging, charged, AC attached, finishing charge" }
+  - { name: remaining,      type: duration }
+  - { name: low_power_mode, type: bool }

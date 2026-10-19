@@ -1,0 +1,43 @@
+{
+  "schema": [
+    {
+      "name": "path",
+      "type": "path"
+    },
+    {
+      "name": "name",
+      "type": "str"
+    },
+    {
+      "name": "parent",
+      "type": "path"
+    }
+  ],
+  "rows": [
+    [
+      "/Users/me/Developer/headroom/headroom/web/node_modules",
+      "node_modules",
+      "/Users/me/Developer/headroom/headroom/web"
+    ],
+    [
+      "/Users/me/Developer/old-site/node_modules",
+      "node_modules",
+      "/Users/me/Developer/old-site"
+    ],
+    [
+      "/Users/me/Developer/tools/cli/node_modules",
+      "node_modules",
+      "/Users/me/Developer/tools/cli"
+    ]
+  ],
+  "meta": {
+    "rows": 3,
+    "truncated": false,
+    "source": [
+      "fs.find_dirs"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

@@ -1,11 +1,19 @@
+; Read-only baseline (implementation.md §3.2). Placeholders are filled by
+; internal/exec at run time; nothing here is editable from a query.
 (version 1)
 (deny default)
 (allow process-fork)
-(allow process-exec (literal "__BINARY__"))
+__EXEC__
 (allow file-read*)
-(deny file-read* (subpath "__HOME__/.ssh") (subpath "__HOME__/Library/Keychains") (subpath "__HOME__/.gnupg") (subpath "__HOME__/.aws"))
+__DENY_READ__
 (allow file-write* (literal "/dev/null") (subpath "__SCRATCH__"))
+(allow file-ioctl (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
 (deny network*)
+(deny user-preference-write)
 (allow sysctl-read)
 (allow mach-lookup)
 (allow iokit-open)
+(allow process-info*)
+(allow ipc-posix-shm-read-data)
+(allow signal (target self))
+(allow user-preference-read)

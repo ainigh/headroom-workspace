@@ -1,0 +1,2 @@
+/opt/homebrew/Caskroom/docker-desktop/4.46.0
+/opt/homebrew/Caskroom/visual-studio-code/1.105.0

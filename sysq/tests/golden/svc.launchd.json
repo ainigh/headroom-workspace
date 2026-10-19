@@ -1,0 +1,74 @@
+{
+  "schema": [
+    {
+      "name": "label",
+      "type": "str"
+    },
+    {
+      "name": "pid",
+      "type": "pid"
+    },
+    {
+      "name": "last_exit",
+      "type": "int"
+    },
+    {
+      "name": "running",
+      "type": "bool"
+    }
+  ],
+  "rows": [
+    [
+      "com.apple.SafariHistoryServiceAgent",
+      null,
+      0,
+      false
+    ],
+    [
+      "com.apple.Finder",
+      873,
+      0,
+      true
+    ],
+    [
+      "com.apple.mdworker.shared.0A000000-0000-0000-0000-000000000000",
+      null,
+      -9,
+      false
+    ],
+    [
+      "application.com.electron.ollama.12345678.12345679",
+      1502,
+      0,
+      true
+    ],
+    [
+      "homebrew.mxcl.postgresql@17",
+      null,
+      78,
+      false
+    ],
+    [
+      "com.ainigh.headroom.sysqd",
+      4100,
+      0,
+      true
+    ],
+    [
+      "com.example.broken-agent",
+      null,
+      1,
+      false
+    ]
+  ],
+  "meta": {
+    "rows": 7,
+    "truncated": false,
+    "source": [
+      "svc.launchd"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

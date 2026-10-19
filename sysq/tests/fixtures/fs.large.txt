@@ -1,0 +1,5 @@
+ 81234567 19531256 -rw-r--r--    1 me               staff            19999999488 Oct 12 14:55 /Users/me/.ollama/models/blobs/sha256-e796792eba26c4d3b04b0ac5adb01a453dd9ec2dfd83b6c59cbf6fe5f30b0f68
+ 81234570 15625008 -rw-r--r--    1 me               staff            16000000000 Sep 30 09:10 /Users/me/.ollama/models/blobs/sha256-3a43f93b78ec50f7c4e4dc8bd1cb3fff5a900e7d574c51a6f7495e48486e0dac
+ 62233412  3417968 -rw-r--r--@   1 me               staff             3500000000 Oct 18 22:41 /Users/me/Downloads/Xcode_26.dmg
+ 71122334  1171876 -rw-r--r--    1 me               staff             1200000000 Mar  3  2025 /Users/me/Movies/Family Trip 2024.mov
+ 52331122  2148440 -rw-r--r--    1 me               staff             2200000000 Aug 21 19:03 /Users/me/Library/Developer/CoreSimulator/Volumes/iOS_23A343/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.0.simruntime/Contents/Resources/RuntimeRoot/System/Library/dyld/dyld_sim_shared_cache_arm64e

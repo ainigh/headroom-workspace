@@ -1,0 +1,297 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Headroom groups.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "groups"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "groups": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "symbol",
+          "headline",
+          "detail",
+          "consumers",
+          "sparkline",
+          "attention"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "headline": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "recipe",
+              "column"
+            ],
+            "properties": {
+              "recipe": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+              },
+              "column": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "params": {
+                "type": "object"
+              }
+            }
+          },
+          "metrics": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "recipe",
+                "column"
+              ],
+              "properties": {
+                "recipe": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+                },
+                "column": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "unit": {
+                  "type": "string"
+                },
+                "params": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "detail": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "recipe"
+            ],
+            "properties": {
+              "recipe": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+              },
+              "column": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "params": {
+                "type": "object"
+              }
+            }
+          },
+          "consumers": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "recipe",
+              "value"
+            ],
+            "properties": {
+              "recipe": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+              },
+              "params": {
+                "type": "object"
+              },
+              "value": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "process",
+                  "app",
+                  "path",
+                  "model"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          },
+          "sparkline": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "recipe",
+              "column"
+            ],
+            "properties": {
+              "recipe": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+              },
+              "column": {
+                "type": "string"
+              },
+              "range": {
+                "type": "string",
+                "pattern": "^[0-9]+(\\.[0-9]+)?(ms|s|m|h|d|w)$"
+              }
+            }
+          },
+          "attention": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+          },
+          "reclaimable": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "recipe",
+              "column"
+            ],
+            "properties": {
+              "recipe": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+              },
+              "column": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "params": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "overview": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+      "description": "Recipe for the large view's health sentence."
+    },
+    "item_profile": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+      "description": "Recipe the Actions panel and the assistant's item scope use: called with kind and id."
+    },
+    "explorer": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Storage Explorer recipes.",
+      "required": [
+        "volumes",
+        "folders"
+      ],
+      "properties": {
+        "group": {
+          "type": "string",
+          "description": "the group whose drill-in offers the explorer"
+        },
+        "volumes": {
+          "$ref": "#/definitions/explorer_binding"
+        },
+        "purgeable": {
+          "$ref": "#/definitions/explorer_binding"
+        },
+        "folders": {
+          "$ref": "#/definitions/explorer_binding"
+        },
+        "files": {
+          "$ref": "#/definitions/explorer_binding"
+        },
+        "by_type": {
+          "$ref": "#/definitions/explorer_binding"
+        },
+        "suggestions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/explorer_binding"
+          }
+        },
+        "roots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "root folders offered in the picker"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "explorer_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recipe"
+      ],
+      "properties": {
+        "recipe": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+        },
+        "params": {
+          "type": "object"
+        },
+        "root": {
+          "type": "string",
+          "description": "name of the recipe's root-folder parameter"
+        },
+        "min": {
+          "type": "string",
+          "description": "name of its minimum-size parameter"
+        },
+        "age": {
+          "type": "string",
+          "description": "name of its max-age parameter (a duration)"
+        }
+      }
+    }
+  }
+}

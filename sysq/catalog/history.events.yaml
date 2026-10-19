@@ -1,0 +1,15 @@
+name: history.events
+doc: Event markers from sysqd's history (pressure transitions, status changes, app launches) over a range.
+params:
+  range: { type: duration, default: 2h, max: 2592000 }
+  kind:  { type: str, pattern: "^[a-z_]*$", default: "" }
+cost: cheap
+sensitivity: personal
+builtin: history_events
+schema:
+  - { name: ts,       type: ts }
+  - { name: kind,     type: str }
+  - { name: recipe,   type: str }
+  - { name: subject,  type: str }
+  - { name: message,  type: str }
+  - { name: severity, type: enum, values: [info, low, medium, high, critical] }

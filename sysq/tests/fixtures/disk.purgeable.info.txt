@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>APFSContainerFree</key>
+	<integer>93273530368</integer>
+	<key>APFSContainerSize</key>
+	<integer>994662584320</integer>
+	<key>DeviceIdentifier</key>
+	<string>disk3s1s1</string>
+	<key>FilesystemType</key>
+	<string>apfs</string>
+	<key>FreeSpace</key>
+	<integer>93273530368</integer>
+	<key>MountPoint</key>
+	<string>/</string>
+	<key>VolumeName</key>
+	<string>Macintosh HD</string>
+</dict>
+</plist>

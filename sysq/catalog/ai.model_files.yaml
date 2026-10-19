@@ -1,0 +1,18 @@
+name: ai.model_files
+doc: Ollama models on disk from their manifests — one row per layer with the model it belongs to; the largest layer of each model is its weights.
+params:
+  dir: { type: path, default: "~/.ollama/models/manifests" }
+cost: cheap
+sensitivity: personal
+argv: ["/usr/bin/grep", "-r", "-o", "-E", "\"digest\":\"sha256:[0-9a-f]+\",\"size\":[0-9]+", "{dir}"]
+allow_exit: [1, 2]
+parser: ollama_manifests
+timeout: 10s
+cache_ttl: 1m
+fixture_params: { dir: "~/.ollama/models/manifests" }
+schema:
+  - { name: model,      type: str }
+  - { name: digest,     type: str }
+  - { name: size,       type: bytes }
+  - { name: role,       type: enum, values: [weights, layer, config] }
+  - { name: model_size, type: bytes, doc: "all layers of this model" }

@@ -1,0 +1,24 @@
+name: fs.large
+doc: Largest files at or above a size under a root (find with a time budget; partial results are marked truncated), biggest first.
+params:
+  path:     { type: path, default: "~", must_exist: true }
+  min_size: { type: bytes, default: 1GB, min: 1024, render: find_k }
+  limit:    { type: int, default: 20, min: 1, max: 200 }
+cost: expensive
+sensitivity: personal
+argv: ["/usr/bin/find", "{path}", "-xdev", "-type", "f", "-size", "{min_size}", "-ls"]
+allow_exit: [1]
+parser: find_ls_size
+timeout: 20s
+partial_ok: true
+cache_ttl: 10m
+pushdown:
+  filter: { bounds: [{ column: size, ops: [">", ">="], param: min_size }] }
+  limit: limit
+fixture_params: { path: "~" }
+schema:
+  - { name: path,     type: path }
+  - { name: name,     type: str }
+  - { name: size,     type: bytes }
+  - { name: modified, type: ts }
+  - { name: owner,    type: str }

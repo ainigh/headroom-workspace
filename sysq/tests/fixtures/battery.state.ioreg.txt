@@ -1,0 +1,21 @@
++-o AppleSmartBattery  <class AppleSmartBattery, id 0x100000a1c, registered, matched, active, busy 0 (0 ms), retain 7>
+    {
+      "PostChargeWaitSeconds" = 120
+      "built-in" = Yes
+      "AppleRawCurrentCapacity" = 4860
+      "AppleRawMaxCapacity" = 5589
+      "DesignCapacity" = 6075
+      "NominalChargeCapacity" = 5650
+      "CycleCount" = 142
+      "Temperature" = 3051
+      "Voltage" = 12634
+      "Amperage" = 1520
+      "InstantAmperage" = 1498
+      "IsCharging" = Yes
+      "ExternalConnected" = Yes
+      "FullyCharged" = No
+      "CurrentCapacity" = 87
+      "MaxCapacity" = 100
+      "TimeRemaining" = 42
+      "BatteryInstalled" = Yes
+    }

@@ -1,0 +1,20 @@
+Processes: 642 total, 3 running, 639 sleeping, 3321 threads 
+2026/10/19 10:47:01
+Load Avg: 3.21, 2.98, 2.75 
+CPU usage: 4.12% user, 8.55% sys, 87.32% idle 
+
+PID    COMMAND          POWER %CPU
+0      kernel_task      0.0   0.0 
+3320   photoanalysisd   0.0   0.0 
+
+Processes: 642 total, 4 running, 638 sleeping, 3318 threads 
+2026/10/19 10:47:02
+Load Avg: 3.21, 2.98, 2.75 
+CPU usage: 21.43% user, 12.84% sys, 65.72% idle 
+
+PID    COMMAND          POWER %CPU
+3320   photoanalysisd   61.3  98.2
+2244   Google Chrome He 12.4  9.8 
+2210   Google Chrome    8.9   7.6 
+4100   Headroom         0.8   1.1 
+1502   ollama           0.1   0.2 

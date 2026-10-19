@@ -1,0 +1,43 @@
+{
+  "schema": [
+    {
+      "name": "name",
+      "type": "str"
+    },
+    {
+      "name": "version",
+      "type": "str"
+    },
+    {
+      "name": "installed",
+      "type": "ts"
+    }
+  ],
+  "rows": [
+    [
+      "macOS Tahoe 26.0.1",
+      "26.0.1",
+      "2026-10-02T09:12:44-07:00"
+    ],
+    [
+      "XProtectPlistConfigData",
+      "5318",
+      "2026-10-14T03:01:12-07:00"
+    ],
+    [
+      "Safari",
+      "26.0",
+      "2026-09-15T08:00:31-07:00"
+    ]
+  ],
+  "meta": {
+    "rows": 3,
+    "truncated": false,
+    "source": [
+      "sys.updates"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "public",
+    "fixture": true
+  }
+}

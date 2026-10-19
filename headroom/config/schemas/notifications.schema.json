@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Headroom notifications.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "on_status": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "amber",
+          "red",
+          "unknown"
+        ]
+      }
+    },
+    "groups": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "array",
+            "items": {
+              "enum": [
+                "amber",
+                "red",
+                "unknown"
+              ]
+            }
+          },
+          {
+            "const": "off"
+          },
+          {
+            "const": false
+          }
+        ]
+      }
+    },
+    "assistant": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "OK",
+          "ATTENTION",
+          "WARNING",
+          "CRITICAL"
+        ]
+      }
+    },
+    "cooldown_minutes": {
+      "type": "number",
+      "minimum": 0
+    },
+    "quiet_hours": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "type": "string",
+          "pattern": "^[0-2][0-9]:[0-5][0-9]$"
+        },
+        "to": {
+          "type": "string",
+          "pattern": "^[0-2][0-9]:[0-5][0-9]$"
+        }
+      }
+    }
+  }
+}

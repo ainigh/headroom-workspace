@@ -1,13 +1,18 @@
 version: 1
 enabled: true
+backend: ollama
+ollama_url: http://127.0.0.1:11434
 model: ""                 # chosen in settings; empty = ask on first use
+tools: auto               # auto (use tool calling when the model supports it) | on | off (text loop)
 privacy_level: consumers  # aggregates | consumers | files
 summary_window: 10
 action_requests: true
 confirm_delay_seconds: 2
-fuel_budget: 2000
+fuel_budget: 2000         # sysq cost units per conversation
 max_tool_calls: 25
 max_turn_seconds: 90
+narrative_range: 2h
 system_prompt: prompts/system.md
 request_template: prompts/request.md.tmpl
 unload_after_minutes: 10
+preflight_recipe: headroom.check   # run with memory=<model size> before loading a model

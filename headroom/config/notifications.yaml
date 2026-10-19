@@ -1,0 +1,13 @@
+version: 1
+enabled: true
+# Notify when a group's status changes to one of these.
+on_status: [red]
+# Per-group overrides: off, or a different list.
+groups:
+  battery: [amber, red]
+  network: "off"
+# Notify on the assistant's STATUS line at these levels.
+assistant: [WARNING, CRITICAL]
+# Minimum minutes between notifications for the same group.
+cooldown_minutes: 30
+quiet_hours: { from: "22:00", to: "07:00" }

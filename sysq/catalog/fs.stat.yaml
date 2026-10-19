@@ -1,0 +1,21 @@
+name: fs.stat
+doc: Metadata for one path (kind, size, mode, owner, modified/accessed/created times).
+params:
+  path: { type: path, required: true, must_exist: true }
+cost: cheap
+sensitivity: personal
+argv: ["/usr/bin/stat", "-f", "%HT%t%z%t%Sp%t%Su%t%Sg%t%m%t%a%t%B%t%N", "{path}"]
+parser: stat_f
+timeout: 3s
+cache_ttl: 5s
+fixture_params: { path: "~/Downloads" }
+schema:
+  - { name: path,     type: path }
+  - { name: kind,     type: str }
+  - { name: size,     type: bytes }
+  - { name: mode,     type: str }
+  - { name: owner,    type: str }
+  - { name: group,    type: str }
+  - { name: modified, type: ts }
+  - { name: accessed, type: ts }
+  - { name: created,  type: ts }

@@ -1,0 +1,37 @@
+name: proc.info
+doc: One process in detail, with its open files and sockets as nested tables.
+params:
+  pid: { type: pid, required: true }
+cost: moderate
+sensitivity: personal
+commands:
+  - { id: ps, argv: ["/bin/ps", "-ww", "-p", "{pid}", "-o", "pid=,ppid=,user=,%cpu=,%mem=,rss=,lstart=,command="] }
+  - { id: lsof, argv: ["/usr/sbin/lsof", "-nP", "-p", "{pid}", "-FftnPT"], allow_exit: [1], optional: true }
+parser: proc_info
+timeout: 8s
+cache_ttl: 3s
+redact: true
+fixture_params: { pid: 2210 }
+schema:
+  - { name: pid,     type: pid }
+  - { name: ppid,    type: pid }
+  - { name: user,    type: str }
+  - { name: cpu,     type: float, unit: "%" }
+  - { name: mem_pct, type: float, unit: "%" }
+  - { name: rss,     type: bytes }
+  - { name: started, type: ts }
+  - { name: command, type: str }
+  - name: open_files
+    type: table
+    schema:
+      - { name: fd,   type: str }
+      - { name: kind, type: str }
+      - { name: path, type: path }
+  - name: sockets
+    type: table
+    schema:
+      - { name: fd,      type: str }
+      - { name: family,  type: str }
+      - { name: proto,   type: str }
+      - { name: address, type: str }
+      - { name: state,   type: str }

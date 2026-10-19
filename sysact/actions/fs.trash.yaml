@@ -1,0 +1,10 @@
+name: fs.trash
+doc: Move a file or folder to the Trash (recoverable from the Trash until it is emptied).
+tier: risky
+params:
+  path: { type: path, required: true }
+kind: trash
+target: "{path}"
+must_exist: true
+effect: "Moves {path} to the Trash. It stays recoverable until the Trash is emptied."
+undo_hint: "Open the Trash and choose Put Back."

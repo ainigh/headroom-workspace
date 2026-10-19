@@ -1,0 +1,15 @@
+name: net.dns
+doc: DNS resolvers (scutil --dns), one row per resolver and nameserver.
+cost: cheap
+sensitivity: personal
+argv: ["/usr/sbin/scutil", "--dns"]
+parser: scutil_dns
+timeout: 5s
+cache_ttl: 1m
+schema:
+  - { name: resolver,   type: int }
+  - { name: scoped,     type: bool }
+  - { name: domain,     type: str }
+  - { name: search,     type: str }
+  - { name: nameserver, type: str }
+  - { name: interface,  type: str }

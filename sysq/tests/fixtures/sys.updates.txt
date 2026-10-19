@@ -1,0 +1,5 @@
+Display Name                                       Version    Date                  
+------------                                       -------    ----                  
+macOS Tahoe 26.0.1                                 26.0.1     10/02/2026, 09:12:44  
+XProtectPlistConfigData                            5318       10/14/2026, 03:01:12  
+Safari                                             26.0       09/15/2026, 08:00:31  

@@ -1,0 +1,19 @@
+name: fs.find_dirs
+doc: Directories with an exact name under a root, without descending into matches (e.g. node_modules, .git, DerivedData).
+params:
+  root:  { type: path, default: "~", must_exist: true }
+  name:  { type: str, required: true, pattern: "^[A-Za-z0-9._-]+$" }
+  depth: { type: int, default: 4, min: 1, max: 6 }
+cost: expensive
+sensitivity: personal
+argv: ["/usr/bin/find", "{root}", "-maxdepth", "{depth}", "-type", "d", "-name", "{name}", "-prune"]
+allow_exit: [1]
+parser: path_lines
+timeout: 20s
+partial_ok: true
+cache_ttl: 10m
+fixture_params: { root: "~/Developer", name: node_modules }
+schema:
+  - { name: path,   type: path }
+  - { name: name,   type: str }
+  - { name: parent, type: path }

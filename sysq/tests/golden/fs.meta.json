@@ -1,0 +1,58 @@
+{
+  "schema": [
+    {
+      "name": "key",
+      "type": "str"
+    },
+    {
+      "name": "value",
+      "type": "str"
+    },
+    {
+      "name": "type",
+      "type": "str"
+    }
+  ],
+  "rows": [
+    [
+      "kMDItemContentType",
+      "com.apple.disk-image-udif",
+      "string"
+    ],
+    [
+      "kMDItemDateAdded",
+      "2026-10-19T05:41:09Z",
+      "date"
+    ],
+    [
+      "kMDItemDisplayName",
+      "Xcode_26.dmg",
+      "string"
+    ],
+    [
+      "kMDItemFSSize",
+      "3500000000",
+      "int"
+    ],
+    [
+      "kMDItemLastUsedDate",
+      "2026-10-19T05:50:12Z",
+      "date"
+    ],
+    [
+      "kMDItemWhereFroms",
+      "https://download.developer.apple.com/Developer_Tools/Xcode_26/Xcode_26.dmg, https://developer.apple.com/",
+      "array"
+    ]
+  ],
+  "meta": {
+    "rows": 6,
+    "truncated": false,
+    "source": [
+      "fs.meta"
+    ],
+    "cost_ms": 0,
+    "sensitivity": "personal",
+    "fixture": true
+  }
+}

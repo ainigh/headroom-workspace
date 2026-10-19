@@ -1,0 +1,10 @@
+name: history.consumers_at
+doc: The stored consumers table of a recipe nearest a time ("what spiked at 3:14 pm?"); at is HH:MM today, an RFC 3339 time, or a duration ago like 20m.
+params:
+  recipe: { type: str, pattern: "^[a-z][a-z0-9_.]*$", required: true }
+  at:     { type: str, pattern: "^[0-9:TZ+.-]+[smhd]?$", required: true }
+  window: { type: duration, default: 2m, max: 3600 }
+cost: cheap
+sensitivity: personal
+builtin: history_consumers_at
+schema: []
