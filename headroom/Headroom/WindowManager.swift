@@ -13,6 +13,8 @@ final class UIState {
     var assistantScope: AssistantScope = .keyGroups
     var graphsSelection: Set<String> = []
     var settingsTab: SettingsTab = .general
+    /// Height the panel may take under the icon on its screen.
+    var panelMaxHeight: CGFloat = 800
 }
 
 /// Owns the panel that drops down from the menu bar icon and the app's
@@ -58,10 +60,14 @@ final class WindowManager: NSObject, NSWindowDelegate {
     }
 
     func showPanel() {
+        // Closing the last window hides the app; a hidden app shows no windows.
+        if NSApp.isHidden { NSApp.unhideWithoutActivation() }
         let p = panel ?? makePanel()
         panel = p
         guard let button = statusItem.button, let window = button.window else { return }
         let spot = window.convertToScreen(button.convert(button.bounds, to: nil))
+        let screen = NSScreen.screens.first { $0.frame.contains(spot.origin) }?.visibleFrame ?? NSScreen.main?.visibleFrame ?? .zero
+        ui.panelMaxHeight = max(300, spot.minY - 6 - screen.minY - 8)
         p.present(below: spot)
         applyPinned(pinned)
         permissions.refresh()
@@ -198,12 +204,16 @@ final class WindowManager: NSObject, NSWindowDelegate {
             return
         }
         guard confirmWindow == nil else { return }
+        // The drop-down panel sits at menu level, above the sheet.
+        if !pinned { hidePanel() }
         let p = NSPanel(contentRect: NSRect(x: 0, y: 0, width: 460, height: 380),
                         styleMask: [.titled, .closable, .fullSizeContentView],
                         backing: .buffered, defer: false)
         p.title = "Confirm Action"
         p.titlebarAppearsTransparent = true
         p.level = .modalPanel
+        // No Dock icon: a sheet hidden on deactivate couldn't be brought back.
+        p.hidesOnDeactivate = false
         p.isReleasedWhenClosed = false
         p.delegate = self
         p.contentViewController = NSHostingController(rootView: ConfirmationSheet(flow: model.actions.flow, catalog: model.actions))
@@ -226,7 +236,7 @@ final class WindowManager: NSObject, NSWindowDelegate {
             self.updateViewOpen()
             // Back to being a menu bar app once its windows are gone: the
             // app you were in before comes forward again.
-            let anyOpen = self.windows.values.contains { $0.isVisible } || self.confirmWindow != nil
+            let anyOpen = self.windows.values.contains { $0.isVisible || $0.isMiniaturized } || self.confirmWindow != nil
             if !anyOpen && !self.panelVisible { NSApp.hide(nil) }
         }
     }
@@ -263,7 +273,10 @@ final class MenuPanel: NSPanel {
         hasShadow = true
         hidesOnDeactivate = false
         isReleasedWhenClosed = false
+        canHide = false
         hosting.sizingOptions = [.intrinsicContentSize]
+        // The window's height clamp (fit) wins over the content's wish to grow.
+        hosting.setContentCompressionResistancePriority(.init(490), for: .vertical)
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .transient]
         let glass = NSVisualEffectView()
         glass.material = .popover
@@ -302,7 +315,10 @@ final class MenuPanel: NSPanel {
         let top = anchor.minY - 6
         let height = min(size.height, top - screen.minY - 8)
         let frame = NSRect(x: x, y: top - height, width: size.width, height: height)
-        if frame != self.frame { setFrame(frame, display: true) }
+        if frame != self.frame {
+            setFrame(frame, display: true)
+            invalidateShadow()
+        }
     }
 
     override func cancelOperation(_ sender: Any?) {

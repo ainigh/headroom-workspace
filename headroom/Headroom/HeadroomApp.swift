@@ -92,8 +92,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func showMenu() {
-        windows?.hidePanel()
         let menu = buildMenu()
+        if windows?.pinned != true { windows?.hidePanel() }
         menu.delegate = self
         item.menu = menu
         item.button?.performClick(nil)       // opens the menu under the icon
@@ -212,17 +212,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 @MainActor
 final class MenuAction: NSObject {
     private let run: () -> Void
-    private static var live: [MenuAction] = []
 
     private init(_ run: @escaping () -> Void) { self.run = run }
 
     static func item(_ title: String, key: String = "", _ run: @escaping () -> Void) -> NSMenuItem {
         let target = MenuAction(run)
-        // Menus are rebuilt each time they open; keep only the latest targets.
-        if live.count > 64 { live.removeFirst(live.count - 64) }
-        live.append(target)
         let i = NSMenuItem(title: title, action: #selector(MenuAction.fire), keyEquivalent: key)
         i.target = target
+        i.representedObject = target        // target is weak; the item keeps it alive
         return i
     }
 

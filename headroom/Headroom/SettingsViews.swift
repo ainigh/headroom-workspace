@@ -15,7 +15,8 @@ struct SettingsView: View {
     let windows: WindowManager
 
     var body: some View {
-        TabView(selection: Binding(get: { windows.ui.settingsTab }, set: { windows.ui.settingsTab = $0 })) {
+        @Bindable var ui = windows.ui
+        TabView(selection: $ui.settingsTab) {
             GeneralTab(model: model).tabItem { Label("General", systemImage: "gearshape") }.tag(SettingsTab.general)
             PermissionsTab(model: model, permissions: windows.permissions).tabItem { Label("Permissions", systemImage: "checkmark.shield") }.tag(SettingsTab.permissions)
             YAMLEditor(model: model, file: "groups").tabItem { Label("Groups", systemImage: "square.grid.2x2") }.tag(SettingsTab.groups)

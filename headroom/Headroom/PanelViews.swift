@@ -31,11 +31,10 @@ struct SmallPanelView: View {
     let ui: UIState
     let windows: WindowManager
 
-    /// Room for the scrolling middle: the screen less the header and bottom bar.
-    var middleMax: CGFloat {
-        let screen = NSScreen.main?.visibleFrame.height ?? 800
-        return max(240, screen - 190)
-    }
+    /// Room for the scrolling middle: what the icon's screen leaves under it,
+    /// less the header, mode chips, bottom bar and padding (measured).
+    @State private var chrome: CGFloat = 170
+    var middleMax: CGFloat { max(160, ui.panelMaxHeight - chrome) }
 
     var body: some View {
         let p = model.panel()
@@ -57,11 +56,24 @@ struct SmallPanelView: View {
                 }
             }
             .frame(maxHeight: middleMax)
+            .background(GeometryReader { g in Color.clear.preference(key: MiddleHeight.self, value: g.size.height) })
             Divider().opacity(0.5)
             footer
         }
         .padding(16)
         .frame(width: MenuPanel.width)
+        .background(GeometryReader { g in Color.clear.preference(key: TotalHeight.self, value: g.size.height) })
+        .onPreferenceChange(TotalHeight.self) { total in totalHeight = total; measureChrome() }
+        .onPreferenceChange(MiddleHeight.self) { middle in middleHeight = middle; measureChrome() }
+    }
+
+    @State private var totalHeight: CGFloat = 0
+    @State private var middleHeight: CGFloat = 0
+
+    func measureChrome() {
+        guard totalHeight > 0, middleHeight > 0 else { return }
+        let c = (totalHeight - middleHeight).rounded()
+        if abs(c - chrome) > 1 { chrome = c }
     }
 
     // MARK: header
@@ -528,4 +540,14 @@ struct MetricsList: View {
             SysqTableView(table: table, maxHeight: 220)
         }
     }
+}
+
+private struct TotalHeight: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = max(value, nextValue()) }
+}
+
+private struct MiddleHeight: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = max(value, nextValue()) }
 }
