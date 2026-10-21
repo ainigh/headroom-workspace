@@ -75,16 +75,20 @@ func (r *Rules) Check(p string) (string, error) {
 		return "", fmt.Errorf("path must be absolute or start with ~")
 	}
 	clean := filepath.Clean(p)
-	for _, cand := range []string{clean, resolve(clean)} {
+	// Compared case-folded: APFS and HFS+ volumes are case-insensitive by
+	// default, so ~/documents names ~/Documents. (On a case-sensitive volume
+	// this refuses a little more, never less.)
+	fold := strings.ToLower
+	for _, cand := range []string{fold(clean), fold(resolve(clean))} {
 		for _, e := range r.Exact {
 			ex := filepath.Clean(r.expand(e))
-			if cand == ex || cand == resolve(ex) {
+			if cand == fold(ex) || cand == fold(resolve(ex)) {
 				return "", fmt.Errorf("%s is protected", p)
 			}
 		}
 		for _, t := range r.Trees {
 			tr := filepath.Clean(r.expand(t))
-			for _, root := range []string{tr, resolve(tr)} {
+			for _, root := range []string{fold(tr), fold(resolve(tr))} {
 				if cand == root || strings.HasPrefix(cand, root+"/") || root == "/" {
 					return "", fmt.Errorf("%s is inside protected %s", p, t)
 				}
