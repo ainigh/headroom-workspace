@@ -105,6 +105,25 @@ func TestPushdown(t *testing.T) {
 	}
 }
 
+// A bound outside the parameter's range is not pushed ("invalid parameter
+// min_size: below minimum 1024"); the filter still runs afterwards.
+func TestBoundPushdownRespectsParamRange(t *testing.T) {
+	res := run(t, `fs.large(path: "~") | filter size > 500`)
+	tb := res.Items[0].Table
+	if tb.Meta.Error != "" || tb.Len() != 5 {
+		t.Fatalf("error %q, %d rows", tb.Meta.Error, tb.Len())
+	}
+	for _, p := range tb.Meta.Pushdown {
+		if strings.HasPrefix(p, "min_size") {
+			t.Fatalf("out-of-range bound pushed: %v", tb.Meta.Pushdown)
+		}
+	}
+	res = run(t, `fs.large(path: "~") | filter size > 2GB`)
+	if m := res.Items[0].Table.Meta; len(m.Pushdown) != 1 || !strings.HasPrefix(m.Pushdown[0], "min_size") {
+		t.Fatalf("in-range bound not pushed: %v", m.Pushdown)
+	}
+}
+
 // A limit pushed into the primitive ahead of a residual filter cut rows the
 // filter would have kept: the .dmg is the third-largest file, so pushing
 // limit 2 returned nothing.

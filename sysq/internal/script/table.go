@@ -11,6 +11,7 @@ import (
 	"github.com/ainigh/headroom-workspace/sysq/internal/catalog"
 	"github.com/ainigh/headroom-workspace/sysq/internal/expr"
 	"github.com/ainigh/headroom-workspace/sysq/internal/table"
+	"github.com/ainigh/headroom-workspace/sysq/pkg/argv"
 )
 
 // source is something a lazy table materializes from: a primitive or a recipe.
@@ -661,7 +662,7 @@ func (t *Table) pushFilter(e *Expr) (*Table, bool) {
 		}
 	}
 	for _, bd := range pd.Bounds {
-		if v, ok := boundValue(n, bd, b); ok {
+		if v, ok := boundValue(n, bd, b); ok && t.boundValid(bd.Param, v) {
 			if _, set := params[bd.Param]; !set {
 				params[bd.Param] = v
 				pushed = append(pushed, fmt.Sprintf("%s: %s", bd.Param, table.Format(v)))
@@ -678,6 +679,23 @@ func (t *Table) pushFilter(e *Expr) (*Table, bool) {
 		return expr.Filter(r, n, &ev)
 	})
 	return &Table{rt: t.rt, src: &source{kind: "primitive", name: t.src.name, prim: t.src.prim, params: params}, post: post, push: append(append([]string(nil), t.push...), pushed...)}, true
+}
+
+// boundValid reports whether v passes the bound param's spec (type, min,
+// max). A bound outside it (size > 500 against min_size's 1024 floor) is not
+// pushed; the full filter still runs on the primitive's output.
+func (t *Table) boundValid(param string, v any) bool {
+	spec, ok := t.src.prim.Params[param]
+	if !ok {
+		return false
+	}
+	spec.Default, spec.Required, spec.MustExist = nil, false, false
+	var pol argv.PathPolicy
+	if t.rt != nil && t.rt.Engine != nil {
+		pol = t.rt.Engine.PathPolicy()
+	}
+	_, err := argv.Validate(map[string]argv.Spec{param: spec}, map[string]any{param: v}, pol)
+	return err == nil
 }
 
 func boundValue(n expr.Node, bd catalog.BoundPushdown, b map[string]any) (any, bool) {
