@@ -498,8 +498,8 @@ struct DrillInView: View {
 
     func loadHistory() async {
         guard let g = model.config.group(vm.id) else { return }
-        await model.history.load([g], range: range)
-        points = model.history.series[vm.id]?.points.map(\.1) ?? []
+        await model.drillHistory.load([g], range: range)
+        points = model.drillHistory.series[vm.id]?.points.map(\.1) ?? []
     }
 
     func inspectRow(_ t: SysqTable, _ row: Int) {

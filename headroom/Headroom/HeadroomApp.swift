@@ -59,6 +59,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         model.start()
         Updater.shared.start()
         windows.permissions.refresh()
+        // After sleep the update streams can sit dead until they time out: reconnect them.
+        NSWorkspace.shared.notificationCenter.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { _ in
+            MainActor.assumeIsolated { model.groups.refreshAll() }
+        }
         if config.config.layout.panel?.remember_position != false,
            config.config.layout.panel?.always_on_top == true,
            UserDefaults.standard.bool(forKey: "panelWasOpen") {

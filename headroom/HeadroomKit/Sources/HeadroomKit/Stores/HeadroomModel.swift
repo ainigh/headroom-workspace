@@ -35,6 +35,8 @@ public final class HeadroomModel {
     public let actions: ActionStore
     public let recipes: RecipeStore
     public let history: HistoryStore
+    /// The drill-in's history, apart from the Graphs window's (each has its own range).
+    public let drillHistory: HistoryStore
     public let pairing: PairingStore
     public let setup: SetupStore
     public let explorer: ExplorerStore
@@ -57,6 +59,7 @@ public final class HeadroomModel {
         actions = ActionStore(client: services.actions, flow: flow)
         recipes = RecipeStore()
         history = HistoryStore()
+        drillHistory = HistoryStore()
         pairing = PairingStore(admin: services.admin)
         setup = SetupStore(admin: services.admin)
         explorer = ExplorerStore()
@@ -97,6 +100,7 @@ public final class HeadroomModel {
         groups.attach(services.ui)
         recipes.attach(services.ui)
         history.attach(services.ui)
+        drillHistory.attach(services.ui)
         explorer.attach(services.ui, config: config.groups.explorer)
         assistant.attach(sysq: services.assistant, chat: services.chat, actions: ActionBridge(actions), config: config)
     }

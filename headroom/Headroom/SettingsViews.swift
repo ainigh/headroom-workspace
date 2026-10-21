@@ -180,6 +180,14 @@ struct APITab: View {
     @State private var privacy: [String: String] = [:]
     @State private var scripts: [String: Bool] = [:]
 
+    /// "2026-10-21T17:03:00Z" as "21 Oct 2026 at 17:03" (raw text if it doesn't parse).
+    static func when(_ s: String) -> String {
+        let f = ISO8601DateFormatter()
+        f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let d = f.date(from: s) ?? ISO8601DateFormatter().date(from: s)
+        return d.map { $0.formatted(date: .abbreviated, time: .shortened) } ?? s
+    }
+
     var body: some View {
         let pairing = model.pairing
         VStack(alignment: .leading, spacing: 10) {
@@ -229,7 +237,7 @@ struct APITab: View {
                         Text(c.name).font(.system(size: 12))
                         Badge(text: c.privacy)
                         if c.allow_scripts { Badge(text: "scripts") }
-                        if let s = c.last_seen { Text("last seen \(s)").font(.system(size: 10)).foregroundStyle(.secondary) }
+                        if let s = c.last_seen { Text("last seen \(Self.when(s))").font(.system(size: 10)).foregroundStyle(.secondary) }
                         Spacer()
                         Button("Revoke", role: .destructive) { Task { await pairing.revoke(c.id) } }
                     }
