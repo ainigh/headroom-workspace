@@ -30,9 +30,24 @@ public protocol ServiceLauncher: Sendable {
 /// rewritten only when its program changes (e.g. the app moved or updated).
 public struct LaunchAgentLauncher: ServiceLauncher {
     public let agentsDir: URL
+    /// Runs launchctl (a seam for tests; nil runs /bin/launchctl).
+    let runner: (@Sendable ([String]) async throws -> String)?
 
     public init(home: URL = FileManager.default.homeDirectoryForCurrentUser) {
+        self.init(home: home, runner: nil)
+    }
+
+    init(home: URL, runner: (@Sendable ([String]) async throws -> String)?) {
         agentsDir = home.appendingPathComponent("Library/LaunchAgents")
+        self.runner = runner
+    }
+
+    /// The executable's modification time. An update replaces the binary at
+    /// the same path; with this in the plist the plist changes too, so the
+    /// running service is restarted onto the new binary.
+    func stamp(_ s: ServiceSpec) -> String {
+        guard let d = (try? FileManager.default.attributesOfItem(atPath: s.executable))?[.modificationDate] as? Date else { return "" }
+        return String(Int64(d.timeIntervalSince1970))
     }
 
     func plist(_ s: ServiceSpec) -> String {
@@ -40,6 +55,7 @@ public struct LaunchAgentLauncher: ServiceLauncher {
         return """
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <!-- Written by Headroom; binary modified \(stamp(s)) -->
         <plist version="1.0">
         <dict>
           <key>Label</key><string>\(xml(s.label))</string>
@@ -78,6 +94,12 @@ public struct LaunchAgentLauncher: ServiceLauncher {
             _ = try await launchctl(["bootstrap", domain, url.path])
         } else if (try? await launchctl(["print", "\(domain)/\(spec.label)"])) == nil {
             _ = try await launchctl(["bootstrap", domain, url.path])
+        } else {
+            // Loaded but maybe not running: a clean exit (SIGTERM from
+            // Activity Monitor exits 0) isn't restarted by KeepAlive's
+            // SuccessfulExit=false. kickstart without -k starts it only if
+            // it isn't running.
+            _ = try? await launchctl(["kickstart", "\(domain)/\(spec.label)"])
         }
     }
 
@@ -87,7 +109,8 @@ public struct LaunchAgentLauncher: ServiceLauncher {
 
     @discardableResult
     func launchctl(_ args: [String]) async throws -> String {
-        try await Task.detached {
+        if let runner { return try await runner(args) }
+        return try await Task.detached {
             let p = Process()
             p.executableURL = URL(fileURLWithPath: "/bin/launchctl")
             p.arguments = args

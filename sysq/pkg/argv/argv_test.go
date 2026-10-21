@@ -122,6 +122,12 @@ func TestRootPolicy(t *testing.T) {
 	if err != nil || got != filepath.Join(home, "Downloads") {
 		t.Fatalf("%v %s", err, got)
 	}
+	// macOS volumes are case-insensitive by default: ~/.SSH is ~/.ssh.
+	for _, bad := range []string{"~/.SSH", "~/.Ssh/id_ed25519"} {
+		if _, err := pol.CheckPath(bad); err == nil {
+			t.Errorf("%s accepted", bad)
+		}
+	}
 }
 
 func FuzzValidateBuild(f *testing.F) {

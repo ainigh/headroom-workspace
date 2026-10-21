@@ -16,6 +16,7 @@ func init() {
 var (
 	thermWarn  = regexp.MustCompile(`(?i)thermal warning level (?:set to|is) (\d+)`)
 	speedLimit = regexp.MustCompile(`CPU_Speed_Limit\s*=\s*(\d+)`)
+	perfNormal = regexp.MustCompile(`(?i)performance warning level (?:set to|is) 0\b`)
 )
 
 // sys.thermal: pmset -g therm. Apple silicon usually reports "No thermal
@@ -36,14 +37,16 @@ func parsePmsetTherm(in Input) ([]Row, error) {
 			r["level"], r["state"] = int64(1), "fair"
 		}
 	}
-	if m := thermWarn.FindStringSubmatch(out); m != nil {
+	// A recorded level of 0 is the normal level (macOS sets it back after
+	// an event); only a non-zero level is a warning.
+	if m := thermWarn.FindStringSubmatch(out); m != nil && m[1] != "0" {
 		r["warning"] = "thermal warning level " + m[1]
 		if r["level"].(int64) < 1 {
 			r["level"], r["state"] = int64(1), "fair"
 		}
 	}
 	for _, l := range lines(out) {
-		if strings.Contains(strings.ToLower(l), "performance warning level") && !strings.Contains(l, "No ") {
+		if strings.Contains(strings.ToLower(l), "performance warning level") && !strings.Contains(l, "No ") && !perfNormal.MatchString(l) {
 			r["warning"] = strings.TrimSpace(l)
 		}
 	}

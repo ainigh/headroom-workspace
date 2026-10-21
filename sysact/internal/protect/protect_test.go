@@ -42,3 +42,22 @@ func TestShippedRules(t *testing.T) {
 		t.Fatal("user file removed a shipped rule")
 	}
 }
+
+// macOS volumes are case-insensitive by default: ~/documents is ~/Documents
+// and ~/.SSH is ~/.ssh, so a different spelling must not slip past a rule.
+func TestRulesIgnoreCase(t *testing.T) {
+	home := testhome.New(t)
+	r, err := Load("", home)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, bad := range []string{"~/documents", "~/DOCUMENTS/", "/users", "/system/Library/Fonts", "/USR/lib",
+		"~/.SSH/id_ed25519", "~/library/keychains/login.keychain-db", "~/Library/application support/SYSACT/host.key"} {
+		if _, err := r.Check(bad); err == nil {
+			t.Errorf("%s accepted", bad)
+		}
+	}
+	if _, err := r.Check("~/Downloads/Documents.zip"); err != nil {
+		t.Errorf("ordinary file refused: %v", err)
+	}
+}

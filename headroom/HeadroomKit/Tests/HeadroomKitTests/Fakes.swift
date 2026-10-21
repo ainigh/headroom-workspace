@@ -18,6 +18,9 @@ final class FakeSysq: SysqClientProtocol, @unchecked Sendable {
     var calls: [String] = []
     var subscribeFails = false
     var catalogEntries: [CatalogEntry] = []
+    /// Per history range: a delay (ns) and a single value to return.
+    var historyDelay: [String: UInt64] = [:]
+    var historyValue: [String: Double] = [:]
 
     func record(_ s: String) { lock.lock(); calls.append(s); lock.unlock() }
     func get(_ name: String) -> SysqTable { lock.lock(); defer { lock.unlock() }; return tables[name] ?? SysqTable(schema: [], rows: []) }
@@ -40,6 +43,8 @@ final class FakeSysq: SysqClientProtocol, @unchecked Sendable {
     func explain(recipe: String) async throws -> ExplainPlan { try await explain(script: recipe) }
     func history(_ name: String, range: String, column: String?, key: String?) async throws -> SysqTable {
         record("history \(name) \(range) \(column ?? "")")
+        if let d = historyDelay[range] { try? await Task.sleep(nanoseconds: d) }
+        if let v = historyValue[range] { return table([("t", "ts"), ("value", "float")], [["2026-10-19T12:00:00Z", .number(v)]]) }
         return table([("t", "ts"), ("value", "float")], [["2026-10-19T12:00:00Z", 1], ["2026-10-19T12:00:05Z", 2]])
     }
     func events(range: String) async throws -> SysqTable { table([("ts", "ts"), ("kind", "str"), ("message", "str")], []) }

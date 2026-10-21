@@ -80,6 +80,42 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(c.groups.groups.last?.name, "Disk I/O")
     }
 
+    func testDuplicateGroupIDsKeepLastGoodInsteadOfCrashing() throws {
+        let dir = tempDir()
+        let loader = ConfigLoader(userDir: dir, defaultsDir: shippedConfig)
+        try loader.bootstrap()
+        let (good, _) = loader.load(previous: nil)
+        var text = loader.text(of: "groups")
+        text += """
+          - id: memory
+            name: Memory again
+            symbol: memorychip
+            headline:  { recipe: mem.headline, column: available }
+            detail:    { recipe: mem.detail }
+            consumers: { recipe: proc.top, value: mem }
+            sparkline: { recipe: mem.headline, column: available }
+            attention: attention.memory
+
+        """
+        XCTAssertNotNil(loader.save("groups", text: text))
+        try text.write(to: dir.appendingPathComponent("groups.yaml"), atomically: true, encoding: .utf8)
+        let (c, problems) = loader.load(previous: good)
+        XCTAssertTrue(problems.contains { $0.file == "groups.yaml" })
+        XCTAssertEqual(c.groups.groups.count, good.groups.groups.count)
+        XCTAssertEqual(c.orderedGroups.count, good.groups.groups.count)
+    }
+
+    func testDuplicateGroupOrderEntriesDoNotDuplicateGroups() throws {
+        let dir = tempDir()
+        let loader = ConfigLoader(userDir: dir, defaultsDir: shippedConfig)
+        try loader.bootstrap()
+        XCTAssertNil(loader.save("layout", text: "version: 1\ngroup_order: [cpu, memory, cpu]\n"))
+        let (c, _) = loader.load(previous: nil)
+        let ids = c.orderedGroups.map(\.id)
+        XCTAssertEqual(ids.count, Set(ids).count)
+        XCTAssertEqual(Array(ids.prefix(2)), ["cpu", "memory"])
+    }
+
     func testUnits() {
         XCTAssertEqual(Units.parse("50GB"), 50e9)
         XCTAssertEqual(Units.parse("1.5 GiB"), 1.5 * 1_073_741_824)
@@ -88,6 +124,11 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(Units.parse("90s"), 90)
         XCTAssertEqual(Units.bytes(18_200_000_000), "18.2 GB")
         XCTAssertEqual(Units.bytes(995_000_000_000), "995 GB")
+        // Rounding happens before the unit is picked (as sysq's HumanBytes).
+        XCTAssertEqual(Units.bytes(999_950), "1.0 MB")
+        XCTAssertEqual(Units.bytes(999_600_000_000), "1.0 TB")
+        XCTAssertEqual(Units.bytes(99_960), "100 KB")
+        XCTAssertEqual(Units.bytes(-999_950), "-1.0 MB")
         XCTAssertEqual(Units.duration(7800), "2 h 10 min")
     }
 }

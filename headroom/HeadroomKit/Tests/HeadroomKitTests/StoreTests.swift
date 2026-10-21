@@ -65,6 +65,21 @@ final class GroupStoreTests: XCTestCase {
         XCTAssertEqual(vm.headline, Units.percent(34))
     }
 
+    /// Reconnecting (Retry, sysqd restart, new tokens) reloads the history
+    /// part of each sparkline; it must not be prepended to the points that
+    /// already hold the same history.
+    @MainActor
+    func testReattachDoesNotRepeatSparklineHistory() async {
+        let store = GroupStore(config: loadShipped())
+        let s = sysq()
+        store.attach(s)
+        _ = await waitUntil { (store.state("memory")?.sparkline.filter { $0 == 1 }.count ?? 0) == 1 }
+        store.attach(s)
+        _ = await waitUntil { s.calls.filter { $0.hasPrefix("history mem.headline") }.count >= 2 }
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertEqual(store.state("memory")?.sparkline.filter { $0 == 1 }.count, 1, "\(store.state("memory")?.sparkline ?? [])")
+    }
+
     @MainActor
     func testPausedStopsFeeds() async {
         let store = GroupStore(config: loadShipped())
@@ -73,6 +88,69 @@ final class GroupStoreTests: XCTestCase {
         store.attach(s)
         try? await Task.sleep(nanoseconds: 100_000_000)
         XCTAssertTrue(s.calls.isEmpty)
+    }
+}
+
+final class LaunchAgentTests: XCTestCase {
+    final class Recorder: @unchecked Sendable {
+        let lock = NSLock()
+        var calls: [String] = []
+        func add(_ a: [String]) { lock.lock(); calls.append(a.first ?? ""); lock.unlock() }
+    }
+
+    /// A service that exited cleanly (SIGTERM) stays loaded but stopped, and
+    /// KeepAlive won't restart it: ensure must start it again.
+    func testEnsureStartsALoadedButStoppedService() async throws {
+        let home = tempDir()
+        let rec = Recorder()
+        let l = LaunchAgentLauncher(home: home, runner: { args in rec.add(args); return "" })
+        let spec = ServiceSpec(label: "com.example.svc", executable: "/bin/true", arguments: [], logPath: home.path + "/logs/svc.log")
+        try await l.ensure(spec)
+        XCTAssertEqual(rec.calls, ["bootout", "bootstrap"])
+        rec.calls = []
+        try await l.ensure(spec)
+        XCTAssertEqual(rec.calls, ["print", "kickstart"])
+    }
+
+    /// An app update replaces the binary at the same path: the running
+    /// service must be restarted onto it, not left on the old build.
+    func testEnsureRestartsWhenTheBinaryChanges() async throws {
+        let home = tempDir()
+        let exe = home.appendingPathComponent("svc")
+        try Data("v1".utf8).write(to: exe)
+        try FileManager.default.setAttributes([.modificationDate: Date(timeIntervalSince1970: 1_800_000_000)], ofItemAtPath: exe.path)
+        let rec = Recorder()
+        let l = LaunchAgentLauncher(home: home, runner: { args in rec.add(args); return "" })
+        let spec = ServiceSpec(label: "com.example.svc", executable: exe.path, arguments: [], logPath: home.path + "/logs/svc.log")
+        try await l.ensure(spec)
+        rec.calls = []
+        try Data("v2".utf8).write(to: exe)
+        try FileManager.default.setAttributes([.modificationDate: Date(timeIntervalSince1970: 1_800_086_400)], ofItemAtPath: exe.path)
+        try await l.ensure(spec)
+        XCTAssertEqual(rec.calls, ["bootout", "bootstrap"])
+    }
+}
+
+final class HistoryStoreTests: XCTestCase {
+    /// Switching the range while a slow load is in flight: the slow, older
+    /// load must not overwrite the newer range's series when it lands.
+    @MainActor
+    func testOlderLoadDoesNotOverwriteNewerRange() async {
+        let c = loadShipped()
+        let s = FakeSysq()
+        s.historyDelay = ["24h": 300_000_000]
+        s.historyValue = ["24h": 24, "1h": 1]
+        let store = HistoryStore()
+        store.attach(s)
+        let g = c.group("memory")!
+        let slow = Task { await store.load([g], range: "24h") }
+        try? await Task.sleep(nanoseconds: 50_000_000)
+        await store.load([g], range: "1h")
+        XCTAssertEqual(store.series["memory"]?.points.map(\.1), [1])
+        XCTAssertFalse(store.loading)
+        await slow.value
+        XCTAssertEqual(store.series["memory"]?.points.map(\.1), [1])
+        XCTAssertFalse(store.loading)
     }
 }
 
@@ -230,5 +308,26 @@ final class ExplorerTests: XCTestCase {
         let items = ExplorerStore.items(t)
         XCTAssertEqual(items.first?.name, "big.dmg")
         XCTAssertEqual(items.first?.size, 4e9)
+    }
+
+    /// Switching to a view groups.yaml doesn't configure while a scan runs:
+    /// the cancelled scan never clears `scanning`, so the spinner stuck.
+    @MainActor
+    func testUnconfiguredViewStopsTheSpinnerAndClearsTheOldListing() async {
+        var ec = loadShipped().groups.explorer!
+        ec.files = nil
+        let s = FakeSysq()
+        s.set("disk.hogs", table([("path", "path"), ("size", "bytes")], [["/Users/me/Library", 9e9]]))
+        let ex = ExplorerStore()
+        ex.attach(s, config: ec)
+        ex.refresh()
+        XCTAssertTrue(ex.scanning)
+        ex.view = .files
+        ex.refresh()
+        XCTAssertNotNil(ex.error)
+        XCTAssertFalse(ex.scanning)
+        try? await Task.sleep(nanoseconds: 50_000_000)
+        XCTAssertFalse(ex.scanning)
+        XCTAssertTrue(ex.items.isEmpty)
     }
 }
