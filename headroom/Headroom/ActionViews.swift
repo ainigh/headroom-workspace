@@ -58,8 +58,11 @@ struct ActionsPanel: View {
                     Button("Ask AI") { windows.showAssistant(scope: .item(item)) }.disabled(!model.assistant.available)
                 }
                 .controlSize(.small)
+                // Safe-tier catalog actions belong here too, not under CAUTION.
+                let safe = actions.filter { $0.0.tier == "safe" }
+                ForEach(safe.indices, id: \.self) { i in ActionCatalogRow(model: model, info: safe[i].0, fill: safe[i].1) }
 
-                let caution = actions.filter { $0.0.tier != "risky" }
+                let caution = actions.filter { $0.0.tier != "risky" && $0.0.tier != "safe" }
                 let risky = actions.filter { $0.0.tier == "risky" }
                 if !caution.isEmpty {
                     Text("CAUTION").font(.system(size: 10, weight: .semibold)).foregroundStyle(.orange)
@@ -94,6 +97,7 @@ struct RecipeRow: View {
     let params: [String: JSONValue]
     @State private var showExplain = false
     @State private var plan: ExplainPlan?
+    @State private var explaining = false
 
     var body: some View {
         let entry = model.recipes.entry(name)
@@ -109,11 +113,15 @@ struct RecipeRow: View {
                 if let c = entry?.cost { Badge(text: c) }
                 if let s = entry?.sensitivity { Badge(text: s) }
                 Button("Run") { Task { await model.recipes.run(name, params: params) } }
-                    .disabled(entry?.available == false)
+                    .disabled(entry?.available == false || run?.running == true)
                     .help(entry?.reason ?? "Runs now; read-only")
                 Button { Finder.copy(RecipeStore.cli(name, params: params)) } label: { Image(systemName: "terminal") }
                     .help("Copy as CLI: \(RecipeStore.cli(name, params: params))")
-                Button { showExplain = true; Task { plan = await model.recipes.explain(name) } } label: { Image(systemName: "questionmark.circle") }
+                Button {
+                    showExplain = true
+                    explaining = true
+                    Task { plan = await model.recipes.explain(name); explaining = false }
+                } label: { Image(systemName: "questionmark.circle") }
                     .help("Explain")
             }
             .buttonStyle(.borderless)
@@ -124,7 +132,7 @@ struct RecipeRow: View {
             }
         }
         .sheet(isPresented: $showExplain) {
-            ExplainSheet(name: name, plan: plan) { showExplain = false }
+            ExplainSheet(name: name, plan: plan, loading: explaining) { showExplain = false }
         }
     }
 }
@@ -143,6 +151,7 @@ struct Badge: View {
 struct ExplainSheet: View {
     var name: String
     var plan: ExplainPlan?
+    var loading = false
     var close: () -> Void
 
     var body: some View {
@@ -156,8 +165,12 @@ struct ExplainSheet: View {
                     Text(p.lowered).font(.system(size: 11, design: .monospaced)).textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-            } else {
+            } else if loading {
                 ProgressView()
+            } else {
+                // explain returns nothing when sysqd is down or the recipe is gone; don't spin forever.
+                Text("Couldn't get the plan for \(name). Is sysqd running?").foregroundStyle(.secondary)
+                Spacer()
             }
             HStack { Spacer(); Button("Done", action: close).keyboardShortcut(.defaultAction) }
         }
@@ -177,9 +190,10 @@ struct ActionCatalogRow: View {
 
     var body: some View {
         let risky = info.tier == "risky"
+        let tint: Color = risky ? .red : info.tier == "safe" ? .accentColor : .orange
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 8) {
-                Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 10)).foregroundStyle(risky ? Color.red : Color.orange)
+                Image(systemName: info.tier == "safe" ? "checkmark.shield.fill" : "exclamationmark.triangle.fill").font(.system(size: 10)).foregroundStyle(tint)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(info.name).font(.system(size: 12, design: .monospaced))
                     Text(info.doc + (info.requires_admin ? " (admin)" : "")).font(.system(size: 11)).foregroundStyle(.secondary).lineLimit(2)
@@ -190,7 +204,7 @@ struct ActionCatalogRow: View {
                 }
                 Button("Confirm…") { start() }
                     .controlSize(.small)
-                    .tint(risky ? Color.red : Color.orange)
+                    .tint(tint)
                     .buttonStyle(.bordered)
                     .disabled(model.actions.busy != nil || !missing.isEmpty)
                     .help(missing.isEmpty ? info.effect : "Needs \(missing.joined(separator: ", "))")
@@ -206,7 +220,7 @@ struct ActionCatalogRow: View {
             }
         }
         .padding(8)
-        .background(RoundedRectangle(cornerRadius: 8).fill((risky ? Color.red : Color.orange).opacity(0.06)))
+        .background(RoundedRectangle(cornerRadius: 8).fill(tint.opacity(0.06)))
     }
 
     var current: [String: String] { fill.merging(values) { $1 } }
@@ -219,7 +233,9 @@ struct ActionCatalogRow: View {
         var params: [String: JSONValue] = [:]
         for (k, v) in current where !v.isEmpty {
             let type = info.params?[k]?.type
-            if type == "int" || type == "pid" || type == "float", let d = Double(v) { params[k] = .number(d) } else { params[k] = .string(v) }
+            // A pasted " 1234" must still go as a pid; strings (paths) go exactly as typed.
+            let n = v.trimmingCharacters(in: .whitespacesAndNewlines)
+            if type == "int" || type == "pid" || type == "float", let d = Double(n) { params[k] = .number(d) } else { params[k] = .string(v) }
         }
         Task { _ = await model.actions.run(info.name, params: params, requestedBy: .user) }
     }
