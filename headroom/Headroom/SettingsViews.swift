@@ -5,21 +5,26 @@ import SwiftUI
 /// Settings (headroom-spec §12, ui-design §12): every tab edits a YAML
 /// file — validated against its schema before it's saved — and offers
 /// "Edit file…"; external edits show up live.
+enum SettingsTab: String, Hashable {
+    case general, permissions, groups, modes, thresholds, assistant, api, notifications, advanced
+}
+
 @MainActor
 struct SettingsView: View {
     let model: HeadroomModel
     let windows: WindowManager
 
     var body: some View {
-        TabView {
-            GeneralTab(model: model).tabItem { Label("General", systemImage: "gearshape") }
-            YAMLEditor(model: model, file: "groups").tabItem { Label("Groups", systemImage: "square.grid.2x2") }
-            YAMLEditor(model: model, file: "modes").tabItem { Label("Modes", systemImage: "slider.horizontal.3") }
-            YAMLEditor(model: model, file: "thresholds").tabItem { Label("Thresholds", systemImage: "gauge.with.dots.needle.67percent") }
-            AssistantTab(model: model).tabItem { Label("Assistant", systemImage: "sparkles") }
-            APITab(model: model).tabItem { Label("API", systemImage: "network") }
-            YAMLEditor(model: model, file: "notifications").tabItem { Label("Notifications", systemImage: "bell") }
-            AdvancedTab(model: model).tabItem { Label("Advanced", systemImage: "wrench.and.screwdriver") }
+        TabView(selection: Binding(get: { windows.ui.settingsTab }, set: { windows.ui.settingsTab = $0 })) {
+            GeneralTab(model: model).tabItem { Label("General", systemImage: "gearshape") }.tag(SettingsTab.general)
+            PermissionsTab(model: model, permissions: windows.permissions).tabItem { Label("Permissions", systemImage: "checkmark.shield") }.tag(SettingsTab.permissions)
+            YAMLEditor(model: model, file: "groups").tabItem { Label("Groups", systemImage: "square.grid.2x2") }.tag(SettingsTab.groups)
+            YAMLEditor(model: model, file: "modes").tabItem { Label("Modes", systemImage: "slider.horizontal.3") }.tag(SettingsTab.modes)
+            YAMLEditor(model: model, file: "thresholds").tabItem { Label("Thresholds", systemImage: "gauge.with.dots.needle.67percent") }.tag(SettingsTab.thresholds)
+            AssistantTab(model: model).tabItem { Label("Assistant", systemImage: "sparkles") }.tag(SettingsTab.assistant)
+            APITab(model: model).tabItem { Label("API", systemImage: "network") }.tag(SettingsTab.api)
+            YAMLEditor(model: model, file: "notifications").tabItem { Label("Notifications", systemImage: "bell") }.tag(SettingsTab.notifications)
+            AdvancedTab(model: model).tabItem { Label("Advanced", systemImage: "wrench.and.screwdriver") }.tag(SettingsTab.advanced)
         }
         .padding(12)
     }
@@ -87,19 +92,15 @@ struct YAMLEditor: View {
 @MainActor
 struct GeneralTab: View {
     let model: HeadroomModel
-    @State private var launchAtLogin = LaunchAtLogin.enabled
     @State private var error: String?
 
     var body: some View {
         let layout = model.config.layout
         Form {
             Section {
-                Toggle("Launch at login", isOn: Binding(get: { launchAtLogin }, set: { on in
-                    error = LaunchAtLogin.set(on)
-                    launchAtLogin = LaunchAtLogin.enabled
-                }))
-                if let e = error { Text(e).foregroundStyle(.red).font(.system(size: 11)) }
                 LabeledContent("Version") { UpdateButton() }
+                LabeledContent("Start") { LaunchAtLoginToggle() }
+                if let e = error { Text(e).foregroundStyle(.red).font(.system(size: 11)) }
             }
             Section("Key groups (layout.yaml)") {
                 Picker("Choose", selection: Binding(get: { layout.keyMode }, set: { m in
@@ -108,9 +109,9 @@ struct GeneralTab: View {
                     Text("Pinned").tag("pinned")
                     Text("Auto (most stressed)").tag("auto")
                 }
-                Text("Pinned: \(layout.pinned.joined(separator: ", ")) — star groups in the large view to change them.")
+                Text("Pinned: \(layout.pinned.joined(separator: ", ")). Right-click a group in the Overview to add or remove it.")
                     .font(.system(size: 11)).foregroundStyle(.secondary)
-                Toggle("Keep the panel on top", isOn: Binding(get: { layout.panel?.always_on_top ?? false }, set: { on in
+                Toggle("Pin the panel (stays open and on top)", isOn: Binding(get: { layout.panel?.always_on_top ?? false }, set: { on in
                     error = model.setAlwaysOnTop(on)?.text
                 }))
             }
@@ -293,5 +294,151 @@ struct AdvancedTab: View {
             case .failed(let m): Text(m).font(.system(size: 11)).foregroundStyle(.red).lineLimit(2)
             }
         }
+    }
+}
+
+/// Permissions and one-time setup (README "What needs your Mac"): what each
+/// is for, whether it's in place, and where to grant it. Headroom changes
+/// nothing here itself; it shows the way.
+@MainActor
+struct PermissionsTab: View {
+    let model: HeadroomModel
+    let permissions: SystemPermissions
+    @State private var copied = false
+
+    var body: some View {
+        let setup = model.setup
+        Form {
+            Section {
+                PermissionRow(symbol: "bell.badge.fill", title: "Notifications",
+                              detail: "Tells you when a group turns amber or red (notifications.yaml sets which, how often, and quiet hours).",
+                              state: notificationState) {
+                    switch permissions.notifications {
+                    case .notAsked: Button("Allow…") { permissions.requestNotifications() }
+                    case .denied: Button("Open Settings") { SystemPermissions.open(.notifications) }
+                    default: EmptyView()
+                    }
+                }
+                PermissionRow(symbol: "bolt.fill", title: "Power metrics (sudo rule)",
+                              detail: "Neural Engine activity, thermal pressure and power come from powermetrics, which needs root. sysq runs it only with a sudoers rule for its exact flags, and never asks for a password.",
+                              state: sudoState(setup)) {
+                    Button("Check again") { Task { await setup.refresh(recheck: true) } }
+                }
+                if let line = setup.sudoersLine(user: NSUserName()) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("In Terminal, run `sudo visudo -f /etc/sudoers.d/sysq` and add this line:").font(.system(size: 11)).foregroundStyle(.secondary)
+                        Text(line).font(.system(size: 10, design: .monospaced)).textSelection(.enabled)
+                            .padding(6).frame(maxWidth: .infinity, alignment: .leading)
+                            .background(RoundedRectangle(cornerRadius: 6).fill(Color.primary.opacity(0.06)))
+                        HStack {
+                            Button(copied ? "Copied" : "Copy line") {
+                                Finder.copy(line)
+                                copied = true
+                            }
+                            Button("Open Terminal") { Finder.openTerminal() }
+                        }
+                        .controlSize(.small)
+                    }
+                    .padding(.leading, 30)
+                }
+            }
+            Section("Optional") {
+                PermissionRow(symbol: "externaldrive.fill.badge.checkmark", title: "Full Disk Access for sysqd",
+                              detail: "Lets the Storage Explorer size folders macOS protects (Mail, Messages, other apps' data). Without it those show smaller than they are. In Settings, click +, then choose sysqd (Show sysqd finds it).",
+                              state: .optional("Optional")) {
+                    Button("Open Settings") { SystemPermissions.open(.fullDiskAccess) }
+                    if let sysqd = Finder.bundledTool("sysqd") { Button("Show sysqd") { Finder.reveal(sysqd) } }
+                }
+                PermissionRow(symbol: "trash.fill", title: "Automation (Finder)",
+                              detail: "Moving things to the Trash goes through Finder, so they can be put back. macOS asks once, the first time you confirm a Trash action.",
+                              state: .optional("Asked on first use")) {
+                    Button("Open Settings") { SystemPermissions.open(.automation) }
+                }
+                PermissionRow(symbol: "brain", title: "Local model servers",
+                              detail: "Which models are loaded comes from the local Ollama / LM Studio servers. sysq only talks to them when they're listed under network_primitives in its policy.yaml.",
+                              state: setup.networkPrimitives.isEmpty ? .optional("Off") : .ok("On: \(setup.networkPrimitives.joined(separator: ", "))")) {
+                    Button("Edit policy.yaml") { Finder.openPolicy() }
+                }
+                PermissionRow(symbol: "power", title: "Open at login",
+                              detail: "Start Headroom when you log in (sysqd keeps recording history either way).",
+                              state: LaunchAtLogin.needsApproval ? .needed("Waiting for your approval") : (LaunchAtLogin.enabled ? .ok("On") : .optional("Off"))) {
+                    LaunchAtLoginToggle()
+                    if LaunchAtLogin.needsApproval { Button("Open Login Items") { SystemPermissions.open(.loginItems) } }
+                }
+            }
+            if let e = setup.error {
+                Text("Couldn't ask sysqd: \(e)").font(.system(size: 11)).foregroundStyle(.orange)
+            }
+        }
+        .formStyle(.grouped)
+        .onAppear {
+            permissions.refresh()
+            Task { await setup.refresh() }
+        }
+    }
+
+    var notificationState: PermissionState {
+        switch permissions.notifications {
+        case .allowed: return .ok("Allowed")
+        case .denied: return .needed("Off in System Settings")
+        case .notAsked: return .needed("Not allowed yet")
+        case .unknown: return permissions.canNotify ? .unknown("Checking…") : .unknown("Needs the app (not a dev build)")
+        }
+    }
+
+    func sudoState(_ setup: SetupStore) -> PermissionState {
+        if !setup.loaded { return .unknown("Checking…") }
+        if setup.error != nil { return .unknown("sysqd isn't answering") }
+        if setup.fixtures { return .unknown("sysqd is serving fixtures") }
+        if setup.sudo.isEmpty { return .ok("Not needed") }
+        let missing = setup.sudo.filter { !$0.allowed }.count
+        return missing == 0 ? .ok("In place") : .needed(missing == 1 ? "1 rule missing" : "\(missing) rules missing")
+    }
+}
+
+enum PermissionState {
+    case ok(String), needed(String), optional(String), unknown(String)
+
+    var text: String {
+        switch self {
+        case .ok(let t), .needed(let t), .optional(let t), .unknown(let t): return t
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .ok: return Palette.green
+        case .needed: return Palette.orange
+        case .optional, .unknown: return .gray
+        }
+    }
+}
+
+@MainActor
+struct PermissionRow<Actions: View>: View {
+    var symbol: String
+    var title: String
+    var detail: String
+    var state: PermissionState
+    @ViewBuilder var actions: Actions
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: symbol).font(.system(size: 13, weight: .semibold)).foregroundStyle(.white)
+                .frame(width: 22, height: 22)
+                .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(state.color))
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 6) {
+                    Text(title).font(.system(size: 13, weight: .medium))
+                    Text(state.text).font(.system(size: 10, weight: .medium)).foregroundStyle(state.color)
+                        .padding(.horizontal, 6).padding(.vertical, 1)
+                        .background(Capsule().fill(state.color.opacity(0.12)))
+                }
+                Text(detail).font(.system(size: 11)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 8)
+            HStack(spacing: 6) { actions }.controlSize(.small)
+        }
+        .padding(.vertical, 2)
     }
 }

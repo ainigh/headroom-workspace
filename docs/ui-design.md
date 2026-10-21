@@ -25,7 +25,7 @@ References `headroom-spec.md` for behavior. This document proposes the look, lay
 
 - Icon plus an optional readout chosen in settings (e.g. memory available, or the worst group's headline). Readout text turns amber/red with status.
 - Left click: toggle the small view. Right click: menu with mode switch, Open Large View, Graphs, Storage Explorer, Ask AI, Pause sampling, Settings, Quit.
-- As built (implementation.md §2 fixes `MenuBarExtra`, which can't tell left from right clicks): one menu whose first item toggles the small view, followed by the items above; ⌃⌥H toggles the small view from anywhere.
+- As built: an `NSStatusItem` (implementation.md §2). Left click drops the small view down from the icon, right click (or ⌃-click) shows the menu above plus Check for Updates; ⌃⌥H toggles the small view from anywhere. The icon itself shows the worst status (and paused / sysqd down).
 
 ## 4. Small view (floating panel)
 
@@ -56,6 +56,7 @@ References `headroom-spec.md` for behavior. This document proposes the look, lay
 └──────────────────────────────────────────────────────┘
 ```
 
+- As built, top to bottom: header (app mark tinted by the worst status, "Headroom" and a one-line status, Pause, Pin, Settings); mode chips; banners; key groups 2×2; alert strip; a row of tiles for the windows (Overview, Graphs, Storage, Ask AI, History); top consumers; a "things left to set up" line while permissions are missing (opens Settings → Permissions); bottom bar with the version / **Update**, **Open at login** and **Quit**. It drops down under the icon like a menu, closes on a click elsewhere or Escape, and stays open and on top when pinned.
 - Fixed width (≈ 380 pt), height grows with consumer lists up to a cap, then scrolls.
 - **Group box anatomy:** icon + name, status dot top-right, headline figure large, sparkline (last 5 min) with one supporting metric to its right, second supporting metric beneath. Hover reveals a subtle "Open" affordance; click drills in.
 - **Consumer rows:** name (with app icon when resolvable), value with unit, proportional bar, `⋯` opens the Actions panel. Rows are keyboard-navigable.
@@ -139,7 +140,8 @@ Slides in from the right (large/drill-in) or replaces the consumer list with a b
 
 ## 12. Settings
 
-- Standard macOS tabbed settings: General, Groups, Modes, Thresholds, Assistant, API, Notifications, Advanced.
+- Standard macOS tabbed settings: General, Permissions, Groups, Modes, Thresholds, Assistant, API, Notifications, Advanced.
+- Permissions lists what needs the user, each with what it's for, whether it's in place, and where to grant it: notifications; the powermetrics sudoers rule (from sysqd's `/admin/status` `sudo` / `sudo_rules`, with the exact line to add and "Check again"); optional Full Disk Access for sysqd, Finder automation for Trash, local model servers (sysq policy `network_primitives`), open at login. Headroom changes none of it itself.
 - Every tab edits a YAML file and shows "Edit file…" to open it in the default editor; changes made externally appear live.
 - Advanced shows sysqd/sysact status, enabled sensitivity classes, sudo-enabled primitives, and an "Open audit log" button.
 

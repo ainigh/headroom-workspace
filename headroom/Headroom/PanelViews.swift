@@ -1,91 +1,289 @@
+import AppKit
 import HeadroomKit
 import SwiftUI
 
-/// The floating panel (ui-design §4): key groups 2×2, alert strip, grouped
-/// top consumers.
+/// What the panel holds; reports its size so the panel fits it.
+@MainActor
+struct PanelRoot: View {
+    let model: HeadroomModel
+    let ui: UIState
+    let windows: WindowManager
+    var resized: (CGSize) -> Void
+
+    var body: some View {
+        SmallPanelView(model: model, ui: ui, windows: windows)
+            .fixedSize()
+            .background(GeometryReader { g in
+                Color.clear
+                    .onAppear { resized(g.size) }
+                    .onChange(of: g.size) { _, size in resized(size) }
+            })
+    }
+}
+
+/// The panel that drops down from the menu bar (ui-design §4): header with
+/// status and quick switches, mode, key groups 2×2, alert strip, the app's
+/// windows as tiles, top consumers, anything left to set up, and the bottom
+/// bar (version and Update, open at login, Quit).
 @MainActor
 struct SmallPanelView: View {
     let model: HeadroomModel
     let ui: UIState
     let windows: WindowManager
 
+    /// Room for the scrolling middle: the screen less the header and bottom bar.
+    var middleMax: CGFloat {
+        let screen = NSScreen.main?.visibleFrame.height ?? 800
+        return max(240, screen - 190)
+    }
+
     var body: some View {
         let p = model.panel()
-        VStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: 12) {
             header(p)
-            Divider()
+            modes(p)
             ScrollView {
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 12) {
                     BannerList(banners: p.banners)
                     if !p.connected && p.allGroups.allSatisfy({ $0.updated == nil }) {
                         ServiceDownCard(model: model)
+                    } else {
+                        groups(p)
                     }
-                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
-                        ForEach(p.keyGroups) { g in
-                            GroupBoxView(vm: g, compact: true, tint: p.mode?.tint) { windows.showLarge(drillIn: g.id) }
+                    alerts(p)
+                    tools
+                    consumers(p)
+                    setup
+                }
+            }
+            .frame(maxHeight: middleMax)
+            Divider().opacity(0.5)
+            footer
+        }
+        .padding(16)
+        .frame(width: MenuPanel.width)
+    }
+
+    // MARK: header
+
+    func header(_ p: PanelViewModel) -> some View {
+        HStack(spacing: 10) {
+            AppMark(colors: markColors(p))
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Headroom").font(.system(size: 15, weight: .semibold))
+                HStack(spacing: 5) {
+                    Circle().fill(p.connected ? p.worst.color : Color.gray).frame(width: 7, height: 7)
+                    Text(statusText(p)).font(.system(size: 11)).foregroundStyle(.secondary).lineLimit(1)
+                }
+            }
+            Spacer()
+            Button { model.setPaused(!p.paused) } label: {
+                Image(systemName: p.paused ? "play.fill" : "pause.fill")
+            }
+            .buttonStyle(IconButton(active: p.paused, tint: Palette.orange))
+            .help(p.paused ? "Resume sampling" : "Pause sampling")
+            PinButton(model: model, windows: windows)
+            Button { windows.fromPanel { windows.showSettings() } } label: { Image(systemName: "gearshape.fill") }
+                .buttonStyle(IconButton())
+                .help("Settings")
+        }
+    }
+
+    func markColors(_ p: PanelViewModel) -> [Color] {
+        guard p.connected else { return [Color.gray, Color.gray.opacity(0.7)] }
+        switch p.worst {
+        case .red: return [Palette.red, Palette.pink]
+        case .amber: return [Palette.orange, Palette.pink]
+        default: return [Palette.teal, Palette.blue]
+        }
+    }
+
+    func statusText(_ p: PanelViewModel) -> String {
+        if !p.connected { return "sysqd isn't running" }
+        if p.paused { return "Sampling paused" }
+        let alerts = p.allGroups.filter { $0.status.isAlert }
+        var text: String
+        if alerts.isEmpty {
+            text = p.allGroups.contains { $0.updated != nil } ? "All normal" : "Waiting for the first samples…"
+        } else {
+            text = alerts.prefix(2).map { "\($0.name) \($0.status.label)" }.joined(separator: ", ")
+            if alerts.count > 2 { text += " +\(alerts.count - 2)" }
+        }
+        if p.onBattery { text += " · on battery" }
+        return text
+    }
+
+    // MARK: mode
+
+    func modes(_ p: PanelViewModel) -> some View {
+        HStack(spacing: 6) {
+            ForEach(p.modes) { m in
+                Button(m.label) { model.setMode(m.id) }
+                    .buttonStyle(Chip(selected: m.id == model.mode, tint: modeTint(m)))
+                    .help(m.question)
+            }
+            Spacer(minLength: 0)
+        }
+    }
+
+    func modeTint(_ m: ModeViewModel) -> Color {
+        switch m.tint {
+        case "reclaimable": return Palette.teal
+        case "warnings": return Palette.orange
+        default: return Palette.indigo
+        }
+    }
+
+    // MARK: groups
+
+    func groups(_ p: PanelViewModel) -> some View {
+        LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
+            ForEach(p.keyGroups) { g in
+                GroupBoxView(vm: g, compact: true, tint: p.mode?.tint) { windows.fromPanel { windows.showLarge(drillIn: g.id) } }
+            }
+        }
+        .opacity(p.connected ? 1 : 0.55)
+    }
+
+    @ViewBuilder
+    func alerts(_ p: PanelViewModel) -> some View {
+        if !p.alerts.isEmpty {
+            VStack(alignment: .leading, spacing: 4) {
+                ForEach(p.alerts) { g in
+                    Button { windows.fromPanel { windows.showLarge(drillIn: g.id) } } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(g.status.color)
+                            Text("\(g.name): \(g.status.label)").fontWeight(.medium)
+                            if let m = g.statusMessage { Text(m).foregroundStyle(.secondary).lineLimit(1) }
+                            Spacer()
+                            Image(systemName: "chevron.right").foregroundStyle(.tertiary)
                         }
+                        .font(.system(size: 11))
+                        .contentShape(Rectangle())
                     }
-                    .opacity(p.connected ? 1 : 0.55)
-                    ForEach(p.alerts) { g in
-                        Button { windows.showLarge(drillIn: g.id) } label: {
-                            HStack(spacing: 6) {
-                                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(g.status.color)
-                                Text("\(g.name): \(g.status.label)")
-                                if let m = g.statusMessage { Text(m).foregroundStyle(.secondary).lineLimit(1) }
-                                Spacer()
-                            }
-                            .font(.system(size: 11))
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(8)
+            .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.orange.opacity(0.1)))
+        }
+    }
+
+    // MARK: windows
+
+    var tools: some View {
+        HStack(spacing: 8) {
+            ToolTile(title: "Overview", symbol: "square.grid.2x2.fill", colors: [Palette.indigo, Palette.violet]) {
+                windows.fromPanel { windows.showLarge() }
+            }
+            .help("Every group, its consumers and actions (large view)")
+            ToolTile(title: "Graphs", symbol: "chart.xyaxis.line", colors: [Palette.blue, Palette.teal]) {
+                windows.fromPanel { windows.showGraphs() }
+            }
+            .help("History of every group")
+            ToolTile(title: "Storage", symbol: "externaldrive.fill", colors: [Palette.green, Palette.teal], enabled: model.explorer.available) {
+                windows.fromPanel { windows.showExplorer() }
+            }
+            .help("Storage Explorer: what takes the space")
+            ToolTile(title: "Ask AI", symbol: "sparkles", colors: [Palette.violet, Palette.pink], enabled: model.assistant.available) {
+                windows.fromPanel { windows.showAssistant(scope: .keyGroups) }
+            }
+            .help(model.assistant.available ? "Ask the local model how the Mac is doing" : (model.assistant.warning ?? "The assistant isn't available (Ollama not running?)"))
+            ToolTile(title: "History", symbol: "clock.arrow.circlepath", colors: [Palette.orange, Palette.pink]) {
+                windows.fromPanel { windows.showSummaries() }
+            }
+            .help("Summary History: the assistant's earlier answers")
+        }
+    }
+
+    // MARK: consumers
+
+    @ViewBuilder
+    func consumers(_ p: PanelViewModel) -> some View {
+        let lists = p.keyGroups.filter { !$0.consumers.isEmpty }
+        if !lists.isEmpty {
+            VStack(alignment: .leading, spacing: 6) {
+                SectionTitle("Top consumers")
+                ForEach(lists) { g in
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: 5) {
+                            Image(systemName: g.symbol).font(.system(size: 10)).foregroundStyle(.secondary).frame(width: 14)
+                            Text(g.name).font(.system(size: 11, weight: .semibold)).foregroundStyle(.secondary)
                         }
-                        .buttonStyle(.plain)
-                    }
-                    Divider()
-                    ForEach(p.keyGroups) { g in
-                        if !g.consumers.isEmpty {
-                            Text(g.name.uppercased()).font(.system(size: 10, weight: .semibold)).foregroundStyle(.secondary)
-                            ForEach(g.consumers) { c in
-                                ConsumerRow(vm: c) { inspect(c) }
-                            }
+                        ForEach(g.consumers) { c in
+                            ConsumerRow(vm: c) { inspect(c) }
                         }
                     }
                 }
-                .padding(12)
             }
+            .padding(10)
+            .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Color.primary.opacity(0.04)))
         }
-        .frame(width: 380)
-        .frame(minHeight: 300)
-        .background(VisualEffect())
-    }
-
-    func header(_ p: PanelViewModel) -> some View {
-        HStack(spacing: 8) {
-            StatusDot(status: p.worst)
-            Text("Headroom").font(.system(size: 13, weight: .semibold))
-            if p.paused || p.onBattery {
-                Image(systemName: p.paused ? "pause.circle" : "clock").foregroundStyle(.secondary)
-                    .help(p.paused ? "Sampling paused" : "On battery: sampling slower")
-            }
-            Spacer()
-            ModePicker(model: model).frame(width: 150)
-            Button { windows.showLarge() } label: { Image(systemName: "arrow.up.left.and.arrow.down.right") }.help("Large view")
-            Button { windows.showGraphs() } label: { Image(systemName: "chart.xyaxis.line") }.help("Graphs")
-            Button { windows.showExplorer() } label: { Image(systemName: "externaldrive") }.help("Storage Explorer")
-            Button { windows.showAssistant(scope: .keyGroups) } label: { Image(systemName: "sparkles") }.help("Ask AI")
-                .disabled(!model.assistant.available)
-            PinButton(model: model, windows: windows)
-        }
-        .buttonStyle(.borderless)
-        .padding(.horizontal, 12)
-        .padding(.top, 10)
-        .padding(.bottom, 8)
     }
 
     func inspect(_ c: ConsumerViewModel) {
         guard let id = c.itemID else { return }
-        windows.inspect(ItemRef(kind: c.kind ?? "process", id: id, name: c.name, groupID: c.groupID))
+        windows.fromPanel { windows.inspect(ItemRef(kind: c.kind ?? "process", id: id, name: c.name, groupID: c.groupID)) }
+    }
+
+    // MARK: setup
+
+    @ViewBuilder
+    var setup: some View {
+        let n = windows.permissions.needsAttention(model.setup)
+        if n > 0 {
+            Button { windows.fromPanel { windows.showSettings(tab: .permissions) } } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark.shield.fill").foregroundStyle(Palette.blue)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(n == 1 ? "1 thing left to set up" : "\(n) things left to set up").font(.system(size: 12, weight: .medium))
+                        Text("Permissions and the powermetrics rule, for every metric").font(.system(size: 10)).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right").foregroundStyle(.tertiary)
+                }
+                .padding(10)
+                .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Palette.blue.opacity(0.08)))
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    // MARK: bottom bar
+
+    var footer: some View {
+        HStack(spacing: 10) {
+            UpdateButton()
+            Spacer()
+            LaunchAtLoginToggle()
+            Button("Quit") { NSApp.terminate(nil) }
+                .buttonStyle(PillButton(tint: .secondary, filled: false))
+                .keyboardShortcut("q")
+        }
     }
 }
 
-/// Always-on-top toggle, saved to layout.yaml.
+/// "Open at login" (macOS login items).
+@MainActor
+struct LaunchAtLoginToggle: View {
+    @State private var on = LaunchAtLogin.enabled
+    @State private var error: String?
+
+    var body: some View {
+        Toggle("Open at login", isOn: Binding(get: { on }, set: { want in
+            error = LaunchAtLogin.set(want)
+            on = LaunchAtLogin.enabled
+        }))
+        .toggleStyle(.checkbox)
+        .font(.system(size: 11))
+        .help(error ?? (LaunchAtLogin.needsApproval ? "macOS needs you to allow Headroom in System Settings → General → Login Items" : "Start Headroom when you log in"))
+        .onAppear { on = LaunchAtLogin.enabled }
+    }
+}
+
+/// Pin: the panel stays open (and on top) when you click elsewhere. Saved to
+/// layout.yaml (panel.always_on_top).
 @MainActor
 struct PinButton: View {
     let model: HeadroomModel
@@ -96,7 +294,8 @@ struct PinButton: View {
             windows.setAlwaysOnTop(!on)
             _ = model.setAlwaysOnTop(!on)
         } label: { Image(systemName: on ? "pin.fill" : "pin") }
-            .help(on ? "Unpin" : "Keep on top")
+            .buttonStyle(IconButton(active: on, tint: Palette.indigo))
+            .help(on ? "Unpin: close when you click elsewhere" : "Pin: keep the panel open and on top")
     }
 }
 

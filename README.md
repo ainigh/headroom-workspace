@@ -27,15 +27,24 @@ on your Mac (that needs Apple's command line tools with Swift 5.9 or newer, and 
 look for the gauge in the menu bar. `HL_BRANCH=name` follows another branch; `HL_FROM_SOURCE=1`
 always builds.
 
-**Update**: Settings shows the version; when the branch has something newer it shows **Update**
-(GitHub's build when there is one for that exact commit, otherwise it builds that commit here).
-Running the install line again works too. Nothing depends on GitHub Actions working.
+**Update**: the panel's bottom bar shows the version; when the branch has something newer it shows
+**Update** (GitHub's build when there is one for that exact commit, otherwise it builds that commit
+here). The right-click menu and Settings → General have it too. Running the install line again
+works too. Nothing depends on GitHub Actions working.
+
+**Permissions**: the panel shows "things left to set up" until they're done; Settings →
+Permissions lists each one, whether it's in place, and where to grant it: notifications, the
+powermetrics sudoers rule (with the exact line to add), and the optional ones (Full Disk Access for
+sysqd, Finder automation for Trash, local model servers, open at login).
 
 ## Using it
 
-- The menu bar item opens a menu; **Show Headroom** (or ⌃⌥H anywhere) toggles the floating panel
-  with the four key groups and their top consumers. Click a group to drill in; `⋯` on a consumer
-  opens its Actions panel.
+- Click the gauge in the menu bar (or ⌃⌥H anywhere) and the panel drops down: how the Mac is
+  doing, the mode (View / Optimize / Deep Dive / Repair), the four key groups, the app's windows
+  (Overview, Graphs, Storage, Ask AI, History), the top consumers, and the bottom bar (version and
+  **Update**, **Open at login**, **Quit**). Click elsewhere and it closes; the pin keeps it open
+  and on top. Click a group to drill in; `⋯` on a consumer opens its Actions panel.
+- Right-click the gauge for the menu: mode, the windows, pause sampling, updates, settings, quit.
 - Headroom starts `sysqd` and `sysact` as LaunchAgents from inside the app
   (`~/Library/LaunchAgents/com.ainigh.headroom.*.plist`), so history keeps recording while the app
   is closed. Logs: `~/Library/Logs/Headroom/`.

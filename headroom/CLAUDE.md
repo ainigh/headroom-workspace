@@ -12,7 +12,7 @@ Menu bar app + `HeadroomKit` package. See `../docs/headroom-spec.md`, `../docs/u
 
 ## Layout
 ```
-Headroom/            app target (MenuBarExtra, panels, views)
+Headroom/            app target (status item, drop-down panel, windows, views)
 HeadroomKit/         Swift package: Config, Clients, Stores, ViewModels, Assistant, Confirmation
 config/              default YAML + JSON Schemas + prompts
 ```
