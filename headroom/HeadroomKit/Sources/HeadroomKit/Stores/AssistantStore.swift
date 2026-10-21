@@ -41,6 +41,9 @@ public final class AssistantStore {
     @ObservationIgnored var config: AppConfig?
     @ObservationIgnored var conversation: Conversation?
     @ObservationIgnored var task: Task<Void, Never>?
+    /// Bumped by reset(): a turn still finishing must not bring back the conversation reset cleared.
+    @ObservationIgnored var generation = 0
+    @ObservationIgnored var confirming: Set<String> = []
     @ObservationIgnored var preflighted = Set<String>()
     /// Called with each finished answer's STATUS (notifications).
     @ObservationIgnored public var onStatus: ((AssistantStatus, String) -> Void)?
@@ -85,6 +88,7 @@ public final class AssistantStore {
     /// Starts a new conversation (scope or mode changed, or the panel closed).
     public func reset() {
         stop()
+        generation += 1
         flushLogs()
         turns = []
         conversation = nil
@@ -107,6 +111,7 @@ public final class AssistantStore {
         let model = self.model
         let req = AssistantRequest(question: q, mode: mode, scope: scope, keyIDs: keyIDs)
         let id = turn.id
+        let gen = generation
         task = Task { [weak self] in
             guard let self else { return }
             if !self.preflighted.contains(model) {
@@ -126,9 +131,15 @@ public final class AssistantStore {
             } onCancel: {
                 worker.cancel()
             }
-            let conv = await worker.value
-            self.conversation = conv
-            self.fuel = conv.budget.fraction
+            var conv = await worker.value
+            if self.generation == gen {
+                // An earlier action card declined (✕) while this turn ran was
+                // added to the conversation here; keep it.
+                let added = (self.conversation?.actionResults ?? []).filter { r in !conv.actionResults.contains { $0.id == r.id } }
+                conv.actionResults += added
+                self.conversation = conv
+                self.fuel = conv.budget.fraction
+            }
             self.finish(id)
         }
     }
@@ -178,10 +189,17 @@ public final class AssistantStore {
     /// The Confirm… button on an action card: opens the one confirmation
     /// sheet; if it runs, the model answers again with the result.
     public func confirmAction(_ turnID: String) {
-        guard let i = index(turnID), let r = turns[i].response, let a = r.actionRequest, turns[i].actionResult == nil, let actions else { return }
+        guard let i = index(turnID), let r = turns[i].response, let a = r.actionRequest, turns[i].actionResult == nil, let actions,
+              !confirming.contains(turnID) else { return }
         let explanation = r.actionExplanation ?? ""
+        // A second click while the first is in flight would prepare a second
+        // plan and log the action as declined while the first one runs.
+        confirming.insert(turnID)
         Task {
             let result = await actions.requestAction(a.name, params: a.params, explanation: explanation)
+            confirming.remove(turnID)
+            // Never shown (another sheet was up): the card stays, nothing is logged.
+            if result.notShown { return }
             guard let j = index(turnID) else { return }
             turns[j].actionResult = result
             conversation?.actionResults.append(result)

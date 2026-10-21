@@ -15,6 +15,8 @@ public struct ActionResult: Sendable, Hashable, Identifiable {
     public var ok: Bool
     public var output: String
     public var at: Date
+    /// The sheet was never shown (another confirmation was open): nobody declined anything.
+    public var notShown = false
 
     public var callText: String {
         "\(name)(\(params.keys.sorted().map { "\($0)=\"\(params[$0]!)\"" }.joined(separator: ", ")))"
@@ -125,6 +127,13 @@ public final class ActionStore {
             plan = try await client.prepare(name, params: params)
         } catch {
             return result(false, false, "Couldn't prepare \(name): \(error.localizedDescription)", shown)
+        }
+        if flow.current != nil {
+            var r = ActionResult(id: UUID().uuidString, name: name, params: plan.params, requestedBy: requestedBy, approved: false, ok: false,
+                                 output: "Another confirmation is open; finish that one first.", at: Date())
+            r.notShown = true
+            toast = r
+            return r
         }
         guard let token = await flow.request(plan, requestedBy: requestedBy, explanation: explanation) else {
             return result(false, false, "Declined.", plan.params)

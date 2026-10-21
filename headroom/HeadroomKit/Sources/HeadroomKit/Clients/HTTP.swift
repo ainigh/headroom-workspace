@@ -33,17 +33,45 @@ public final class URLSessionTransport: HTTPTransport, @unchecked Sendable {
     }
 
     public func send(_ request: URLRequest) async throws -> (Data, Int) {
-        try await withCheckedThrowingContinuation { cont in
-            let task = session.dataTask(with: request) { data, response, error in
-                if let error {
-                    cont.resume(throwing: ClientError(.unreachable, "\(request.url?.host ?? "server"): \(error.localizedDescription)"))
-                    return
+        // Cancelling the calling task cancels the request: Stop on a 300 s
+        // model call must not wait for the model to finish.
+        let box = TaskBox()
+        return try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { cont in
+                let task = session.dataTask(with: request) { data, response, error in
+                    if let error {
+                        cont.resume(throwing: ClientError(.unreachable, "\(request.url?.host ?? "server"): \(error.localizedDescription)"))
+                        return
+                    }
+                    let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+                    cont.resume(returning: (data ?? Data(), status))
                 }
-                let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-                cont.resume(returning: (data ?? Data(), status))
+                box.set(task)
+                task.resume()
             }
-            task.resume()
+        } onCancel: {
+            box.cancel()
         }
+    }
+}
+
+/// The data task of one send, cancellable from the cancellation handler
+/// (which may run before the task exists).
+private final class TaskBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var task: URLSessionTask?
+    private var cancelled = false
+
+    func set(_ t: URLSessionTask) {
+        lock.lock(); defer { lock.unlock() }
+        task = t
+        if cancelled { t.cancel() }
+    }
+
+    func cancel() {
+        lock.lock(); defer { lock.unlock() }
+        cancelled = true
+        task?.cancel()
     }
 }
 

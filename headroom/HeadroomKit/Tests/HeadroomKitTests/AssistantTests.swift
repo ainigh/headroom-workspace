@@ -289,6 +289,23 @@ final class OrchestratorTests: XCTestCase {
         XCTAssertNil(store.turns.first?.response)
     }
 
+    @MainActor
+    func testResetDuringATurnDoesNotBringTheConversationBack() async throws {
+        let c = loadShipped()
+        let store = AssistantStore(summaries: FileSummaryHistory(url: tempDir().appendingPathComponent("s.json")),
+                                   log: JSONLAssistantLog(url: tempDir().appendingPathComponent("l.jsonl")))
+        store.attach(sysq: fixtures(), chat: SlowChat(), actions: ActionBridge(ActionStore(client: FakeSysact(), flow: ConfirmationFlow())), config: c)
+        store.setModel("qwen3:8b")
+        store.ask("x", mode: "view", scope: .keyGroups, keyIDs: ["memory"])
+        _ = await waitUntil { store.turns.first?.progress == "Thinking" }
+        store.reset()
+        let stopped = await waitUntil { !store.running }
+        XCTAssertTrue(stopped)
+        XCTAssertTrue(store.turns.isEmpty)
+        XCTAssertNil(store.conversation)
+        XCTAssertEqual(store.fuel, 0)
+    }
+
     func testSummaryWindowSkipsDeleted() {
         let h = FileSummaryHistory(url: tempDir().appendingPathComponent("s.json"))
         for i in 0..<5 { h.append(SummaryRecord(id: "s\(i)", at: Date(timeIntervalSince1970: Double(i)), scope: "", mode: "", status: nil, summary: "n\(i)", action: nil)) }

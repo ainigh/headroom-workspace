@@ -114,6 +114,25 @@ final class ConfirmationTests: XCTestCase {
         XCTAssertEqual(sysact.executed[0].1.via, "headroom-ui")
     }
 
+    /// A second request while a sheet is up is "not shown", never a decline.
+    @MainActor
+    func testRequestWhileASheetIsOpenIsNotADecline() async {
+        let sysact = FakeSysact()
+        sysact.catalogList = [action("ai.ollama_unload", params: ["model": spec("str")])]
+        let flow = ConfirmationFlow(delay: 2)
+        let store = ActionStore(client: sysact, flow: flow)
+        await store.loadCatalog()
+        let first = Task { await store.run("ai.ollama_unload", params: ["model": "a"], requestedBy: .user) }
+        _ = await waitUntil { flow.current != nil }
+        let second = await store.run("ai.ollama_unload", params: ["model": "b"], requestedBy: .assistant)
+        XCTAssertTrue(second.notShown)
+        XCTAssertFalse(second.approved)
+        XCTAssertEqual(flow.current?.plan.params["model"], "a")
+        flow.decline()
+        let d = await first.value
+        XCTAssertFalse(d.notShown)
+    }
+
     @MainActor
     func testActionsForAnItemArePrefilled() async {
         let sysact = FakeSysact()
