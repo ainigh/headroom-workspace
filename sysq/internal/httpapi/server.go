@@ -259,34 +259,46 @@ var absPath = regexp.MustCompile(`(?:/[^/\s:'"]+)+/([^/\s:'"]+)`)
 
 // filterPrivacy applies the client's privacy level beyond sensitivity: at
 // "consumers" level, paths (in path columns and inside text such as command
-// lines) are reduced to their last element.
+// lines) are reduced to their last element, in nested tables too.
 func filterPrivacy(cl *Client, items []script.Item) []script.Item {
 	if cl.Privacy != "consumers" {
 		return items
 	}
 	out := make([]script.Item, len(items))
 	for i, it := range items {
-		t := it.Table.Clone()
-		t.Rows = make([][]any, len(it.Table.Rows))
-		for r, row := range it.Table.Rows {
-			nr := append([]any(nil), row...)
-			for c, col := range t.Schema {
-				p, ok := nr[c].(string)
-				if !ok || p == "" {
-					continue
-				}
-				switch col.Type {
-				case table.Path:
-					nr[c] = "…/" + p[strings.LastIndexByte(p, '/')+1:]
-				case table.Str:
-					nr[c] = absPath.ReplaceAllString(p, "…/$1")
-				}
-			}
-			t.Rows[r] = nr
-		}
-		out[i] = script.Item{Label: it.Label, Table: t}
+		out[i] = script.Item{Label: it.Label, Table: consumersOnly(it.Table)}
 	}
 	return out
+}
+
+// consumersOnly returns a copy of t with paths reduced to their last element,
+// recursing into nested tables. t is not modified.
+func consumersOnly(src *table.Table) *table.Table {
+	t := src.Clone()
+	t.Rows = make([][]any, len(src.Rows))
+	for r, row := range src.Rows {
+		nr := append([]any(nil), row...)
+		for c, v := range nr {
+			switch x := v.(type) {
+			case *table.Table:
+				if x != nil {
+					nr[c] = consumersOnly(x)
+				}
+			case string:
+				if x == "" || c >= len(t.Schema) {
+					continue
+				}
+				switch t.Schema[c].Type {
+				case table.Path:
+					nr[c] = "…/" + x[strings.LastIndexByte(x, '/')+1:]
+				case table.Str:
+					nr[c] = absPath.ReplaceAllString(x, "…/$1")
+				}
+			}
+		}
+		t.Rows[r] = nr
+	}
+	return t
 }
 
 type runResponse struct {
