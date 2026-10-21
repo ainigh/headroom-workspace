@@ -227,6 +227,28 @@ func TestTableOps(t *testing.T) {
 	}
 }
 
+// A ts compared with a duration compares against now − d on the env's clock
+// (it used to fall through to a string comparison).
+func TestTSComparedWithDuration(t *testing.T) {
+	cases := map[string]int{
+		"started < 12h":  2, // launchd (48h), ollama (13h): older than 12h
+		"started >= 12h": 3,
+		"started > 2h":   2, // Chrome (90m), photoanalysisd (15m)
+		"12h > started":  2,
+		"started > span": 2,
+	}
+	for src, want := range cases {
+		got := mustFilter(t, src, map[string]any{"span": Typed{V: 7200.0, T: table.Duration}})
+		if got.Len() != want {
+			t.Errorf("%s: got %d rows, want %d", src, got.Len(), want)
+		}
+		ago := strings.NewReplacer("12h", "ago(12h)", "2h", "ago(2h)", "span", "ago(span)").Replace(src)
+		if alt := mustFilter(t, ago, map[string]any{"span": Typed{V: 7200.0, T: table.Duration}}); alt.Len() != want {
+			t.Errorf("%s disagrees with %s: %d rows", src, ago, alt.Len())
+		}
+	}
+}
+
 // Scalar functions check their arity before touching arguments: lower(),
 // upper(), trim() and str() with no argument panicked, round() too.
 func TestScalarArity(t *testing.T) {

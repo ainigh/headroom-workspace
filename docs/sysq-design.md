@@ -382,7 +382,7 @@ All operators are `Table → Table` (or `Table × Table → Table`) and run loca
 | `sample n` | random rows |
 | `head n` / `tail n` | |
 
-Expression language inside `filter`/`select`: arithmetic, comparisons, `and/or/not`, `in`, `contains`, `matches`, `startswith`, `coalesce`, `now()`, `ago(duration)`, `humanize(bytes|duration)`, `basename(path)`, `dirname(path)`, string functions. Pure, total, no side effects.
+Expression language inside `filter`/`select`: arithmetic, comparisons, `and/or/not`, `in`, `contains`, `matches`, `startswith`, `coalesce`, `now()`, `ago(duration)`, `humanize(bytes|duration)`, `basename(path)`, `dirname(path)`, string functions. Pure, total, no side effects. A `ts` compared with a `duration` `d` compares against `now() - d`, exactly as `ago(d)`: `modified < 7d` means "modified more than 7 days ago".
 
 ---
 

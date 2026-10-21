@@ -290,7 +290,7 @@ func evalBinary(x Binary, env *Env) (Value, error) {
 			}
 			return Value{false, table.Bool}, nil
 		}
-		c := compare(l, r)
+		c := compare(l, r, env)
 		var b bool
 		switch x.Op {
 		case "==":
@@ -331,14 +331,31 @@ func evalBinary(x Binary, env *Env) (Value, error) {
 	return Value{}, fmt.Errorf("unknown operator %s", x.Op)
 }
 
-func compare(l, r Value) int {
-	// A ts compared with a duration literal means "older than": now - d.
+func compare(l, r Value, env *Env) int {
+	// A ts compared with a duration d compares against now − d on the env's
+	// clock, like ago(d): `started < 12h` is "started more than 12h ago".
+	l, r = durationAsAgo(l, r, env), durationAsAgo(r, l, env)
 	if lt, ok := l.V.(time.Time); ok {
 		if rt, ok := r.V.(time.Time); ok {
 			return lt.Compare(rt)
 		}
 	}
 	return table.Compare(l.V, r.V)
+}
+
+// durationAsAgo turns v into now − v when v is a duration compared with a ts.
+func durationAsAgo(v, other Value, env *Env) Value {
+	if v.T != table.Duration {
+		return v
+	}
+	if _, ok := other.V.(time.Time); !ok {
+		return v
+	}
+	d, ok := table.ToFloat(v.V)
+	if !ok {
+		return v
+	}
+	return Value{env.now().Add(-time.Duration(d * float64(time.Second))), table.TS}
 }
 
 func member(l, r Value) bool {
