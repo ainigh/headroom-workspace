@@ -240,6 +240,14 @@ final class ScheduleTests: XCTestCase {
         }
     }
 
+    func testScheduleNumbersAreWrittenExactly() throws {
+        let text = ScheduleWriter.emit(.object(["high": .number(0.05), "low": .number(1234.5), "n": .number(3)]), order: [])
+        let doc = try XCTUnwrap(try Yams.load(yaml: text) as? [String: Any])
+        XCTAssertEqual(doc["high"] as? Double, 0.05)
+        XCTAssertEqual(doc["low"] as? Double, 1234.5)
+        XCTAssertEqual(doc["n"] as? Int, 3)
+    }
+
     func testHiddenGroupsSampleSlowly() throws {
         var c = loadShipped()
         c.layout.hidden_groups = ["thermal"]

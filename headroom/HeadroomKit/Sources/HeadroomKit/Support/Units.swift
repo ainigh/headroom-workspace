@@ -52,6 +52,8 @@ public enum Units {
 
     public static func number(_ v: Double) -> String {
         if v.rounded() == v, abs(v) < 1e12 { return String(Int64(v)) }
-        return abs(v) >= 100 ? String(Int64(v.rounded())) : String(format: "%.1f", v)
+        // Decide on the value as shown: 99.96 reads "100", not "100.0".
+        let tenth = (v * 10).rounded() / 10
+        return abs(tenth) >= 100 ? String(Int64(v.rounded())) : String(format: "%.1f", tenth)
     }
 }

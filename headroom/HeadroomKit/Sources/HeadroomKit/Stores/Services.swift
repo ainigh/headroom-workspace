@@ -189,7 +189,8 @@ public enum ScheduleWriter {
             switch v {
             case .null: return Node("null", Tag(.null))
             case .bool(let b): return Node(b ? "true" : "false", Tag(.bool))
-            case .number(let n): return Node(Units.number(n).replacingOccurrences(of: ",", with: ""), Tag(n.rounded() == n ? .int : .float))
+            // Exact, not Units.number (a display formatter: 0.05 would be written as 0.1).
+            case .number(let n): return Node(JSONValue.number(n).string ?? String(n), Tag(n.rounded() == n && abs(n) < 1e15 ? .int : .float))
             case .string(let s): return Node(s, Tag(.str), .plain)
             case .array(let a): return Node(a.map { node($0, flow: true) }, Tag(.seq), flow ? .flow : .block)
             case .object(let o):

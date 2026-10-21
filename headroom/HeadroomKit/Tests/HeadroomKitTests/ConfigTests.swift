@@ -135,5 +135,7 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(Units.percent(0.04), "0 %")
         XCTAssertEqual(Units.percent(3), "3 %")
         XCTAssertEqual(Units.percent(-12.4), "-12 %")
+        XCTAssertEqual(Units.number(99.96), "100")
+        XCTAssertEqual(Units.number(2.25), "2.3")
     }
 }

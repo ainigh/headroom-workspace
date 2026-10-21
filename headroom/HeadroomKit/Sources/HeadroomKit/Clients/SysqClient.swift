@@ -150,7 +150,11 @@ public final class SysqClient: SysqClientProtocol, @unchecked Sendable {
 
     func url(_ path: String, _ query: [String: String] = [:]) -> URL {
         var c = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
-        if !query.isEmpty { c.queryItems = query.sorted { $0.key < $1.key }.map { URLQueryItem(name: $0.key, value: $0.value) } }
+        if !query.isEmpty {
+            c.queryItems = query.sorted { $0.key < $1.key }.map { URLQueryItem(name: $0.key, value: $0.value) }
+            // URLComponents leaves "+" alone, and Go reads it as a space ("C++" → "C  ").
+            c.percentEncodedQuery = c.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
+        }
         return c.url!
     }
 
