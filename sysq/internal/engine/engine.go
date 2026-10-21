@@ -337,7 +337,7 @@ func (e *Engine) execute(ctx context.Context, p *catalog.Primitive, vals map[str
 				}
 				return fail("%v", err)
 			}
-			if res.ExitCode != 0 && !allowed(c.AllowExit, res.ExitCode) {
+			if exitFailed(c, res) {
 				if c.Optional {
 					continue
 				}
@@ -437,6 +437,17 @@ func (e *Engine) SudoStatus(ctx context.Context) map[string]bool {
 		}
 	}
 	return out
+}
+
+// exitFailed reports whether a command's exit status makes it a failure. A
+// partial_ok command killed at its timeout or output cap exits non-zero
+// (signalled, -1) but the runner accepted its partial output, which is kept
+// and marked truncated.
+func exitFailed(c catalog.Command, res exec.Result) bool {
+	if res.ExitCode == 0 || res.TimedOut || res.Truncated {
+		return false
+	}
+	return !allowed(c.AllowExit, res.ExitCode)
 }
 
 func allowed(codes []int, c int) bool {
@@ -567,7 +578,7 @@ func (e *Engine) Capture(ctx context.Context, name string, raw map[string]any) (
 			}
 			return nil, err
 		}
-		if res.ExitCode != 0 && !allowed(c.AllowExit, res.ExitCode) && !c.Optional {
+		if exitFailed(c, res) && !c.Optional {
 			return nil, fmt.Errorf("%s exited %d: %s", filepath.Base(args[0]), res.ExitCode, firstLine(res.Stderr))
 		}
 		out[c.ID] = res.Stdout
