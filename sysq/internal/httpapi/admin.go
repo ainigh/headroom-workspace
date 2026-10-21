@@ -25,13 +25,16 @@ func (a *Admin) Handler() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /admin/status", func(w http.ResponseWriter, r *http.Request) {
 		b := a.S.B()
+		if r.URL.Query().Get("recheck") == "1" {
+			b.Engine.RecheckSudo()
+		}
 		view, batt := false, false
 		if b.Sampler != nil {
 			view, batt = b.Sampler.State()
 		}
 		writeJSON(w, http.StatusOK, map[string]any{"version": b.Version, "api": a.S.Clients.API(), "view_open": view, "on_battery": batt,
 			"clients": len(a.S.Clients.List()), "pending": len(a.S.Clients.PendingList()), "warnings": b.Warnings,
-			"sudo": b.Engine.SudoStatus(r.Context()), "enabled_sensitivity": b.Engine.Policy.EnabledSensitivity,
+			"sudo": b.Engine.SudoStatus(r.Context()), "sudo_rules": b.Engine.SudoRules(), "enabled_sensitivity": b.Engine.Policy.EnabledSensitivity,
 			"network_primitives": b.Engine.Policy.NetworkPrimitives, "fixtures": b.Engine.Fixtures != nil})
 	})
 	mux.HandleFunc("GET /admin/clients", func(w http.ResponseWriter, r *http.Request) {
