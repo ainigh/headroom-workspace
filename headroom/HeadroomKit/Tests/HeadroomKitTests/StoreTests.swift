@@ -76,6 +76,29 @@ final class GroupStoreTests: XCTestCase {
     }
 }
 
+final class HistoryStoreTests: XCTestCase {
+    /// Switching the range while a slow load is in flight: the slow, older
+    /// load must not overwrite the newer range's series when it lands.
+    @MainActor
+    func testOlderLoadDoesNotOverwriteNewerRange() async {
+        let c = loadShipped()
+        let s = FakeSysq()
+        s.historyDelay = ["24h": 300_000_000]
+        s.historyValue = ["24h": 24, "1h": 1]
+        let store = HistoryStore()
+        store.attach(s)
+        let g = c.group("memory")!
+        let slow = Task { await store.load([g], range: "24h") }
+        try? await Task.sleep(nanoseconds: 50_000_000)
+        await store.load([g], range: "1h")
+        XCTAssertEqual(store.series["memory"]?.points.map(\.1), [1])
+        XCTAssertFalse(store.loading)
+        await slow.value
+        XCTAssertEqual(store.series["memory"]?.points.map(\.1), [1])
+        XCTAssertFalse(store.loading)
+    }
+}
+
 final class ViewModelTests: XCTestCase {
     func vm(_ id: String, _ status: GroupStatus, reclaim: Double? = nil) -> GroupViewModel {
         GroupViewModel(id: id, name: id, symbol: "", headline: "", headlineLabel: nil, status: status, statusMessage: nil, sparkline: [],

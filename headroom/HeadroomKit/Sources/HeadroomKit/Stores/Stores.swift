@@ -129,6 +129,7 @@ public final class HistoryStore {
     public private(set) var error: String?
     public private(set) var consumersAt: (group: String, at: Date, table: SysqTable)?
     @ObservationIgnored var client: SysqClientProtocol?
+    @ObservationIgnored var loadGeneration = 0
 
     public init() {}
     public func attach(_ c: SysqClientProtocol?) { client = c }
@@ -148,8 +149,12 @@ public final class HistoryStore {
     /// Loads one series per group (its sparkline binding) over a range.
     public func load(_ groups: [GroupConfig], range: String) async {
         guard let client else { error = "sysqd isn't connected"; return }
+        // Only the latest load writes: a slower load for a range the user
+        // already switched away from must not land on top of the new one.
+        loadGeneration += 1
+        let gen = loadGeneration
         loading = true
-        defer { loading = false }
+        defer { if gen == loadGeneration { loading = false } }
         error = nil
         await withTaskGroup(of: (String, Series?).self) { tg in
             for g in groups {
@@ -163,9 +168,9 @@ public final class HistoryStore {
                     return (g.id, Series(id: g.id, label: g.name, unit: unit, columnType: "float", points: pts))
                 }
             }
-            for await (id, s) in tg { series[id] = s }
+            for await (id, s) in tg where gen == loadGeneration { series[id] = s }
         }
-        if let t = try? await client.events(range: range) {
+        if let t = try? await client.events(range: range), gen == loadGeneration {
             events = (0..<t.count).compactMap { i in
                 guard let d = Self.date(t.value(i, "ts")) else { return nil }
                 return EventMarker(id: "\(i):\(t.string(i, "ts") ?? "")", at: d, kind: t.string(i, "kind") ?? "",
