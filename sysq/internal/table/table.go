@@ -577,11 +577,16 @@ func HumanDuration(sec float64) string {
 		return "-" + HumanDuration(-sec)
 	}
 	d := time.Duration(sec * float64(time.Second))
+	if d >= time.Second {
+		// Round to whole seconds before choosing the unit: 59.6 is "1m 0s",
+		// not "60s".
+		d = d.Round(time.Second)
+	}
 	switch {
 	case d < time.Second:
 		return fmt.Sprintf("%dms", d.Milliseconds())
 	case d < time.Minute:
-		return fmt.Sprintf("%.0fs", d.Seconds())
+		return fmt.Sprintf("%ds", int(d.Seconds()))
 	case d < time.Hour:
 		return fmt.Sprintf("%dm %ds", int(d.Minutes()), int(d.Seconds())%60)
 	case d < 48*time.Hour:

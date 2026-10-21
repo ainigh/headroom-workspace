@@ -34,6 +34,11 @@ func TestHumanDuration(t *testing.T) {
 		90_000:  "25h 0m", // hours up to 48h
 		200_000: "2d 7h",
 		-40:     "-40s",
+		59.6:    "1m 0s", // rounded before choosing the unit (was "60s")
+		59.4:    "59s",
+		3599.6:  "1h 0m",
+		1.0:     "1s",
+		0.9996:  "999ms",
 	}
 	for sec, want := range cases {
 		if got := HumanDuration(sec); got != want {
