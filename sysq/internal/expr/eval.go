@@ -827,7 +827,10 @@ func Aggregate(c Call, t *table.Table, rows [][]any, base *Env) (Value, error) {
 		}
 		sort.Float64s(fs)
 		q := map[string]float64{"p50": .5, "p90": .9, "p95": .95, "p99": .99}[c.Fn]
-		f := fs[int(math.Min(float64(len(fs)-1), math.Floor(q*float64(len(fs)))))]
+		// Nearest rank: the ceil(q·n)-th smallest (1-based). The epsilon keeps
+		// q·n that should be whole (0.95·20) from rounding up a rank.
+		i := int(math.Ceil(q*float64(len(fs))-1e-9)) - 1
+		f := fs[max(0, min(len(fs)-1, i))]
 		if typ.IsIntegral() {
 			return Value{int64(f), typ}, nil
 		}

@@ -227,6 +227,39 @@ func TestTableOps(t *testing.T) {
 	}
 }
 
+// Percentiles are nearest-rank: the ceil(q·n)-th smallest value. floor(q·n)
+// was one rank high (p50 of 1..10 gave 6).
+func TestPercentileNearestRank(t *testing.T) {
+	seq := func(n int) *table.Table {
+		tb := table.New([]table.Col{{Name: "x", Type: table.Int}})
+		for i := 1; i <= n; i++ {
+			tb.Append(int64(i))
+		}
+		return tb
+	}
+	aggs, err := ParseList("p50(x) as p50, p90(x) as p90, p95(x) as p95, p99(x) as p99", "group")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for n, want := range map[int][4]int64{
+		1:   {1, 1, 1, 1},
+		2:   {1, 2, 2, 2},
+		10:  {5, 9, 10, 10},
+		20:  {10, 18, 19, 20},
+		100: {50, 90, 95, 99},
+	} {
+		g, err := Group(seq(n), nil, aggs, env)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for i, name := range []string{"p50", "p90", "p95", "p99"} {
+			if got := g.Get(0, name); got != want[i] {
+				t.Errorf("%s of 1..%d = %v, want %d", name, n, got, want[i])
+			}
+		}
+	}
+}
+
 // A ts compared with a duration compares against now − d on the env's clock
 // (it used to fall through to a string comparison).
 func TestTSComparedWithDuration(t *testing.T) {

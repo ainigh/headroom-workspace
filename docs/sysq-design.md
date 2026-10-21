@@ -372,7 +372,7 @@ All operators are `Table → Table` (or `Table × Table → Table`) and run loca
 | `sort by field [asc|desc], ...` | |
 | `limit n [offset m]` | hard cap still enforced |
 | `distinct [fields]` | |
-| `group by f, g { count(), sum(x), avg(x), min, max, p50, p95, any, all, list(x) }` | aggregation; `list(x)` yields a `table` column |
+| `group by f, g { count(), sum(x), avg(x), min, max, p50, p95, any, all, list(x) }` | aggregation; `list(x)` yields a `table` column; `p50`…`p99` are nearest-rank (the ⌈q·n⌉-th smallest value) |
 | `join T2 on field` / `left join` / `anti join` | typed join keys |
 | `union T2`, `except T2`, `intersect T2` | set ops |
 | `diff T2 [on key]` | → rows with `change ∈ {added, removed, changed}` plus before/after |

@@ -95,3 +95,4 @@ One line per choice the docs left open. Format: `YYYY-MM-DD — area — decisio
 2026-10-21 — sysq/recipes — net.headline (the Network group figure and attention.network input) excludes lo0; net.throughput still lists every interface.
 2026-10-21 — headroom/services — LaunchAgent plists carry the bundled binary's mtime (as an XML comment), so an in-place app update rewrites the plist and restarts sysqd/sysact onto the new binaries.
 2026-10-21 — sysq/expr — A ts compared with a duration d compares against now − d on the run's clock (same as ago(d)); sysq-design §13 amended — the code comment promised it but it fell through to a string comparison.
+2026-10-21 — sysq/expr — Percentile aggregates (p50/p90/p95/p99) are nearest-rank, the ⌈q·n⌉-th smallest non-null value (no interpolation); sysq-design §13 amended — floor(q·n) was one rank high (p50 of 1..10 read 6).
