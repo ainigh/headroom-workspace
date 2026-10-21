@@ -393,8 +393,8 @@ struct LargeView: View {
                         GroupBoxView(vm: g, compact: false, tint: p.mode?.tint) { ui.drillIn = g.id }
                             .contextMenu {
                                 Button(g.isKey ? "Remove from key groups" : "Make a key group") { toggleKey(g.id) }
-                                Button("Move earlier") { move(g.id, by: -1, p) }.disabled(g.id == p.allGroups.first?.id)
-                                Button("Move later") { move(g.id, by: 1, p) }.disabled(g.id == p.allGroups.last?.id)
+                                Button("Move earlier") { move(g.id, by: -1, p) }.disabled(g.id == model.config.orderedGroups.first?.id)
+                                Button("Move later") { move(g.id, by: 1, p) }.disabled(g.id == model.config.orderedGroups.last?.id)
                                 Button("Graph") { windows.showGraphs([g.id]) }
                             }
                     }
