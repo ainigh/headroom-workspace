@@ -83,3 +83,4 @@ One line per choice the docs left open. Format: `YYYY-MM-DD — area — decisio
 2026-10-19 — sysq/sampler — `idle_every` has the same 1 s floor as `every` (the schema already forbids negative durations).
 2026-10-19 — sysact/run — Captured output is truncated on a UTF-8 boundary so the JSON result is always valid.
 2026-10-21 — headroom/config — groups.yaml with a duplicate group id is a load error (last good kept); a repeated id in layout.group_order counts at its first position only.
+2026-10-21 — headroom/services — An unchanged, loaded LaunchAgent is `launchctl kickstart`ed (no -k) on connect, so Retry restarts a sysqd/sysact that exited cleanly (KeepAlive only restarts failures).

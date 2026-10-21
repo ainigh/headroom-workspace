@@ -30,9 +30,16 @@ public protocol ServiceLauncher: Sendable {
 /// rewritten only when its program changes (e.g. the app moved or updated).
 public struct LaunchAgentLauncher: ServiceLauncher {
     public let agentsDir: URL
+    /// Runs launchctl (a seam for tests; nil runs /bin/launchctl).
+    let runner: (@Sendable ([String]) async throws -> String)?
 
     public init(home: URL = FileManager.default.homeDirectoryForCurrentUser) {
+        self.init(home: home, runner: nil)
+    }
+
+    init(home: URL, runner: (@Sendable ([String]) async throws -> String)?) {
         agentsDir = home.appendingPathComponent("Library/LaunchAgents")
+        self.runner = runner
     }
 
     func plist(_ s: ServiceSpec) -> String {
@@ -78,6 +85,12 @@ public struct LaunchAgentLauncher: ServiceLauncher {
             _ = try await launchctl(["bootstrap", domain, url.path])
         } else if (try? await launchctl(["print", "\(domain)/\(spec.label)"])) == nil {
             _ = try await launchctl(["bootstrap", domain, url.path])
+        } else {
+            // Loaded but maybe not running: a clean exit (SIGTERM from
+            // Activity Monitor exits 0) isn't restarted by KeepAlive's
+            // SuccessfulExit=false. kickstart without -k starts it only if
+            // it isn't running.
+            _ = try? await launchctl(["kickstart", "\(domain)/\(spec.label)"])
         }
     }
 
@@ -87,7 +100,8 @@ public struct LaunchAgentLauncher: ServiceLauncher {
 
     @discardableResult
     func launchctl(_ args: [String]) async throws -> String {
-        try await Task.detached {
+        if let runner { return try await runner(args) }
+        return try await Task.detached {
             let p = Process()
             p.executableURL = URL(fileURLWithPath: "/bin/launchctl")
             p.arguments = args

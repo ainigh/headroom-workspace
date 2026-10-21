@@ -91,6 +91,28 @@ final class GroupStoreTests: XCTestCase {
     }
 }
 
+final class LaunchAgentTests: XCTestCase {
+    final class Recorder: @unchecked Sendable {
+        let lock = NSLock()
+        var calls: [String] = []
+        func add(_ a: [String]) { lock.lock(); calls.append(a.first ?? ""); lock.unlock() }
+    }
+
+    /// A service that exited cleanly (SIGTERM) stays loaded but stopped, and
+    /// KeepAlive won't restart it: ensure must start it again.
+    func testEnsureStartsALoadedButStoppedService() async throws {
+        let home = tempDir()
+        let rec = Recorder()
+        let l = LaunchAgentLauncher(home: home, runner: { args in rec.add(args); return "" })
+        let spec = ServiceSpec(label: "com.example.svc", executable: "/bin/true", arguments: [], logPath: home.path + "/logs/svc.log")
+        try await l.ensure(spec)
+        XCTAssertEqual(rec.calls, ["bootout", "bootstrap"])
+        rec.calls = []
+        try await l.ensure(spec)
+        XCTAssertEqual(rec.calls, ["print", "kickstart"])
+    }
+}
+
 final class HistoryStoreTests: XCTestCase {
     /// Switching the range while a slow load is in flight: the slow, older
     /// load must not overwrite the newer range's series when it lands.
