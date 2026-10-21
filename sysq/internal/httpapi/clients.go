@@ -47,7 +47,7 @@ type Client struct {
 	Origins      []string  `yaml:"origins,omitempty" json:"origins,omitempty"`
 	Exposed      []string  `yaml:"exposed,omitempty" json:"exposed,omitempty"` // recipe globs; empty = API default
 	Created      time.Time `yaml:"created" json:"created"`
-	LastSeen     time.Time `yaml:"last_seen,omitempty" json:"last_seen,omitempty"`
+	LastSeen     time.Time `yaml:"last_seen,omitempty" json:"last_seen,omitzero"`
 	Host         bool      `yaml:"host,omitempty" json:"host,omitempty"` // created by the host app itself
 }
 

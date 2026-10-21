@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -73,6 +74,18 @@ func TestTokensAreHashedOnDiskAndAuthenticate(t *testing.T) {
 	}
 	if err := c2.Revoke("headroom-ui"); err == nil {
 		t.Error("revoking twice should fail")
+	}
+}
+
+// A client that never called the API has no last_seen: the host's API
+// settings showed "last seen 0001-01-01T00:00:00Z" for every new pairing.
+func TestNeverSeenClientHasNoLastSeen(t *testing.T) {
+	data, err := json.Marshal(Client{ID: "app", Privacy: "files"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(data), "last_seen") {
+		t.Fatalf("zero last_seen serialized: %s", data)
 	}
 }
 
