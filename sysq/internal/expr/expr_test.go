@@ -227,6 +227,33 @@ func TestTableOps(t *testing.T) {
 	}
 }
 
+// Scalar functions check their arity before touching arguments: lower(),
+// upper(), trim() and str() with no argument panicked, round() too.
+func TestScalarArity(t *testing.T) {
+	for _, src := range []string{"lower()", "upper()", "trim()", "str()", "round()", "round(1, 2, 3)", `lower("a", "b")`} {
+		n, err := Parse(src)
+		if err != nil {
+			t.Fatalf("%s: %v", src, err)
+		}
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					t.Errorf("%s panicked: %v", src, r)
+				}
+			}()
+			if _, err := Eval(n, env); err == nil || !strings.Contains(err.Error(), "argument") {
+				t.Errorf("%s: got %v, want an arity error", src, err)
+			}
+		}()
+	}
+	for src, want := range map[string]any{`lower("AB")`: "ab", "round(2.5)": 3.0, "round(1.234, 2)": 1.23} {
+		n, _ := Parse(src)
+		if v, err := Eval(n, env); err != nil || v.V != want {
+			t.Errorf("%s = %v (%v), want %v", src, v.V, err, want)
+		}
+	}
+}
+
 func FuzzParse(f *testing.F) {
 	for _, s := range []string{"cpu > 30", `a contains "x" and not b in [1,2]`, "sum(size) / 1GB", "~/x", "a ?? b"} {
 		f.Add(s)

@@ -550,14 +550,20 @@ func evalCall(c Call, env *Env) (Value, error) {
 			return Value{}, err
 		}
 		return Value{strings.TrimPrefix(strings.ToLower(filepath.Ext(str(0))), "."), table.Str}, nil
-	case "lower":
-		return Value{strings.ToLower(str(0)), table.Str}, need(1)
-	case "upper":
-		return Value{strings.ToUpper(str(0)), table.Str}, need(1)
-	case "trim":
-		return Value{strings.TrimSpace(str(0)), table.Str}, need(1)
-	case "str":
-		return Value{str(0), table.Str}, need(1)
+	case "lower", "upper", "trim", "str":
+		if err := need(1); err != nil {
+			return Value{}, err
+		}
+		s := str(0)
+		switch c.Fn {
+		case "lower":
+			s = strings.ToLower(s)
+		case "upper":
+			s = strings.ToUpper(s)
+		case "trim":
+			s = strings.TrimSpace(s)
+		}
+		return Value{s, table.Str}, nil
 	case "concat":
 		var b strings.Builder
 		for i := range args {
@@ -631,6 +637,9 @@ func evalCall(c Call, env *Env) (Value, error) {
 		}
 		return Value{f, args[0].T}, nil
 	case "round":
+		if len(args) != 1 && len(args) != 2 {
+			return Value{}, fmt.Errorf("round() takes 1 or 2 arguments, got %d", len(args))
+		}
 		f, ok := table.ToFloat(args[0].V)
 		if !ok {
 			return Value{nil, args[0].T}, nil
