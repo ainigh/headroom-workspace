@@ -130,5 +130,10 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(Units.bytes(99_960), "100 KB")
         XCTAssertEqual(Units.bytes(-999_950), "-1.0 MB")
         XCTAssertEqual(Units.duration(7800), "2 h 10 min")
+        XCTAssertEqual(Units.percent(9.96), "10 %")
+        XCTAssertEqual(Units.percent(9.94), "9.9 %")
+        XCTAssertEqual(Units.percent(0.04), "0 %")
+        XCTAssertEqual(Units.percent(3), "3 %")
+        XCTAssertEqual(Units.percent(-12.4), "-12 %")
     }
 }

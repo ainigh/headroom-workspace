@@ -45,7 +45,9 @@ public enum Units {
     }
 
     public static func percent(_ v: Double) -> String {
-        v >= 10 || v == 0 ? "\(Int(v.rounded())) %" : String(format: "%.1f %%", v)
+        // Decide on the value as shown: 9.96 reads "10 %", not "10.0 %".
+        let tenth = (v * 10).rounded() / 10
+        return abs(tenth) >= 10 || tenth == tenth.rounded() ? "\(Int(v.rounded())) %" : String(format: "%.1f %%", tenth)
     }
 
     public static func number(_ v: Double) -> String {
