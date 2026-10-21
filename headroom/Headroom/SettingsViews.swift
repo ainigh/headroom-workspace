@@ -52,7 +52,10 @@ struct YAMLEditor: View {
                 }
                 Spacer()
                 Button("Edit file…") { NSWorkspace.shared.open(url) }
-                Button("Revert") { load() }
+                if text != lastSavedText {
+                    Text("Unsaved changes").font(.system(size: 11)).foregroundStyle(.secondary)
+                }
+                Button("Revert") { load() }.disabled(text == lastSavedText)
                 Button("Save") { save() }.keyboardShortcut("s").buttonStyle(.borderedProminent)
             }
             TextEditor(text: $text)
@@ -66,6 +69,10 @@ struct YAMLEditor: View {
             }
         }
         .onAppear { load() }
+        // "Saved and applied." and an old error describe the text as it was; editing again clears them.
+        .onChange(of: text) { _, new in
+            if new != lastSavedText { saved = false }
+        }
         .onChange(of: model.configStore.generation) { _, _ in
             // An external edit: reload unless there are unsaved changes.
             // (Our own save also bumps the generation; the file then matches
@@ -221,11 +228,12 @@ struct APITab: View {
                         Toggle("Scripts", isOn: Binding(get: { scripts[p.id] ?? false }, set: { scripts[p.id] = $0 })).controlSize(.small)
                         Button("Approve") {
                             Task {
-                                _ = await pairing.approve(p, code: codes[p.id] ?? "", privacy: privacy[p.id] ?? (model.config.api.default_privacy ?? "aggregates"),
+                                // The code is read off another screen; a pasted space or newline mustn't fail it.
+                                _ = await pairing.approve(p, code: (codes[p.id] ?? "").trimmingCharacters(in: .whitespacesAndNewlines), privacy: privacy[p.id] ?? (model.config.api.default_privacy ?? "aggregates"),
                                                           allowScripts: scripts[p.id] ?? false, origins: p.origin.map { [$0] } ?? [])
                             }
                         }
-                        .disabled((codes[p.id] ?? "").isEmpty)
+                        .disabled((codes[p.id] ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     }
                 }
             }
@@ -343,6 +351,7 @@ struct PermissionsTab: View {
                             Button(copied ? "Copied" : "Copy line") {
                                 Finder.copy(line)
                                 copied = true
+                                Task { try? await Task.sleep(for: .seconds(2)); copied = false }
                             }
                             Button("Open Terminal") { Finder.openTerminal() }
                         }
