@@ -319,6 +319,8 @@ struct LargeView: View {
     let windows: WindowManager
     @State private var overview: String?
     @State private var collapsed: Set<String> = []
+    /// Why the last star/reorder couldn't be saved to layout.yaml.
+    @State private var layoutError: String?
 
     var body: some View {
         let p = model.panel(consumerRows: model.modeViewModel?.consumerCount ?? 5)
@@ -384,14 +386,15 @@ struct LargeView: View {
                         .buttonStyle(.borderless).help("Refresh")
                 }
                 BannerList(banners: p.banners)
+                if let e = layoutError { Notice(text: "Couldn't save layout.yaml: \(e)") }
                 if !p.connected { ServiceDownCard(model: model) }
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3), spacing: 12) {
                     ForEach(p.allGroups) { g in
                         GroupBoxView(vm: g, compact: false, tint: p.mode?.tint) { ui.drillIn = g.id }
                             .contextMenu {
                                 Button(g.isKey ? "Remove from key groups" : "Make a key group") { toggleKey(g.id) }
-                                Button("Move earlier") { move(g.id, by: -1, p) }
-                                Button("Move later") { move(g.id, by: 1, p) }
+                                Button("Move earlier") { move(g.id, by: -1, p) }.disabled(g.id == p.allGroups.first?.id)
+                                Button("Move later") { move(g.id, by: 1, p) }.disabled(g.id == p.allGroups.last?.id)
                                 Button("Graph") { windows.showGraphs([g.id]) }
                             }
                     }
@@ -425,7 +428,7 @@ struct LargeView: View {
     func toggleKey(_ id: String) {
         var keys = model.keyIDs
         if let i = keys.firstIndex(of: id) { keys.remove(at: i) } else { keys = Array((keys + [id]).suffix(4)) }
-        _ = model.setPinned(keys)
+        layoutError = model.setPinned(keys)?.text
     }
 
     func move(_ id: String, by d: Int, _ p: PanelViewModel) {
@@ -433,7 +436,7 @@ struct LargeView: View {
         guard let i = order.firstIndex(of: id) else { return }
         let j = max(0, min(order.count - 1, i + d))
         order.swapAt(i, j)
-        _ = model.setGroupOrder(order)
+        layoutError = model.setGroupOrder(order)?.text
     }
 }
 
