@@ -130,6 +130,7 @@ public final class HistoryStore {
     public private(set) var consumersAt: (group: String, at: Date, table: SysqTable)?
     @ObservationIgnored var client: SysqClientProtocol?
     @ObservationIgnored var loadGeneration = 0
+    @ObservationIgnored var consumersGeneration = 0
 
     public init() {}
     public func attach(_ c: SysqClientProtocol?) { client = c }
@@ -170,21 +171,27 @@ public final class HistoryStore {
             }
             for await (id, s) in tg where gen == loadGeneration { series[id] = s }
         }
-        if let t = try? await client.events(range: range), gen == loadGeneration {
-            events = (0..<t.count).compactMap { i in
+        let t = try? await client.events(range: range)
+        guard gen == loadGeneration else { return }
+        // A failed lookup clears the markers: the old range's must not sit on the new axis.
+        events = t.map { t in
+            (0..<t.count).compactMap { i in
                 guard let d = Self.date(t.value(i, "ts")) else { return nil }
                 return EventMarker(id: "\(i):\(t.string(i, "ts") ?? "")", at: d, kind: t.string(i, "kind") ?? "",
                                    message: t.string(i, "message") ?? "", severity: t.string(i, "severity") ?? "info")
             }
-        }
+        } ?? []
     }
 
     /// "What spiked at 3:14 pm?" — the group's consumer table nearest a time.
     public func consumers(group: String, at: Date) async {
         guard let client else { return }
+        // Only the latest click's answer shows (an earlier, slower one lands last otherwise).
+        consumersGeneration += 1
+        let gen = consumersGeneration
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withInternetDateTime]
-        if let t = try? await client.consumersAt("consumers.\(group)", at: f.string(from: at)) {
+        if let t = try? await client.consumersAt("consumers.\(group)", at: f.string(from: at)), gen == consumersGeneration {
             consumersAt = (group, at, t)
         }
     }

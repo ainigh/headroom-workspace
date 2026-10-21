@@ -208,6 +208,13 @@ final class ViewModelTests: XCTestCase {
         XCTAssertEqual(LayoutEditor(text: "version: 1\n").flagText("always_on_top", true, under: "panel"), "version: 1\n\npanel:\n  always_on_top: true")
     }
 
+    func testLayoutEditorReplacesBlockLists() {
+        let text = "version: 1\nkey_groups:\n  pinned:\n    - memory\n    # the busy one\n    - cpu\n  auto_hold_minutes: 5\ngroup_order:\n- memory\n- cpu\npanel: {}\n"
+        let e = LayoutEditor(text: text)
+        XCTAssertEqual(e.pinnedText(["gpu"]), "version: 1\nkey_groups:\n  pinned: [gpu]\n  auto_hold_minutes: 5\ngroup_order:\n- memory\n- cpu\npanel: {}\n")
+        XCTAssertEqual(e.orderText(["cpu", "memory"]), "version: 1\nkey_groups:\n  pinned:\n    - memory\n    # the busy one\n    - cpu\n  auto_hold_minutes: 5\ngroup_order: [cpu, memory]\npanel: {}\n")
+    }
+
     func testCLIText() {
         XCTAssertEqual(RecipeStore.cli("disk.hogs", params: ["root": "~/Library", "min_size": "1GB"]), "sysq disk hogs --min-size 1GB --root ~/Library")
         XCTAssertEqual(RecipeStore.cli("disk.recent_big", params: ["root": "/Users/me/My Files", "all": true]), "sysq disk recent-big --all --root '/Users/me/My Files'")

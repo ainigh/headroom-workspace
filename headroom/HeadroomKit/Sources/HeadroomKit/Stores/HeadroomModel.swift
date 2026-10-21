@@ -256,7 +256,18 @@ public struct LayoutEditor: Sendable {
             if parent != nil, inParent, !l.hasPrefix(" "), !l.isEmpty, !l.hasPrefix("#") { inParent = false }
             if inParent, l.hasPrefix(indent + key + ":") {
                 let comment = l.range(of: " #").map { String(l[$0.lowerBound...]) } ?? ""
+                let old = l.dropFirst(indent.count + key.count + 1).prefix { $0 != "#" }.trimmingCharacters(in: .whitespaces)
                 lines[i] = indent + key + ": " + value + comment
+                // A block-style list under the key ("pinned:\n  - memory") goes
+                // with the old value, or the result isn't valid YAML.
+                if old.isEmpty {
+                    var j = i + 1
+                    while j < lines.count {
+                        let t = lines[j].trimmingCharacters(in: .whitespaces)
+                        let lead = lines[j].prefix { $0 == " " }.count
+                        if (t.hasPrefix("-") && lead >= indent.count) || (t.hasPrefix("#") && lead > indent.count) { lines.remove(at: j) } else { break }
+                    }
+                }
                 return lines.joined(separator: "\n")
             }
         }
