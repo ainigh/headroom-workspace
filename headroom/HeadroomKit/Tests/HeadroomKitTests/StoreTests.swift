@@ -65,6 +65,21 @@ final class GroupStoreTests: XCTestCase {
         XCTAssertEqual(vm.headline, Units.percent(34))
     }
 
+    /// Reconnecting (Retry, sysqd restart, new tokens) reloads the history
+    /// part of each sparkline; it must not be prepended to the points that
+    /// already hold the same history.
+    @MainActor
+    func testReattachDoesNotRepeatSparklineHistory() async {
+        let store = GroupStore(config: loadShipped())
+        let s = sysq()
+        store.attach(s)
+        _ = await waitUntil { (store.state("memory")?.sparkline.filter { $0 == 1 }.count ?? 0) == 1 }
+        store.attach(s)
+        _ = await waitUntil { s.calls.filter { $0.hasPrefix("history mem.headline") }.count >= 2 }
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertEqual(store.state("memory")?.sparkline.filter { $0 == 1 }.count, 1, "\(store.state("memory")?.sparkline ?? [])")
+    }
+
     @MainActor
     func testPausedStopsFeeds() async {
         let store = GroupStore(config: loadShipped())
