@@ -41,6 +41,11 @@ public enum ResponseParser {
     /// Splits text into `## NAME` sections (case-insensitive, tolerant of
     /// "## 1. SUMMARY", "**SUMMARY**" headings and trailing colons).
     public static func sections(_ text: String) -> [String: String] {
+        let lines = text.components(separatedBy: "\n")
+        // A mixed-case bold line with text after it ("**Status:** memory is
+        // fine") is often prose inside MESSAGE: it counts as a heading only
+        // when the response has no proper heading of that name.
+        let proper = Set(lines.compactMap { l in header(l).flatMap { $0.weak ? nil : $0.name } })
         var out: [String: String] = [:]
         var current: String?
         var buf: [String] = []
@@ -48,8 +53,8 @@ public enum ResponseParser {
             if let c = current, out[c] == nil { out[c] = buf.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines) }
             buf = []
         }
-        for line in text.components(separatedBy: "\n") {
-            if let h = header(line) {
+        for line in lines {
+            if let h = header(line), !(h.weak && proper.contains(h.name)) {
                 flush()
                 current = h.name
                 if !h.rest.isEmpty { buf.append(h.rest) }
@@ -61,7 +66,7 @@ public enum ResponseParser {
         return out
     }
 
-    static func header(_ line: String) -> (name: String, rest: String)? {
+    static func header(_ line: String) -> (name: String, rest: String, weak: Bool)? {
         var l = line.trimmingCharacters(in: .whitespaces)
         let bold = !l.hasPrefix("#")
         guard l.hasPrefix("#") || l.hasPrefix("**") else { return nil }
@@ -69,12 +74,15 @@ public enum ResponseParser {
         if let r = l.range(of: "^[0-9]+[.)]\\s*", options: .regularExpression) { l.removeSubrange(r) }
         let upper = l.uppercased()
         for h in headers.sorted(by: { $0.count > $1.count }) where upper.hasPrefix(h) {
-            var rest = String(l.dropFirst(h.count))
-            rest = rest.trimmingCharacters(in: CharacterSet(charactersIn: "*:—–- ").union(.whitespaces))
+            let after = String(l.dropFirst(h.count))
+            // The name must end there: "### Status of disks" is text, not STATUS.
+            if let c = after.trimmingCharacters(in: .whitespaces).first, !":*—–-".contains(c) { return nil }
+            let rest = after.trimmingCharacters(in: CharacterSet(charactersIn: "*:—–- ").union(.whitespaces))
             // A bold line is a heading only when it's nothing but the name
             // ("**Summary of findings**" inside MESSAGE is text).
             if bold, !rest.isEmpty, !line.contains(":") { return nil }
-            return (h, rest)
+            let weak = bold && !rest.isEmpty && !l.hasPrefix(h)
+            return (h, rest, weak)
         }
         return nil
     }

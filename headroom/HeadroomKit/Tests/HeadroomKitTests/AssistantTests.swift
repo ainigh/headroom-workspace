@@ -60,6 +60,15 @@ final class ParserTests: XCTestCase {
         XCTAssertEqual(r.message, "Nothing to do.")
     }
 
+    func testProseInMessageIsNotAHeading() {
+        let text = "## SUMMARY\nFine.\n## MESSAGE\n**Status:** memory is fine\n### Status of disks\nAll healthy.\n## STATUS — WARNING — disk 91% full\n## ACTION REQUEST\nnone\n## ACTION EXPLANATION\nnone"
+        let s = ResponseParser.sections(text)
+        XCTAssertEqual(s["STATUS"], "WARNING — disk 91% full")
+        XCTAssertEqual(s["MESSAGE"], "**Status:** memory is fine\n### Status of disks\nAll healthy.")
+        // With no proper STATUS heading, the bold one still counts.
+        XCTAssertEqual(ResponseParser.sections("**Status:** OK — idle")["STATUS"], "OK — idle")
+    }
+
     func testBoldTextInsideMessageIsNotAHeading() {
         let text = exampleAnswer.replacingOccurrences(of: "Pressure is critical", with: "**Summary of findings**\nPressure is critical")
         let r = ResponseParser.parse(text, allowedActions: ["ai.ollama_unload"])
