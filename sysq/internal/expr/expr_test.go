@@ -227,6 +227,43 @@ func TestTableOps(t *testing.T) {
 	}
 }
 
+// Number literals follow the sugar lexer: exponents are accepted, duration
+// units are lower-case only (500M was 500 minutes), byte units are KB or kb
+// (not Kb), and B is bytes.
+func TestNumberLiterals(t *testing.T) {
+	for src, want := range map[string]Value{
+		"1e9":     {1e9, table.Float},
+		"1.5e3":   {1500.0, table.Float},
+		"2E-3":    {0.002, table.Float},
+		"1e3s":    {1000.0, table.Duration},
+		"1.5e3MB": {int64(1.5e9), table.Bytes},
+		"500m":    {30000.0, table.Duration},
+		"500MB":   {int64(500e6), table.Bytes},
+		"500mb":   {int64(500e6), table.Bytes},
+		"4GiB":    {int64(4 << 30), table.Bytes},
+		"512B":    {int64(512), table.Bytes},
+		"250ms":   {0.25, table.Duration},
+		"1_000":   {int64(1000), table.Int},
+	} {
+		n, err := Parse(src)
+		if err != nil {
+			t.Errorf("%s: %v", src, err)
+			continue
+		}
+		if v, err := Eval(n, env); err != nil || v != want {
+			t.Errorf("%s = %#v (%v), want %#v", src, v, err, want)
+		}
+	}
+	for _, src := range []string{"500M", "2H", "3D", "10S", "1Mb", "5Kb", "1e"} {
+		if _, err := Parse(src); err == nil {
+			t.Errorf("%s accepted", src)
+		}
+	}
+	if n, err := Parse("mem > 1e9"); err != nil || mustFilter(t, String(n), nil).Len() != 2 {
+		t.Errorf("mem > 1e9: %v", err)
+	}
+}
+
 // Percentiles are nearest-rank: the ceil(q·n)-th smallest value. floor(q·n)
 // was one rank high (p50 of 1..10 gave 6).
 func TestPercentileNearestRank(t *testing.T) {

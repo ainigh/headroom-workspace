@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"strings"
 	"unicode"
+
+	"github.com/ainigh/headroom-workspace/sysq/internal/expr"
 )
 
 type kind int
@@ -32,7 +34,9 @@ type token struct {
 	line  int
 }
 
-var unitSuffixes = []string{"KiB", "MiB", "GiB", "TiB", "kib", "mib", "gib", "tib", "KB", "MB", "GB", "TB", "kb", "mb", "gb", "tb", "ms", "s", "m", "h", "d", "w", "B"}
+// unitSuffixes is shared with the expression lexer so both read 500M, 1e9
+// and 2s the same way.
+var unitSuffixes = expr.UnitSuffixes
 
 // Starlark keywords (and reserved words) that can never end a value.
 var keywords = map[string]bool{

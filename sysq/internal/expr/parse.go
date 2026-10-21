@@ -92,10 +92,21 @@ type tok struct {
 	pos  int
 }
 
-var units = map[string]bool{
-	"ms": true, "s": true, "m": true, "h": true, "d": true, "w": true,
-	"b": true, "kb": true, "mb": true, "gb": true, "tb": true, "kib": true, "mib": true, "gib": true, "tib": true,
-}
+// UnitSuffixes are the unit suffixes a number literal may carry, matched
+// case-sensitively and longest first; the sugar lexer uses the same list.
+// Duration units are lower-case only, so 500M is an error rather than 500
+// minutes; byte units are upper- or lower-case (KB, kb), and B is bytes.
+var UnitSuffixes = []string{"KiB", "MiB", "GiB", "TiB", "kib", "mib", "gib", "tib", "KB", "MB", "GB", "TB", "kb", "mb", "gb", "tb", "ms", "s", "m", "h", "d", "w", "B"}
+
+var units = func() map[string]bool {
+	m := map[string]bool{}
+	for _, u := range UnitSuffixes {
+		m[u] = true
+	}
+	return m
+}()
+
+var durationUnits = map[string]bool{"ms": true, "s": true, "m": true, "h": true, "d": true, "w": true}
 
 func lex(src string) ([]tok, error) {
 	var out []tok
@@ -117,12 +128,18 @@ func lex(src string) ([]tok, error) {
 			for j < len(src) && (src[j] >= '0' && src[j] <= '9' || src[j] == '.' || src[j] == '_') {
 				j++
 			}
+			if j+1 < len(src) && (src[j] == 'e' || src[j] == 'E') && (src[j+1] >= '0' && src[j+1] <= '9' || src[j+1] == '-' || src[j+1] == '+') {
+				j += 2
+				for j < len(src) && src[j] >= '0' && src[j] <= '9' {
+					j++
+				}
+			}
 			k := j
 			for k < len(src) && unicode.IsLetter(rune(src[k])) {
 				k++
 			}
-			if k > j && !units[strings.ToLower(src[j:k])] {
-				return nil, fmt.Errorf("unknown unit %q at %d", src[j:k], j)
+			if k > j && !units[src[j:k]] {
+				return nil, fmt.Errorf("unknown unit %q at %d (use ms s m h d w, B KB MB GB TB, KiB MiB GiB TiB)", src[j:k], j)
 			}
 			out = append(out, tok{"num", src[i:k], i})
 			i = k
@@ -601,22 +618,31 @@ func numLit(text string) (Node, error) {
 	for j > 0 && unicode.IsLetter(rune(s[j-1])) {
 		j--
 	}
-	num, unit := s[:j], strings.ToLower(s[j:])
-	switch unit {
-	case "":
+	num, unit := s[:j], s[j:]
+	if unit != "" && !units[unit] {
+		return nil, fmt.Errorf("unknown unit %q in %s", unit, text)
+	}
+	if unit == "" {
 		if strings.ContainsAny(num, ".eE") {
 			f, err := strconv.ParseFloat(num, 64)
 			return Lit{Val: f, Type: "float", Text: text}, err
 		}
 		n, err := strconv.ParseInt(num, 10, 64)
 		return Lit{Val: n, Type: "int", Text: text}, err
-	case "ms", "s", "m", "h", "d", "w":
+	}
+	if strings.ContainsAny(num, "eE") {
+		f, err := strconv.ParseFloat(num, 64)
+		if err != nil || f < 0 {
+			return nil, fmt.Errorf("bad number %s", text)
+		}
+		num = strconv.FormatFloat(f, 'f', -1, 64)
+	}
+	if durationUnits[unit] {
 		sec, err := argv.ParseDuration(num + unit)
 		return Lit{Val: sec, Type: "duration", Text: text}, err
-	default:
-		n, err := argv.ParseBytes(num + unit)
-		return Lit{Val: n, Type: "bytes", Text: text}, err
 	}
+	n, err := argv.ParseBytes(num + unit)
+	return Lit{Val: n, Type: "bytes", Text: text}, err
 }
 
 // Idents returns the free identifiers an expression refers to (the roots of

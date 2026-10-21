@@ -507,7 +507,7 @@ The model receives four small tables and one sentence — not `ps`, `top`, `df`,
 | `a \| filter cpu > 30 \| limit 5` | `a.filter(expr("cpu > 30")).limit(5)` | readable pipelines |
 | `filter <pred>` / `select a, b as c, x*2 as y` / `sort by f desc` / `group by f { count() as n }` | `Expr` AST objects | pushdown into `find`, `log show --predicate`, `sqlite`, `mdfind`; static analysis for `explain` |
 | `filter(lambda r: ...)` | native | escape hatch; opaque, no pushdown |
-| `2s`, `30m`, `4h`, `1.5GB`, `512MB` | `Duration(2)`, `Bytes(...)` | typed literals |
+| `2s`, `30m`, `4h`, `1.5GB`, `512MB` | `Duration(2)`, `Bytes(...)` | typed literals; units are case-sensitive: durations `ms s m h d w` lower-case only (`500M` is an error, not minutes), bytes `B`, `KB`/`kb`, `KiB`/`kib` …; plain numbers may use exponents (`1e9`, `1.5e3MB`) |
 | `~/Downloads` (unquoted path literal starting with `~` or `/`) | `Path("~/Downloads")` | paths are first-class and validated |
 | `ago(2h)` | `now() - Duration(...)` | time filters |
 | `t.cpu` | `t.col("cpu")` → N×1 table | column extraction |
