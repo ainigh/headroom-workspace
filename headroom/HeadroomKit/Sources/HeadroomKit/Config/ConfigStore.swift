@@ -74,6 +74,8 @@ public struct ConfigLoader: Sendable {
             return nil
         } catch let e as YamlError {
             return ConfigProblem(file: "\(name).yaml", line: yamlLine(e), message: "\(e)")
+        } catch let p as ConfigProblem {
+            return p
         } catch {
             return ConfigProblem(file: "\(name).yaml", line: nil, message: error.localizedDescription)
         }
@@ -101,7 +103,15 @@ public struct ConfigLoader: Sendable {
         let data = try JSONEncoder().encode(v)
         let dec = JSONDecoder()
         switch name {
-        case "groups": return try dec.decode(GroupsFile.self, from: data)
+        case "groups":
+            let f = try dec.decode(GroupsFile.self, from: data)
+            // Duplicate ids would make every id-keyed lookup ambiguous: reject
+            // the file so the last good one stays.
+            var seen = Set<String>()
+            for g in f.groups where !seen.insert(g.id).inserted {
+                throw ConfigProblem(file: "\(name).yaml", line: nil, message: "duplicate group id \(g.id)")
+            }
+            return f
         case "layout": return try dec.decode(LayoutFile.self, from: data)
         case "thresholds":
             var out: [String: Threshold] = [:]
@@ -133,6 +143,8 @@ public struct ConfigLoader: Sendable {
             return (try decodeFile(name, value), nil)
         } catch let e as YamlError {
             return (nil, ConfigProblem(file: "\(name).yaml", line: yamlLine(e), message: "\(e)"))
+        } catch let p as ConfigProblem {
+            return (nil, p)
         } catch {
             return (nil, ConfigProblem(file: "\(name).yaml", line: nil, message: "\(error)"))
         }
