@@ -190,7 +190,13 @@ final class WindowManager: NSObject, NSWindowDelegate {
     /// The Actions panel for an item (inspector in the large view).
     func inspect(_ item: ItemRef) {
         ui.inspecting = item
-        if windows["large"]?.isVisible != true { showLarge(drillIn: item.groupID) }
+        if let w = windows["large"], w.isVisible {
+            // Already open (maybe behind another app's window): bring it forward, keep its drill-in.
+            w.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+        } else {
+            showLarge(drillIn: item.groupID)
+        }
     }
 
     // MARK: confirmation
