@@ -88,3 +88,4 @@ One line per choice the docs left open. Format: `YYYY-MM-DD — area — decisio
 2026-10-21 — sysq/argv — Excluded paths (policy.yaml) match case-insensitively at parameter validation, like sysact's protected paths; allowed roots stay exact (a different case only refuses more).
 2026-10-21 — sysq/parsers — pmset "Thermal/Performance warning level set to 0" is the normal level (not a warning); only a non-zero recorded level raises the thermal state.
 2026-10-21 — sysq/recipes — net.headline (the Network group figure and attention.network input) excludes lo0; net.throughput still lists every interface.
+2026-10-21 — headroom/services — LaunchAgent plists carry the bundled binary's mtime (as an XML comment), so an in-place app update rewrites the plist and restarts sysqd/sysact onto the new binaries.

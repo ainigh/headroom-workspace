@@ -42,11 +42,20 @@ public struct LaunchAgentLauncher: ServiceLauncher {
         self.runner = runner
     }
 
+    /// The executable's modification time. An update replaces the binary at
+    /// the same path; with this in the plist the plist changes too, so the
+    /// running service is restarted onto the new binary.
+    func stamp(_ s: ServiceSpec) -> String {
+        guard let d = (try? FileManager.default.attributesOfItem(atPath: s.executable))?[.modificationDate] as? Date else { return "" }
+        return String(Int64(d.timeIntervalSince1970))
+    }
+
     func plist(_ s: ServiceSpec) -> String {
         let args = ([s.executable] + s.arguments).map { "    <string>\(xml($0))</string>" }.joined(separator: "\n")
         return """
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <!-- Written by Headroom; binary modified \(stamp(s)) -->
         <plist version="1.0">
         <dict>
           <key>Label</key><string>\(xml(s.label))</string>

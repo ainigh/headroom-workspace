@@ -111,6 +111,24 @@ final class LaunchAgentTests: XCTestCase {
         try await l.ensure(spec)
         XCTAssertEqual(rec.calls, ["print", "kickstart"])
     }
+
+    /// An app update replaces the binary at the same path: the running
+    /// service must be restarted onto it, not left on the old build.
+    func testEnsureRestartsWhenTheBinaryChanges() async throws {
+        let home = tempDir()
+        let exe = home.appendingPathComponent("svc")
+        try Data("v1".utf8).write(to: exe)
+        try FileManager.default.setAttributes([.modificationDate: Date(timeIntervalSince1970: 1_800_000_000)], ofItemAtPath: exe.path)
+        let rec = Recorder()
+        let l = LaunchAgentLauncher(home: home, runner: { args in rec.add(args); return "" })
+        let spec = ServiceSpec(label: "com.example.svc", executable: exe.path, arguments: [], logPath: home.path + "/logs/svc.log")
+        try await l.ensure(spec)
+        rec.calls = []
+        try Data("v2".utf8).write(to: exe)
+        try FileManager.default.setAttributes([.modificationDate: Date(timeIntervalSince1970: 1_800_086_400)], ofItemAtPath: exe.path)
+        try await l.ensure(spec)
+        XCTAssertEqual(rec.calls, ["bootout", "bootstrap"])
+    }
 }
 
 final class HistoryStoreTests: XCTestCase {
