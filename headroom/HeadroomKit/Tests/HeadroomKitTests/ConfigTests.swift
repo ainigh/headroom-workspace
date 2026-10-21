@@ -124,6 +124,11 @@ final class ConfigTests: XCTestCase {
         XCTAssertEqual(Units.parse("90s"), 90)
         XCTAssertEqual(Units.bytes(18_200_000_000), "18.2 GB")
         XCTAssertEqual(Units.bytes(995_000_000_000), "995 GB")
+        // Rounding happens before the unit is picked (as sysq's HumanBytes).
+        XCTAssertEqual(Units.bytes(999_950), "1.0 MB")
+        XCTAssertEqual(Units.bytes(999_600_000_000), "1.0 TB")
+        XCTAssertEqual(Units.bytes(99_960), "100 KB")
+        XCTAssertEqual(Units.bytes(-999_950), "-1.0 MB")
         XCTAssertEqual(Units.duration(7800), "2 h 10 min")
     }
 }
