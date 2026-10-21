@@ -214,11 +214,18 @@ struct SysqTableView: View {
     var shown: SysqTable {
         var t = table
         if let c = sortColumn { t = t.sorted(by: c, descending: descending) }
-        let f = filter.trimmingCharacters(in: .whitespaces).lowercased()
+        // The filter field is only shown above 8 rows; a filter typed before the
+        // table shrank must not keep hiding rows with no field to clear it.
+        let f = table.count > 8 ? filter.trimmingCharacters(in: .whitespaces).lowercased() : ""
         if !f.isEmpty {
             t.rows = (0..<t.count).filter { i in t.schema.contains { t.text(i, $0.name).lowercased().contains(f) } }.map { t.rows[$0] }
         }
         return t
+    }
+
+    func rowCount(shown n: Int) -> String {
+        let total = table.count == 1 ? "1 row" : "\(table.count) rows"
+        return n == table.count ? total : "\(n) of \(total)"
     }
 
     var body: some View {
@@ -271,7 +278,7 @@ struct SysqTableView: View {
                 }
                 .frame(maxHeight: maxHeight)
                 HStack(spacing: 8) {
-                    Text("\(table.count) rows").foregroundStyle(.secondary)
+                    Text(rowCount(shown: t.count)).foregroundStyle(.secondary)
                     if table.meta?.truncated == true { Text("truncated").foregroundStyle(.orange) }
                     if let u = table.meta?.unavailable, !u.isEmpty { Text(u).foregroundStyle(.secondary).lineLimit(1) }
                 }

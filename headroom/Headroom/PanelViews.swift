@@ -505,12 +505,16 @@ struct DrillInView: View {
             }
             .padding(18)
         }
-        .task(id: range) { await loadHistory() }
+        // Keyed on the group too: picking another group in the sidebar reuses
+        // this view, and its history must not stay on screen under the new name.
+        .task(id: "\(vm.id) \(range)") { await loadHistory() }
     }
 
     func loadHistory() async {
+        points = []
         guard let g = model.config.group(vm.id) else { return }
         await model.drillHistory.load([g], range: range)
+        guard !Task.isCancelled else { return }
         points = model.drillHistory.series[vm.id]?.points.map(\.1) ?? []
     }
 
