@@ -25,7 +25,11 @@ public enum Units {
         var f = abs(n)
         let units = ["B", "KB", "MB", "GB", "TB", "PB"]
         var i = 0
-        while f >= 1000, i < units.count - 1 { f /= 1000; i += 1 }
+        // Pick the unit from the value as it will be shown, so 999,950 B
+        // reads "1.0 MB", never "1000 KB" (as sysq's HumanBytes).
+        func shown(_ v: Double, _ unit: Int) -> Double { unit == 0 || v >= 100 ? v.rounded() : (v * 10).rounded() / 10 }
+        while shown(f, i) >= 1000, i < units.count - 1 { f /= 1000; i += 1 }
+        if i > 0, f < 100, shown(f, i) >= 100 { f = shown(f, i) }
         let sign = n < 0 ? "-" : ""
         if i == 0 { return "\(sign)\(Int(f)) B" }
         return f >= 100 ? "\(sign)\(Int(f.rounded())) \(units[i])" : "\(sign)\(String(format: "%.1f", f)) \(units[i])"

@@ -95,13 +95,20 @@ public final class GroupStore {
         feeds = [:]
         sparkTasks.values.forEach { $0.cancel() }
         sparkTasks = [:]
+        // The sparkline tasks reload history and prepend it to the live
+        // points; points kept from before would repeat that history.
+        sparklines = [:]
         reconcile()
     }
 
     public func update(config: AppConfig) {
         let old = self.config
         self.config = config
-        if old.groups.groups != config.groups.groups { sparkTasks.values.forEach { $0.cancel() }; sparkTasks = [:] }
+        if old.groups.groups != config.groups.groups {
+            sparkTasks.values.forEach { $0.cancel() }
+            sparkTasks = [:]
+            sparklines = [:]
+        }
         reconcile()
     }
 

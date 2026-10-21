@@ -408,6 +408,26 @@ func (e *Engine) sudoAllowed(ctx context.Context, p *catalog.Primitive) bool {
 	return ok
 }
 
+// SudoRules gives, for each sudo primitive, the exact command line its
+// NOPASSWD sudoers rule must allow (what Headroom shows the user to add).
+func (e *Engine) SudoRules() map[string]string {
+	out := map[string]string{}
+	for _, p := range e.Catalog.All() {
+		if p.RequiresSudo != nil {
+			out[p.Name] = strings.Join(append([]string{p.RequiresSudo.Binary}, p.RequiresSudo.Args...), " ")
+		}
+	}
+	return out
+}
+
+// RecheckSudo forgets the cached `sudo -n -l` answers, so a rule added
+// since sysqd started is noticed without restarting it.
+func (e *Engine) RecheckSudo() {
+	e.mu.Lock()
+	e.sudoOK = nil
+	e.mu.Unlock()
+}
+
 // SudoStatus reports, for each sudo primitive, whether its rule exists.
 func (e *Engine) SudoStatus(ctx context.Context) map[string]bool {
 	out := map[string]bool{}

@@ -563,9 +563,12 @@ func (r RootPolicy) CheckPath(p string) (string, error) {
 	if resolved, err := filepath.EvalSymlinks(clean); err == nil {
 		clean = resolved
 	}
+	// Excludes compare case-folded: macOS volumes are case-insensitive by
+	// default, so ~/.SSH is ~/.ssh.
+	folded := strings.ToLower(clean)
 	for _, ex := range r.Excluded {
 		ex = filepath.Clean(ExpandHome(ex, r.Home))
-		if within(clean, ex) || within(clean, resolve(ex)) {
+		if within(folded, strings.ToLower(ex)) || within(folded, strings.ToLower(resolve(ex))) {
 			return "", fmt.Errorf("%s is excluded", p)
 		}
 	}

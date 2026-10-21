@@ -337,8 +337,7 @@ struct UpdateButton: View {
                 } label: {
                     Label(u.release.map { "Update to \($0.tag)" } ?? "Update (build here)", systemImage: "arrow.down.circle.fill")
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.small)
+                .buttonStyle(PillButton(tint: Palette.blue, filled: true))
                 .help(u.commit.title)
             case .installing(let step):
                 ProgressView().controlSize(.small)

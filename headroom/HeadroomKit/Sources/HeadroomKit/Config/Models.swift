@@ -271,8 +271,9 @@ public struct AppConfig: Sendable {
 
     /// Groups in the configured order, hidden ones last.
     public var orderedGroups: [GroupConfig] {
-        let order = layout.group_order ?? []
-        let byID = Dictionary(uniqueKeysWithValues: groups.groups.map { ($0.id, $0) })
+        var seen = Set<String>()
+        let order = (layout.group_order ?? []).filter { seen.insert($0).inserted }
+        let byID = Dictionary(groups.groups.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         var out = order.compactMap { byID[$0] }
         out += groups.groups.filter { !order.contains($0.id) }
         return out

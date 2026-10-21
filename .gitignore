@@ -7,3 +7,4 @@ build/
 /sysact/bin/
 *.test
 .testhome-*
+.claude/worktrees/

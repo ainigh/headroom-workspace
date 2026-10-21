@@ -51,6 +51,8 @@ public struct APISettings: Codable, Sendable, Equatable {
 
 public protocol SysqAdminProtocol: Sendable {
     func status() async throws -> JSONValue
+    /// The status after sysqd forgets its cached sudo checks (a rule was just added).
+    func status(recheck: Bool) async throws -> JSONValue
     func clients() async throws -> [APIClientInfo]
     func pending() async throws -> [PendingPairing]
     func approve(id: String, code: String, privacy: String, allowScripts: Bool, origins: [String]) async throws
@@ -61,6 +63,10 @@ public protocol SysqAdminProtocol: Sendable {
     func setState(viewOpen: Bool, onBattery: Bool?) async throws
     func putSchedules(_ yaml: String) async throws
     func reload() async throws
+}
+
+extension SysqAdminProtocol {
+    public func status(recheck: Bool) async throws -> JSONValue { try await status() }
 }
 
 public final class SysqAdminClient: SysqAdminProtocol, @unchecked Sendable {
@@ -83,8 +89,10 @@ public final class SysqAdminClient: SysqAdminProtocol, @unchecked Sendable {
 
     func json<T: Encodable>(_ v: T) throws -> Data { try JSONEncoder().encode(v) }
 
-    public func status() async throws -> JSONValue {
-        try JSONDecoder().decode(JSONValue.self, from: await send("GET", "/admin/status"))
+    public func status() async throws -> JSONValue { try await status(recheck: false) }
+
+    public func status(recheck: Bool) async throws -> JSONValue {
+        try JSONDecoder().decode(JSONValue.self, from: await send("GET", recheck ? "/admin/status?recheck=1" : "/admin/status"))
     }
 
     public func clients() async throws -> [APIClientInfo] {

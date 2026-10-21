@@ -233,3 +233,23 @@ func mustJSON(v any) string {
 	b, _ := json.Marshal(v)
 	return string(b)
 }
+
+// The admin status names each sudo primitive's exact command, so the host
+// app can show the sudoers line to add; recheck=1 is accepted.
+func TestAdminStatusSudoRules(t *testing.T) {
+	e := start(t)
+	out := e.adminDo("GET", "/admin/status?recheck=1", nil)
+	rules, ok := out["sudo_rules"].(map[string]any)
+	if !ok || len(rules) == 0 {
+		t.Fatalf("no sudo_rules: %v", out["sudo_rules"])
+	}
+	sudo, _ := out["sudo"].(map[string]any)
+	for name, cmd := range rules {
+		if _, ok := sudo[name]; !ok {
+			t.Errorf("%s has a rule but no status", name)
+		}
+		if !strings.HasPrefix(cmd.(string), "/") {
+			t.Errorf("%s: rule %q isn't an absolute command", name, cmd)
+		}
+	}
+}

@@ -144,11 +144,13 @@ struct GroupBoxView: View {
         }
         .padding(compact ? 10 : 12)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(vm.status.isAlert ? vm.status.color.opacity(contrast == .increased ? 0.3 : 0.1) : Color.secondary.opacity(0.08))
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(vm.status.isAlert ? vm.status.color.opacity(contrast == .increased ? 0.3 : 0.1) : Color.primary.opacity(hover ? 0.08 : 0.05))
         )
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.secondary.opacity(hover ? 0.35 : 0.15), lineWidth: 1))
-        .contentShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous)
+            .strokeBorder((vm.status.isAlert ? vm.status.color : Color.primary).opacity(hover ? 0.35 : 0.1), lineWidth: 1))
+        .contentShape(RoundedRectangle(cornerRadius: 14))
+        .animation(.easeOut(duration: 0.12), value: hover)
         .onHover { hover = $0 }
         .onTapGesture(perform: onOpen)
         .accessibilityElement(children: .combine)
@@ -349,5 +351,148 @@ struct RecipeResultView: View {
                 Text(e).font(.system(size: 11)).foregroundStyle(.red)
             }
         }
+    }
+}
+
+// MARK: - Panel styling (the same look as the other menu bar apps in this family)
+
+enum Palette {
+    static let indigo = Color(red: 0.36, green: 0.36, blue: 0.84)
+    static let violet = Color(red: 0.58, green: 0.36, blue: 0.86)
+    static let pink = Color(red: 0.93, green: 0.33, blue: 0.55)
+    static let orange = Color(red: 0.98, green: 0.58, blue: 0.24)
+    static let teal = Color(red: 0.18, green: 0.70, blue: 0.72)
+    static let blue = Color(red: 0.23, green: 0.52, blue: 0.95)
+    static let green = Color(red: 0.20, green: 0.72, blue: 0.42)
+    static let red = Color(red: 0.90, green: 0.30, blue: 0.26)
+}
+
+/// A small caps heading for a panel section.
+struct SectionTitle: View {
+    var text: String
+    init(_ text: String) { self.text = text }
+
+    var body: some View {
+        Text(text.uppercased()).font(.system(size: 10, weight: .semibold)).foregroundStyle(.secondary).kerning(0.6)
+    }
+}
+
+/// A small rounded selectable button.
+struct Chip: ButtonStyle {
+    var selected: Bool
+    var tint: Color = Palette.indigo
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 11, weight: selected ? .semibold : .regular))
+            .lineLimit(1)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 4)
+            .foregroundStyle(selected ? Color.white : Color.primary)
+            .background(Capsule().fill(selected ? tint : Color.primary.opacity(configuration.isPressed ? 0.14 : 0.07)))
+            .contentShape(Capsule())
+    }
+}
+
+/// A capsule button, filled or outlined.
+struct PillButton: ButtonStyle {
+    var tint: Color
+    var filled: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 12, weight: .semibold))
+            .lineLimit(1)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 5)
+            .foregroundStyle(filled ? Color.white : Color.primary)
+            .background(Capsule().fill(filled ? tint : Color.primary.opacity(0.07)))
+            .contentShape(Capsule())
+            .opacity(configuration.isPressed ? 0.7 : 1)
+    }
+}
+
+/// A round icon-only button for panel headers.
+struct IconButton: ButtonStyle {
+    var active = false
+    var tint: Color = Palette.indigo
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 12, weight: .semibold))
+            .frame(width: 26, height: 26)
+            .foregroundStyle(active ? Color.white : Color.primary)
+            .background(Circle().fill(active ? tint : Color.primary.opacity(configuration.isPressed ? 0.14 : 0.07)))
+            .contentShape(Circle())
+    }
+}
+
+/// The app's mark: a gradient tile with a symbol.
+struct AppMark: View {
+    var symbol = "gauge.with.dots.needle.33percent"
+    var colors: [Color] = [Palette.teal, Palette.blue]
+    var size: CGFloat = 32
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: size * 0.28, style: .continuous)
+                .fill(LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing))
+            Image(systemName: symbol).font(.system(size: size * 0.47, weight: .semibold)).foregroundStyle(.white)
+        }
+        .frame(width: size, height: size)
+    }
+}
+
+/// A colored button for one of the app's windows.
+@MainActor
+struct ToolTile: View {
+    var title: String
+    var symbol: String
+    var colors: [Color]
+    var enabled = true
+    var action: () -> Void
+    @State private var hover = false
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 6) {
+                Image(systemName: symbol)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 32, height: 32)
+                    .background(LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing),
+                                in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                Text(title).font(.system(size: 11, weight: .medium)).lineLimit(1).minimumScaleFactor(0.8)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 9)
+            .background(RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.primary.opacity(hover && enabled ? 0.09 : 0.05)))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(colors[0].opacity(hover && enabled ? 0.5 : 0.12), lineWidth: 1))
+            .contentShape(RoundedRectangle(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+        .disabled(!enabled)
+        .opacity(enabled ? 1 : 0.45)
+        .onHover { hover = $0 }
+        .animation(.easeOut(duration: 0.12), value: hover)
+    }
+}
+
+/// A line saying something's wrong or happening, in a soft colored box.
+struct Notice: View {
+    var text: String
+    var tint: Color = .orange
+    var symbol = "exclamationmark.triangle.fill"
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Image(systemName: symbol).foregroundStyle(tint)
+            Text(text).font(.system(size: 12)).textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+        .padding(10)
+        .background(tint.opacity(0.1), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 }

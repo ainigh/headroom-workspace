@@ -28,7 +28,7 @@ Four processes, three repos (`sysq`, `sysact`, `headroom`). `sysq` and `sysact` 
 | Script runtime | `go.starlark.net` | sysq §17; deterministic, no I/O, step limits |
 | Subprocess sandbox | `sandbox-exec` with per-primitive `.sb` profiles; fallback: dedicated unprivileged macOS user | sysq §6.1, §23.3 |
 | History store | SQLite (WAL) | sysq §25 |
-| Headroom UI | Swift + SwiftUI, `MenuBarExtra` + `NSPanel` for the floating panel | native menu bar, low idle cost |
+| Headroom UI | Swift + SwiftUI, an `NSStatusItem` + `NSPanel` for the drop-down panel (was `MenuBarExtra`, which can't tell left from right clicks; see DECISIONS.md) | native menu bar, low idle cost |
 | Headroom ↔ sysqd transport | sysq HTTP on loopback (and optionally unix socket) | one surface for UI, API clients, assistant |
 | Headroom ↔ sysact transport | unix socket, JSON | not network-reachable |
 | Assistant backend | Ollama `/api/chat` with tools; text-loop fallback | headroom-spec §8.6 |
