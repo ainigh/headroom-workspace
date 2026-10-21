@@ -28,3 +28,10 @@
   - Settings tabs edit the YAML files (validated before save, "Edit file…", live external edits), pairing approve/revoke, launch at login, Update button; notifications with cooldown/quiet hours (tested)
   - Performance design: sampling slows with no view open / on battery (reported to sysqd), hidden groups at hidden rates, detail feeds only while a view is open, shared feeds, sysqd as a low-priority background LaunchAgent
   - Measure on the Mac: `headroom/scripts/perf-check.sh 120` with no Headroom window open
+
+# After M9: UI pass and bug hunt (2026-10-21)
+
+- [x] Panel drops down from an NSStatusItem (left click panel, right click menu), laid out like super-mac-tts-stt-service: status header, mode chips, key groups, window tiles, consumers, setup line, bottom bar (version/Update, Open at login, Quit)
+- [x] Settings → Permissions (notifications, powermetrics sudoers line from sysqd `sudo_rules`, optional FDA / Finder automation / network primitives / login item); `SetupStore` tested
+- [x] Hidden main menu so ⌘C/⌘V/⌘W/⌘Q work in windows; notifications shown while a window is frontmost
+- [ ] On the Mac: build (`HL_FROM_SOURCE=1 ./install.sh`) and check the panel, right-click menu, Permissions tab and Update
