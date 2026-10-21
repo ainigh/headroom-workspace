@@ -90,11 +90,29 @@ func TestDesign14(t *testing.T) {
 func TestPushdown(t *testing.T) {
 	res := run(t, `log.system(since: 1h) | filter process == "kernel" and message contains "pressure" | limit 10`)
 	m := res.Items[0].Table.Meta
-	if len(m.Pushdown) != 2 || !strings.Contains(m.Pushdown[0], `process == "kernel"`) {
+	// The predicate is pushed; the limit is not, because the residual filter
+	// still runs after the primitive.
+	if len(m.Pushdown) != 1 || !strings.Contains(m.Pushdown[0], `process == "kernel"`) {
 		t.Fatalf("pushdown: %v", m.Pushdown)
 	}
 	if res.Items[0].Table.Len() != 1 {
 		t.Fatalf("residual filter not applied: %d", res.Items[0].Table.Len())
+	}
+	// With nothing left to run afterwards the limit is pushed.
+	res = run(t, `fs.large(path: "~") | limit 2`)
+	if m := res.Items[0].Table.Meta; len(m.Pushdown) != 1 || m.Pushdown[0] != "limit: 2" || res.Items[0].Table.Len() != 2 {
+		t.Fatalf("limit pushdown: %v, %d rows", m.Pushdown, res.Items[0].Table.Len())
+	}
+}
+
+// A limit pushed into the primitive ahead of a residual filter cut rows the
+// filter would have kept: the .dmg is the third-largest file, so pushing
+// limit 2 returned nothing.
+func TestLimitNotPushedPastResidualFilter(t *testing.T) {
+	all := run(t, `fs.large(path: "~") | filter size > 1GB and name endswith ".dmg"`)
+	lim := run(t, `fs.large(path: "~") | filter size > 1GB and name endswith ".dmg" | limit 2`)
+	if all.Items[0].Table.Len() != 1 || lim.Items[0].Table.Len() != 1 {
+		t.Fatalf("rows without limit %d, with limit 2 %d; want 1 and 1", all.Items[0].Table.Len(), lim.Items[0].Table.Len())
 	}
 }
 

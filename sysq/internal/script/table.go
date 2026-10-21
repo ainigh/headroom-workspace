@@ -727,7 +727,9 @@ func boundValue(n expr.Node, bd catalog.BoundPushdown, b map[string]any) (any, b
 
 func (t *Table) pushLimit(n int) (*Table, bool) {
 	param := t.src.prim.Pushdown.Limit
-	if param == "" || n < 1 {
+	// A residual step (a pushed filter re-run in full) can drop rows after
+	// the primitive returns, so a limit applied inside it would undercount.
+	if param == "" || n < 1 || len(t.post) > 0 {
 		return nil, false
 	}
 	spec := t.src.prim.Params[param]
