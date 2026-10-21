@@ -129,8 +129,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(MenuAction.item("Overview") { windows.showLarge() })
         menu.addItem(MenuAction.item("Graphs") { windows.showGraphs() })
         if model.explorer.available { menu.addItem(MenuAction.item("Storage Explorer") { windows.showExplorer() }) }
-        let ask = MenuAction.item("Ask AI") { windows.showAssistant(scope: .keyGroups) }
-        ask.isEnabled = model.assistant.available
+        // Disabled while the assistant is unavailable: with a target and an action
+        // NSMenu would auto-enable it, so this one is validated by hand.
+        let ask = MenuAction.item("Ask AI", enabled: { model.assistant.available }) { windows.showAssistant(scope: .keyGroups) }
         menu.addItem(ask)
         menu.addItem(MenuAction.item("Summary History") { windows.showSummaries() })
         menu.addItem(.separator())
@@ -210,13 +211,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
 /// Menu items that run a closure.
 @MainActor
-final class MenuAction: NSObject {
+final class MenuAction: NSObject, NSMenuItemValidation {
     private let run: () -> Void
+    private let enabled: () -> Bool
 
-    private init(_ run: @escaping () -> Void) { self.run = run }
+    private init(_ run: @escaping () -> Void, enabled: @escaping () -> Bool) {
+        self.run = run
+        self.enabled = enabled
+    }
 
-    static func item(_ title: String, key: String = "", _ run: @escaping () -> Void) -> NSMenuItem {
-        let target = MenuAction(run)
+    static func item(_ title: String, key: String = "", enabled: @escaping () -> Bool = { true }, _ run: @escaping () -> Void) -> NSMenuItem {
+        let target = MenuAction(run, enabled: enabled)
         let i = NSMenuItem(title: title, action: #selector(MenuAction.fire), keyEquivalent: key)
         i.target = target
         i.representedObject = target        // target is weak; the item keeps it alive
@@ -224,6 +229,8 @@ final class MenuAction: NSObject {
     }
 
     @objc private func fire() { run() }
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool { enabled() }
 }
 
 /// The main menu isn't shown (no Dock icon), but it gives the windows their
