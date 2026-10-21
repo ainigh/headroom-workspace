@@ -79,6 +79,8 @@ struct AssistantView: View {
     }
 
     func send() {
+        // Return in the field submits too; never start a second turn over a running one.
+        guard !model.assistant.running, model.assistant.available else { return }
         let q = question
         question = ""
         model.assistant.ask(q, mode: model.mode, scope: ui.assistantScope, keyIDs: model.keyIDs)
@@ -102,7 +104,7 @@ struct TurnView: View {
                                 HStack {
                                     Text(q.call).font(.system(size: 11, design: .monospaced)).lineLimit(2).textSelection(.enabled)
                                     Spacer()
-                                    Text(q.error == nil ? "\(q.rows) rows" : "error").font(.system(size: 10)).foregroundStyle(.secondary)
+                                    Text(q.error == nil ? (q.rows == 1 ? "1 row" : "\(q.rows) rows") : "error").font(.system(size: 10)).foregroundStyle(.secondary)
                                 }
                                 if let e = q.error { Text(e).font(.system(size: 11)).foregroundStyle(.red) }
                                 ForEach(Array(q.items.prefix(2).enumerated()), id: \.offset) { _, it in
@@ -228,6 +230,7 @@ struct SummaryHistoryView: View {
     @State private var selection: Set<String> = []
     @State private var before = Date().addingTimeInterval(-30 * 86400)
     @State private var confirmAll = false
+    @State private var confirmBefore = false
 
     var body: some View {
         let all = model.assistant.summaryList.sorted { $0.at > $1.at }
@@ -244,10 +247,17 @@ struct SummaryHistoryView: View {
                 }
                 .frame(width: 160)
                 Spacer()
-                Button("Delete selected") { model.assistant.deleteSummaries(selection); selection = [] }.disabled(selection.isEmpty)
+                // Only what's still shown: a search can hide rows that stay selected.
+                let picked = selection.intersection(shown.map(\.id))
+                Button(picked.count > 1 ? "Delete \(picked.count) selected" : "Delete selected") {
+                    model.assistant.deleteSummaries(picked)
+                    selection = []
+                }
+                .disabled(picked.isEmpty)
                 DatePicker("Before", selection: $before, displayedComponents: .date).labelsHidden().frame(width: 120)
-                Button("Delete before") { model.assistant.deleteSummaries(before: before) }
-                Button("Delete all", role: .destructive) { confirmAll = true }
+                Button("Delete before") { confirmBefore = true }
+                    .disabled(!all.contains { $0.at < before })
+                Button("Delete all", role: .destructive) { confirmAll = true }.disabled(all.isEmpty)
             }
             .padding(10)
             List(shown, selection: $selection) { s in
@@ -265,8 +275,20 @@ struct SummaryHistoryView: View {
                     }
                 }
                 .tag(s.id)
-                .contextMenu { Button("Delete") { model.assistant.deleteSummaries([s.id]) } }
+                .contextMenu {
+                    Button("Copy summary") { Finder.copy(s.summary) }
+                    Button("Delete") { model.assistant.deleteSummaries([s.id]) }
+                }
             }
+            .overlay {
+                if shown.isEmpty {
+                    Text(all.isEmpty ? "No summaries yet. Answers from the assistant are kept here." : "No summaries match.")
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .confirmationDialog("Delete the summaries from before \(before.formatted(date: .abbreviated, time: .omitted))?", isPresented: $confirmBefore) {
+            Button("Delete", role: .destructive) { model.assistant.deleteSummaries(before: before) }
         }
         .confirmationDialog("Delete every summary? The assistant forgets all earlier answers.", isPresented: $confirmAll) {
             Button("Delete all", role: .destructive) { model.assistant.deleteAllSummaries() }
