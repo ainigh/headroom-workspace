@@ -50,6 +50,12 @@ struct GraphsView: View {
                         .pickerStyle(.segmented).labelsHidden().frame(width: 240)
                 }
                 if let e = model.history.error { Text(e).foregroundStyle(.secondary) }
+                if groups.isEmpty {
+                    Text("Pick one or more groups on the left to graph their history.")
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 40)
+                }
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         if overlay {
@@ -85,6 +91,9 @@ struct GraphsView: View {
         .task(id: "\(range)|\(ui.graphsSelection.sorted().joined(separator: ","))") {
             await model.history.load(groups, range: range)
         }
+        // A selection from the previous range would sit outside the new axis.
+        .onChange(of: range) { _, _ in selected = nil }
+        .onAppear { if !ranges.contains(range), let r = ranges.first { range = r } }
     }
 
     func points(_ g: GroupConfig, normalized: Bool) -> [ChartPoint] {
@@ -210,7 +219,11 @@ struct ExplorerWindow: View {
                         if let p = item.path {
                             Button("Reveal") { Finder.reveal(p) }.buttonStyle(.borderless)
                             Button("Trash…") {
-                                Task { _ = await model.actions.run("fs.trash", params: ["path": .string(p)], requestedBy: .user) }
+                                Task {
+                                    // A trashed item must leave the list (it stayed until the next manual refresh).
+                                    let r = await model.actions.run("fs.trash", params: ["path": .string(p)], requestedBy: .user)
+                                    if r.ok { ex.refresh() }
+                                }
                             }
                             .buttonStyle(.bordered).tint(.red).controlSize(.small)
                             .disabled(model.actions.action("fs.trash") == nil)

@@ -508,6 +508,10 @@ struct DrillInView: View {
         // Keyed on the group too: picking another group in the sidebar reuses
         // this view, and its history must not stay on screen under the new name.
         .task(id: "\(vm.id) \(range)") { await loadHistory() }
+        .onAppear {
+            let ranges = model.config.retention.graph_ranges ?? []
+            if !ranges.isEmpty, !ranges.contains(range) { range = ranges[0] }
+        }
     }
 
     func loadHistory() async {
