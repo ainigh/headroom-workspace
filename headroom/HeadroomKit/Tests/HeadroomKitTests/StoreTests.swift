@@ -254,4 +254,25 @@ final class ExplorerTests: XCTestCase {
         XCTAssertEqual(items.first?.name, "big.dmg")
         XCTAssertEqual(items.first?.size, 4e9)
     }
+
+    /// Switching to a view groups.yaml doesn't configure while a scan runs:
+    /// the cancelled scan never clears `scanning`, so the spinner stuck.
+    @MainActor
+    func testUnconfiguredViewStopsTheSpinnerAndClearsTheOldListing() async {
+        var ec = loadShipped().groups.explorer!
+        ec.files = nil
+        let s = FakeSysq()
+        s.set("disk.hogs", table([("path", "path"), ("size", "bytes")], [["/Users/me/Library", 9e9]]))
+        let ex = ExplorerStore()
+        ex.attach(s, config: ec)
+        ex.refresh()
+        XCTAssertTrue(ex.scanning)
+        ex.view = .files
+        ex.refresh()
+        XCTAssertNotNil(ex.error)
+        XCTAssertFalse(ex.scanning)
+        try? await Task.sleep(nanoseconds: 50_000_000)
+        XCTAssertFalse(ex.scanning)
+        XCTAssertTrue(ex.items.isEmpty)
+    }
 }

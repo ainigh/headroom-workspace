@@ -79,7 +79,15 @@ public final class ExplorerStore {
     /// Rescans with the current root, view and filters (cancels a running scan).
     public func refresh() {
         scan?.cancel()
-        guard let client, let b = binding(view) else { error = "This view isn't configured in groups.yaml."; return }
+        guard let client, let b = binding(view) else {
+            // The cancelled scan never clears `scanning`; nor may the other
+            // view's rows stay up under this view's name.
+            scanning = false
+            listing = nil
+            items = []
+            error = "This view isn't configured in groups.yaml."
+            return
+        }
         let params = b.params(root: root, minBytes: minBytes, ageSeconds: ageDays * 86400)
         scanning = true
         error = nil
