@@ -170,10 +170,10 @@ func parseCrashReports(in Input) ([]Row, error) {
 // log.file: numbered lines.
 func parseTextLines(in Input) ([]Row, error) {
 	var rows []Row
-	for i, l := range strings.Split(strings.TrimRight(in.Main(), "\n"), "\n") {
-		if i == 0 && l == "" {
-			break
-		}
+	if in.Main() == "" {
+		return rows, nil
+	}
+	for i, l := range strings.Split(strings.TrimSuffix(in.Main(), "\n"), "\n") {
 		rows = append(rows, Row{"line": int64(i + 1), "text": l})
 	}
 	return rows, nil
