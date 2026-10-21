@@ -36,6 +36,7 @@ public final class HeadroomModel {
     public let recipes: RecipeStore
     public let history: HistoryStore
     public let pairing: PairingStore
+    public let setup: SetupStore
     public let explorer: ExplorerStore
     public let assistant: AssistantStore
     @ObservationIgnored public let notifications: NotificationStore
@@ -57,6 +58,7 @@ public final class HeadroomModel {
         recipes = RecipeStore()
         history = HistoryStore()
         pairing = PairingStore(admin: services.admin)
+        setup = SetupStore(admin: services.admin)
         explorer = ExplorerStore()
         notifications = NotificationStore(notifier: notifier)
         assistant = AssistantStore(summaries: summaries, log: log)
@@ -80,6 +82,7 @@ public final class HeadroomModel {
             await services.connect(config)
             attachClients()
             await actions.loadCatalog()
+            await setup.refresh()
         }
         ticker?.cancel()
         ticker = Task { [weak self] in
@@ -157,6 +160,7 @@ public final class HeadroomModel {
             await services.connect(config)
             attachClients()
             await actions.loadCatalog()
+            await setup.refresh()
         }
     }
 
