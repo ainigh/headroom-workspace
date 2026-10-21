@@ -35,3 +35,10 @@
 - [x] Settings → Permissions (notifications, powermetrics sudoers line from sysqd `sudo_rules`, optional FDA / Finder automation / network primitives / login item); `SetupStore` tested
 - [x] Hidden main menu so ⌘C/⌘V/⌘W/⌘Q work in windows; notifications shown while a window is frontmost
 - [ ] On the Mac: build (`HL_FROM_SOURCE=1 ./install.sh`) and check the panel, right-click menu, Permissions tab and Update
+
+# Second bug hunt and micro UI pass (2026-10-21)
+
+- [x] sysq: partial_ok timeouts keep rows; limit not pushed past a residual filter; out-of-range bounds not pushed; "consumers" privacy recurses into nested tables; expr arity checks (no panics), ts vs duration = now − d, nearest-rank percentiles, exponents and case-sensitive duration units; log.file leading blank line; HumanDuration rounding
+- [x] HeadroomKit: Stop/reset cancel the Ollama request and don't restore the cleared conversation; "another sheet open" isn't a decline; response parser ignores "**Status:**" prose in MESSAGE; exact numbers in schedules.yaml; "+" encoded in query params; no SIGPIPE on unix sockets; block-style lists in layout.yaml editable; Units.percent/number round before formatting
+- [x] App: drill-in history follows the group; safe-tier actions under SAFE; Explain doesn't spin forever; Ask AI greyed in the menu when unavailable; settings editor shows unsaved state; Summary History deletes only shown selections and confirms "Delete before"; Storage Explorer drops trashed items; empty states and "1 row" wording
+- [ ] On the Mac: build the app target (these view changes were not compiled here; HeadroomKit tests pass on Linux with Swift 6.1)
